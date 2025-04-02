@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DATA ACCESS LAYER\REPOSITORIES\SETUP_REPOSITORY\Exemption\**" />
+    <EmbeddedResource Remove="DATA ACCESS LAYER\REPOSITORIES\SETUP_REPOSITORY\Exemption\**" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\SETUP_REPOSITORY\Exemption\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="CORE\INTERFACES\BORROWED_INTERFACE\IBorrowedItem.cs~RF1c1a56f.TMP" />
+    <None Remove="DATA ACCESS LAYER\DTOs\BORROWED_DTO\DtoGetForBorrowedPrint.cs~RF595264.TMP" />
+    <None Remove="DATA ACCESS LAYER\MODELS\BORROWED_MODEL\BorrowedIssue.cs~RF4fdbf8.TMP" />
+    <None Remove="DATA ACCESS LAYER\MODELS\BORROWED_MODEL\ReturnedBorrowed.cs~RF2dd12f.TMP" />
+    <None Remove="DATA ACCESS LAYER\MODELS\ORDERING_MODEL\MoveOrder.cs~RFc78d92.TMP" />
+    <None Remove="DATA ACCESS LAYER\MODELS\ORDERING_MODEL\Ordering.cs~RF45e8aa.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\0c0e30pq.23p~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\aaz3watb.zmc~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\BorrowedRepository.cs~RF235f4c.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\BorrowedRepository.cs~RF54e064.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\BorrowedRepository.cs~RF8816fd.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\cx42blks.ofr~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\gmzrfch1.1tf~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\iwffkyel.vzn~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\jc1pltxp.ygv~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\BORROWED_REPOSITORY\uzibyjn0.vdb~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\IMPORT_REPOSITORY\PoSummaryRepository.cs~RFb3a532.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\MiscellaneousRepository.cs~RF419399.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\INVENTORY_REPOSITORY\MRPInvetoryRepository.cs~RF990c7b.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\d2mrx2zd.x3r~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\mqnhpeko.g55~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\OrderingRepository.cs~RF1ab855f.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\OrderingRepository.cs~RF1c150e7.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\OrderingRepository.cs~RF216c8f7.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\uslek04i.uoq~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\ORDERS_REPOSITORY\vqhsdroh.lls~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\REPORTS_REPOSITORY\ReportsRepository.cs~RF156e0ac.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\SETUP_REPOSITORY\LotRepository.cs~RF142abe1.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\USER_REPOSITORY\ModuleRepository.cs~RF9aa27c.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\USER_REPOSITORY\nxma5tku.yti~" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\WAREHOUSE_REPOSITORY\WarehouseRepository.cs~RF13b1ba9.TMP" />
+    <None Remove="DATA ACCESS LAYER\REPOSITORIES\WAREHOUSE_REPOSITORY\WarehouseRepository.cs~RF3f8327.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
+    <PackageReference Include="MediatR" Version="12.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.31" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DATA ACCESS LAYER\NewFolder\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,41 @@
+version: '3.4'
+
+networks:
+  rdf.etd.api:
+
+services:
+  rdf.etd.api:
+    image: rdf.etd.api
+    build:
+      context: .
+      dockerfile: ELIXIRETD.API/Dockerfile
+    ports:
+    - "5000:5000"
+    - "5001:5001"
+    depends_on: 
+      - etd.database
+    networks: 
+      - rdf.etd.api
+    environment:
+      - ConnectionStrings__data source=10.10.2.31,1433\\SQLEXPRESS; Initial Catalog=ETD_Development; User ID=sa; Password=El!xirServ3r2o22;MultipleActiveResultSets=true
+
+ 
+  etd.database: 
+     image: mcr.microsoft.com/mssql/server:2022-latest
+     container_name: etd.database
+     environment:
+         - ACCEPT_EULA=Y
+         - MSSQL_SA_PASSWORD=El!xirServ3r2o22 
+         - DB_NAME=ETD_Development
+         - DB_SA_PASSWORD=El!xirServ3r2o22 
+     networks:
+       - rdf.etd.api
+     volumes:
+      - ./data:/var/opt/mssql/data
+      - ./log:/var/opt/mssql/log
+      - ./secrets:/var/opt/mssql/secrets
+      - etd-volume:/var/lib/mysql
+     ports:
+        - "5070:1433"
+volumes:
+  etd-volume:

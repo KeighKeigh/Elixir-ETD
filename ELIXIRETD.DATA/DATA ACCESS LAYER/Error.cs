@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER
+{
+    public record Error(string Code, string Message)
+    {
+        public static readonly Error None = new(string.Empty, string.Empty);
+
+        public static readonly Error NullValue = new("Error.NullValue", "The specified result value is null.");
+
+        public static readonly Error ConditionNotMet = new("Error.ConditionNotMet", "The specified condition was not met.");
+
+        public static implicit operator Result(Error error) => Result.Failure(error);
+        public Result ToResult() => Result.Failure(this);
+    }
+}
