@@ -971,7 +971,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
         public async Task<PagedList<DtoInventoryMovement>> InventoryMovementReports(UserParams userParams, string DateFrom, string PlusOne, string Search)
         {
-            var DateToday = DateTime.Today;
+            var DateToday = DateTime.Today.AddDays(1);//dito
 
             var getWarehouseStock = _context.WarehouseReceived
                 .AsNoTracking()
@@ -990,7 +990,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
                 .Where(x => x.IsPrepared == true)
-                .Where(x => x.PreparedDate.Value >= DateTime.Parse(DateFrom) && x.PreparedDate.Value <= DateTime.Parse(PlusOne))
+                .Where(x => x.PreparedDate.Value >= DateTime.Parse(DateFrom) && x.PreparedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
                .GroupBy(x => new
                {
 
@@ -1026,7 +1026,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var getIssueOutByDate = _context.MiscellaneousIssueDetail
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(PlusOne))
+                .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1059,7 +1059,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var getBorrowedOutByDate = _context.BorrowedIssueDetails
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.BorrowedDate >= DateTime.Parse(DateFrom) && x.BorrowedDate <= DateTime.Parse(PlusOne))
+                .Where(x => x.BorrowedDate >= DateTime.Parse(DateFrom) && x.BorrowedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1115,7 +1115,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
                 .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
                 .Where(x => x.returned.IsApprovedReturnedDate.Value >= DateTime.Parse(DateFrom)
-                 && x.returned.IsApprovedReturnedDate.Value <= DateTime.Parse(PlusOne))
+                 && x.returned.IsApprovedReturnedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
                     x.returned.ItemCode,
@@ -1153,7 +1153,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var fuelRegisterByDate = _context.FuelRegisterDetails
                 .AsNoTracking()
                 .Where(fr => fr.Is_Active == true)
-                .Where(x => x.Created_At.Date >= DateTime.Parse(DateFrom).Date && x.Created_At.Date <= DateTime.Parse(PlusOne).Date)
+                .Where(x => x.Created_At.Date >= DateTime.Parse(DateFrom).Date && x.Created_At.Date <= DateTime.Parse(PlusOne).Date.AddDays(1))
                 .GroupBy(fr => new
                 {
                     fr.Material.ItemCode,
@@ -1187,7 +1187,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
                 .Where(x => x.TransactionType == "Receiving")
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne))
+                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1221,7 +1221,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
                 .Where(x => x.TransactionType == "MiscellaneousReceipt")
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne))
+                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
 
@@ -1403,7 +1403,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var wareHouseUnitCost = _context.WarehouseReceived
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne))
+                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .Select(x => new
                 {
                     x.Id,
@@ -1416,7 +1416,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                  .Where(x => x.IsActive == true)
                  .Where(x => x.IsPrepared == true)
-                 .Where(x => x.PreparedDate.Value >= DateTime.Parse(DateFrom) && x.PreparedDate.Value <= DateTime.Parse(PlusOne))
+                 .Where(x => x.PreparedDate.Value >= DateTime.Parse(DateFrom) && x.PreparedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
                  .GroupBy(x => new { x.WarehouseId, x.ItemCode, })
                  .Select(x => new
                  {
@@ -1430,7 +1430,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var issueUnitCost = _context.MiscellaneousIssueDetail
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(PlusOne))
+                .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
                     x.WarehouseId,
@@ -1448,7 +1448,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var borrowedUnitCost = _context.BorrowedIssueDetails
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                 .Where(x => x.BorrowedDate >= DateTime.Parse(DateFrom) && x.BorrowedDate <= DateTime.Parse(PlusOne))
+                 .Where(x => x.BorrowedDate >= DateTime.Parse(DateFrom) && x.BorrowedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
                  .GroupBy(x => new
                  {
                      x.WarehouseId,
@@ -1473,7 +1473,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
                 .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
                 .Where(x => x.returned.IsApprovedReturnedDate.Value >= DateTime.Parse(DateFrom)
-                        && x.returned.IsApprovedReturnedDate.Value <= DateTime.Parse(PlusOne))
+                        && x.returned.IsApprovedReturnedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
                 .GroupBy(x => new
                 {
                     x.returned.WarehouseId,
@@ -1493,7 +1493,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
              .Include(m => m.Material)
              .AsSplitQuery()
              .Where(fr => fr.Is_Active == true)
-             .Where(x => x.Created_At.Date >= DateTime.Parse(DateFrom).AddDays(1).Date && x.Created_At.Date <= DateTime.Parse(PlusOne).Date)
+             .Where(x => x.Created_At.Date >= DateTime.Parse(DateFrom).AddDays(1).Date && x.Created_At.Date <= DateTime.Parse(PlusOne).Date.AddDays(1).AddDays(1))//dito
             .GroupBy(fr => new
             {
                 fr.Material.ItemCode,

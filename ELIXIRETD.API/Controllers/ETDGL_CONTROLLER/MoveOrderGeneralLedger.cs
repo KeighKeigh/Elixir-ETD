@@ -95,7 +95,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             public string FinancialStatement { get; set; }
             public string UnitResponsible { get; set; }
             public string Batch { get; set; }
-            public string Remarks { get; set; }
+            public string LineDescription { get; set; }
             public string PayrollPeriod { get; set; }
             public string Position { get; set; }
             public string PayrollType { get; set; }
@@ -116,6 +116,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             public string BankName { get; set; }
             public string ChequeNumber { get; set; }
             public string ChequeVoucherNumber { get; set; }
+            public string ChequeDate { get; set; }
+            public string ReleasedDate { get; set; }
             public string BOA2 { get; set; }
             public string System { get; set; }
             public string Books { get; set; }
@@ -128,7 +130,9 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             {
                 _context = context;
             }
-
+           // Type desc
+          
+          
             public async Task<Result<List<ETDGLResult>>> Handle(ETDGLQuery request, CancellationToken cancellationToken)
             {
                 if (string.IsNullOrWhiteSpace(request.adjustment_month))
@@ -194,79 +198,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
 
                 var result = transactonList.SelectMany(x => new List<ETDGLResult>
                 {
-                    //credit
-                    new ETDGLResult
-                    {
-                        SyncId = "ETD-" + (x.SyncId.ToString() ?? string.Empty) + "-C",
-                        Mark1 = string.Empty,
-                        Mark2 = string.Empty,
-                        AssetCIP = string.Empty,
-                        AccountingTag = string.Empty,
-                        TransactionDate = x.TransactionDate.HasValue ? x.TransactionDate.Value.ToString("yyyy-MM-dd") : string.Empty,
-                        ClientSupplier = x.ClientSupplier ?? string.Empty,
-                        AccountTitleCode = x.AccountCode ?? string.Empty,
-                        AccountTitle = x.AccountTitle ?? string.Empty,
-                        CompanyCode = "0001",
-                        Company = "RDFFLFI",
-                        DivisionCode = x.DivisionCode ?? string.Empty,
-                        Division = x.Division ?? string.Empty,
-                        DepartmentCode = x.DepartmentCode ?? string.Empty,
-                        Department = x.Department ?? string.Empty,
-                        UnitCode = string.Empty,
-                        Unit = string.Empty,
-                        SubUnitCode = string.Empty,
-                        SubUnit = string.Empty,
-                        LocationCode = x.LocationCode ?? string.Empty,
-                        Location = x.Location ?? string.Empty,
-                        PONumber = x.PONumber ?? string.Empty,
-                        RRNumber = x.RRNumber ?? string.Empty,
-                        ReferenceNo = string.Empty,
-                        ItemCode = x.ItemCode ?? string.Empty,
-                        ItemDescription = x.Description ?? string.Empty,
-                        Quantity = -(x?.Quantity) ?? 0,
-                        UOM = x.UOM ?? string.Empty,
-                        UnitPrice = x?.UnitPrice ?? 0,
-                        LineAmount = -(x.UnitPrice * x.Quantity),
-                        VoucherJournal = string.Empty,
-                        AccountType = string.Empty,
-                        DRCR = "Credit",
-                        AssetCode = string.Empty,
-                        Asset= string.Empty,
-                        ServiceProviderCode = string.Empty,
-                        ServiceProvider = string.Empty,
-                        BOA = "Journal",
-                        Allocation = string.Empty,
-                        AccountGroup = string.Empty,
-                        AccountSubGroup = string.Empty,
-                        FinancialStatement = string.Empty,
-                        UnitResponsible = string.Empty,
-                        Batch = string.Empty,
-                        Remarks = string.Empty,
-                        PayrollPeriod = string.Empty,
-                        Position = string.Empty,
-                        PayrollType = string.Empty,
-                        PayrollType2 = string.Empty,
-                        DepreciationDescription = string.Empty,
-                        RemainingDepreciationValue = string.Empty,
-                        UsefulLife = string.Empty,
-                        Month = x?.TransactionDate?.ToString("MMM") ?? string.Empty,
-                        Year = x?.TransactionDate?.ToString("yyyy") ?? string.Empty,
-                        Particulars = string.Empty,
-                        Month2 = string.Empty,
-                        FarmType = string.Empty,
-                        JeanRemarks = string.Empty,
-                        From = string.Empty,
-                        ChangeTo = string.Empty,
-                        Reason = string.Empty,
-                        CheckingRemarks = string.Empty,
-                        BankName = string.Empty,
-                        ChequeNumber = string.Empty,
-                        ChequeVoucherNumber = string.Empty,
-                        BOA2 = "Journal",
-                        System = "ElixirETD",
-                        Books = "Journal",
-                    },
-
+                    
                     //debit
                     new ETDGLResult
                     {
@@ -307,14 +239,14 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         Asset= string.Empty,
                         ServiceProviderCode = string.Empty,
                         ServiceProvider = string.Empty,
-                        BOA = "Journal",
+                        BOA = "Inventoriables",
                         Allocation = string.Empty,
                         AccountGroup = string.Empty,
                         AccountSubGroup = string.Empty,
                         FinancialStatement = string.Empty,
                         UnitResponsible = string.Empty,
                         Batch = string.Empty,
-                        Remarks = string.Empty,
+                        LineDescription = string.Empty,
                         PayrollPeriod = string.Empty,
                         Position = string.Empty,
                         PayrollType = string.Empty,
@@ -335,9 +267,85 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         BankName = string.Empty,
                         ChequeNumber = string.Empty,
                         ChequeVoucherNumber = string.Empty,
-                        BOA2 = "Journal",
-                        System = "ElixirETD",
-                        Books = "Journal",
+                        ReleasedDate = string.Empty,
+                        ChequeDate = string.Empty,
+                        BOA2 = "Inventoriables",
+                        System = "Elixir - ETD",
+                        Books = "Journal Book",
+                    },
+                    //credit
+                    new ETDGLResult
+                    {
+                        SyncId = "ETD-" + (x.SyncId.ToString() ?? string.Empty) + "-C",
+                        Mark1 = string.Empty,
+                        Mark2 = string.Empty,
+                        AssetCIP = string.Empty,
+                        AccountingTag = string.Empty,
+                        TransactionDate = x.TransactionDate.HasValue ? x.TransactionDate.Value.ToString("yyyy-MM-dd") : string.Empty,
+                        ClientSupplier  = x.ClientSupplier ?? string.Empty,
+                        AccountTitleCode = "115998",
+                        AccountTitle = "Materials & Supplies Inventory",
+                        CompanyCode = "0001",
+                        Company = "RDFFLFI",
+                        DivisionCode = x.DivisionCode ?? string.Empty,
+                        Division = x.Division ?? string.Empty,
+                        DepartmentCode = x.DepartmentCode ?? string.Empty,
+                        Department = x.Department ?? string.Empty,
+                        UnitCode = string.Empty,
+                        Unit = string.Empty,
+                        SubUnitCode = string.Empty,
+                        SubUnit = string.Empty,
+                        LocationCode = x.LocationCode ?? string.Empty,
+                        Location = x.Location ?? string.Empty,
+                        PONumber = x.PONumber ?? string.Empty,
+                        RRNumber = x.RRNumber ?? string.Empty,
+                        ReferenceNo = string.Empty,
+                        ItemCode = x.ItemCode ?? string.Empty,
+                        ItemDescription = x.Description ?? string.Empty,
+                        Quantity = -(x?.Quantity) ?? 0,
+                        UOM = x.UOM ?? string.Empty,
+                        UnitPrice = x?.UnitPrice ?? 0,
+                        LineAmount = -(x.UnitPrice * x.Quantity),
+                        VoucherJournal = string.Empty,
+                        AccountType = string.Empty,
+                        DRCR = "Credit",
+                        AssetCode = string.Empty,
+                        Asset= string.Empty,
+                        ServiceProviderCode = string.Empty,
+                        ServiceProvider = string.Empty,
+                        BOA = "Inventoriables",
+                        Allocation = string.Empty,
+                        AccountGroup = string.Empty,
+                        AccountSubGroup = string.Empty,
+                        FinancialStatement = string.Empty,
+                        UnitResponsible = string.Empty,
+                        Batch = string.Empty,
+                        LineDescription = string.Empty,
+                        PayrollPeriod = string.Empty,
+                        Position = string.Empty,
+                        PayrollType = string.Empty,
+                        PayrollType2 = string.Empty,
+                        DepreciationDescription = string.Empty,
+                        RemainingDepreciationValue = string.Empty,
+                        UsefulLife = string.Empty,
+                        Month = x?.TransactionDate?.ToString("MMM") ?? string.Empty,
+                        Year = x?.TransactionDate?.ToString("yyyy") ?? string.Empty,
+                        Particulars = string.Empty,
+                        Month2 = string.Empty,
+                        FarmType = string.Empty,
+                        JeanRemarks = string.Empty,
+                        From = string.Empty,
+                        ChangeTo = string.Empty,
+                        Reason = string.Empty,
+                        CheckingRemarks = string.Empty,
+                        BankName = string.Empty,
+                        ChequeNumber = string.Empty,
+                        ChequeVoucherNumber = string.Empty,
+                        ReleasedDate = string.Empty,
+                        ChequeDate = string.Empty,
+                        BOA2 = "Inventoriables",
+                        System = "Elixir - ETD",
+                        Books = "Journal Book",
                     }
                 }).ToList();
 
