@@ -517,8 +517,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         AccountingTag = string.Empty,
                         TransactionDate = x.TransactionDate,
                         ClientSupplier = x.ClientSupplier ?? string.Empty,
-                        AccountTitleCode = "115998",
-                        AccountTitle = "Materials & Supplies Inventory",
+                        AccountTitleCode = x.AccountTitleCode,
+                        AccountTitle = x.AccountTitle,
                         CompanyCode = "0001",
                         Company = "RDFFLFI",
                         DivisionCode = x.DivisionCode ?? string.Empty,
@@ -584,7 +584,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     //credit
                     new ETDGLResult
                     {
-                        SyncId = "ETD-" + (x.SyncId.ToString() ?? string.Empty) + "-D",
+                        SyncId = "ETD-" + (x.SyncId.ToString() ?? string.Empty) + "-C",
                         Mark1 = string.Empty,
                         Mark2 = string.Empty,
                         AssetCIP = x.AssetCIP ?? string.Empty,
@@ -592,7 +592,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         TransactionDate = x.TransactionDate,
                         ClientSupplier = x.ClientSupplier ?? string.Empty,
                         AccountTitleCode = "115998",
-                        AccountTitle = "Accrued Materials and Supplies Payable",
+                        AccountTitle = "Materials & Supplies Inventory",
                         CompanyCode = "0001",
                         Company = "RDFFLFI",
                         DivisionCode = x.DivisionCode ?? string.Empty,
@@ -695,6 +695,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   ServiceProviderCode = u.EmpId,
                                   ReferenceNo = (m.Id.ToString() ?? "") + (m.EmpId ?? ""),
                                   LineDescription = m.ItemRemarks
+                                  
+
                               });
 
                 return await result.ToListAsync();
