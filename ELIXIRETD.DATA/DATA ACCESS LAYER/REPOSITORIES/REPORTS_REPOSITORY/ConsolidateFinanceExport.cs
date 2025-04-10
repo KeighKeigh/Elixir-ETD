@@ -15,6 +15,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             public string DateFrom { get; set; }
 
             public string Search { get; set; }
+            public bool gl { get; set; }
+            public string adjustment_month { get; set; }
+            
         }
 
         public class Handler : IRequestHandler<ConsolidateFinanceExportCommand, Unit>
@@ -29,7 +32,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             public async Task<Unit> Handle(ConsolidateFinanceExportCommand command, CancellationToken cancellationToken)
             {
 
-                var consolidate = await _report.Reports.ConsolidateFinanceReport(command.DateFrom, command.DateTo, command.Search);
+                var consolidate = await _report.Reports.ConsolidateFinanceReport(command.DateFrom, command.DateTo, command.Search, command.gl, command.adjustment_month);
 
 
                 using (var workbook = new XLWorkbook())
@@ -38,9 +41,34 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
                     var headers = new List<string>
                     {
-                        "Id","Transaction Date","Item Code","Item Description","Uom","Category","Quantity","Unit Cost","Line Amount",
-                        "Source","Transaction Type","Reason","Reference","Supplier Name","Encoded By","Company Code","Company Name","Department Code","Department Name",
-                        "Location Code","Location Name","Account Title Code","Account Title","EmpId","FullName","Asset Tag","Cip #", "Helpdesk","Rush"
+                        "Id",
+                        "Transaction Date",
+                        "Item Code",
+                        "Item Description",
+                        "Uom","Category",
+                        "Quantity",
+                        "Unit Cost",
+                        "Line Amount",
+                        "Source",
+                        "Transaction Type",
+                        "Reason",
+                        "Reference",
+                        "Supplier Name",
+                        "Encoded By",
+                        "Company Code",
+                        "Company Name",
+                        "Department Code",
+                        "Department Name",
+                        "Location Code",
+                        "Location Name",
+                        "Account Title Code",
+                        "Account Title",
+                        "EmpId",
+                        "FullName",
+                        "Asset Tag",
+                        "Cip #", 
+                        "Helpdesk",
+                        "Rush"
 
                     };
 

@@ -44,6 +44,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string EmpId { get; set; }
         public string Fullname { get; set; }
 
+        public string ServiceProviderCode { get; set; }
+        public string ServiceProvider { get; set; }
+
 
         public string AssetTag { get; set; }
         public string CIPNo { get; set; }

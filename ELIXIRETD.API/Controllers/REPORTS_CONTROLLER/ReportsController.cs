@@ -12,7 +12,7 @@ using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY.Co
 using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY.ConsolidateFinanceExport;
 using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY.GeneralLedgerExport;
 using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY.MoveOrderReportExport;
-using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY.ConsolidateGLFinanceExport;
+
 
 
 namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
@@ -295,9 +295,9 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
 
         [HttpGet]
         [Route("ConsolidationFinanceReports")]
-        public async Task<IActionResult> ConsolidationFinanceReports([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
+        public async Task<IActionResult> ConsolidationFinanceReports([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search, bool gl, string adjustment_month)
         {
-            var reports = await _unitofwork.Reports.ConsolidateFinanceReport(DateFrom,DateTo,Search);
+            var reports = await _unitofwork.Reports.ConsolidateFinanceReport(DateFrom,DateTo,Search,gl,adjustment_month);
 
             return Ok(reports);
         }
@@ -330,32 +330,32 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
 
         }
 
-        [HttpGet("ExportGLConsolidateFinance")]
-        public async Task<IActionResult> ExportGLConsolidateFinance([FromQuery] ConsolidateGLFinanceExportCommand command)
-        {
-            var filePath = $"ConsolidatedReports {command.DateFrom} - {command.DateTo}.xlsx";
+        //[HttpGet("ExportGLConsolidateFinance")]
+        //public async Task<IActionResult> ExportGLConsolidateFinance([FromQuery] ConsolidateGLFinanceExportCommand command)
+        //{
+        //    var filePath = $"ConsolidatedReports {command.DateFrom} - {command.DateTo}.xlsx";
 
-            try
-            {
-                await _mediator.Send(command);
-                var memory = new MemoryStream();
-                await using (var stream = new FileStream(filePath, FileMode.Open))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                memory.Position = 0;
-                var result = File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    filePath);
-                System.IO.File.Delete(filePath);
-                return result;
+        //    try
+        //    {
+        //        await _mediator.Send(command);
+        //        var memory = new MemoryStream();
+        //        await using (var stream = new FileStream(filePath, FileMode.Open))
+        //        {
+        //            await stream.CopyToAsync(memory);
+        //        }
+        //        memory.Position = 0;
+        //        var result = File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //            filePath);
+        //        System.IO.File.Delete(filePath);
+        //        return result;
 
-            }
-            catch (Exception e)
-            {
-                return Conflict(e.Message);
-            }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Conflict(e.Message);
+        //    }
 
-        }
+        //}
 
         [HttpGet]
         [Route("ConsolidateAuditReport")]

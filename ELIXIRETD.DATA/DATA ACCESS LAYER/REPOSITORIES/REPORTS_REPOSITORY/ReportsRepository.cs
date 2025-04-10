@@ -12,6 +12,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIRETD.DATA.Migrations;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 {
@@ -1741,126 +1742,137 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
         }
 
-        public async Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateGLFinanceReport(string DateFrom, string DateTo, string Search)
+        //public async Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateGLFinanceReport(string DateFrom, string DateTo, string Search)
+        //{
+        //    var dateStart = DateTime.Parse(DateFrom).Date;
+        //    var dateEnd = DateTime.Parse(DateTo).Date;
+        //    var moveOrderConsol = from moveOrder in _context.MoveOrders
+        //                          join transact in _context.TransactOrder
+        //                          on moveOrder.OrderNo equals transact.OrderNo
+
+        //                          join warehouse in _context.WarehouseReceived
+        //                          on moveOrder.WarehouseId equals warehouse.Id
+        //                          where transact.PreparedDate >= dateStart && transact.PreparedDate <= dateEnd && transact.IsTransact == true
+        //                          select new
+        //                          {
+        //                              Id = moveOrder.Id,
+        //                              TransactionDate = transact.PreparedDate.Value,
+        //                              ItemCode = moveOrder.ItemCode,
+        //                              ItemDescription = moveOrder.ItemDescription,
+        //                              Uom = moveOrder.Uom,
+        //                              Category = moveOrder.Category,
+        //                              Quantity = Math.Round(moveOrder.QuantityOrdered, 2),
+        //                              UnitCost = moveOrder.UnitPrice,
+        //                              LineAmount = Math.Round(moveOrder.UnitPrice * moveOrder.QuantityOrdered, 2),
+        //                              Source = Convert.ToString(transact.OrderNo),
+        //                              TransactionType = "Move Order",
+        //                              Reason = "",
+        //                              Reference = moveOrder.ItemRemarks,
+        //                              SupplierName = "",
+        //                              EncodedBy = transact.PreparedBy,
+        //                              CompanyCode = moveOrder.CompanyCode,
+        //                              CompanyName = moveOrder.CompanyName,
+        //                              DepartmentCode = moveOrder.DepartmentCode,
+        //                              DepartmentName = moveOrder.DepartmentName,
+        //                              LocationCode = moveOrder.LocationCode,
+        //                              LocationName = moveOrder.LocationName,
+        //                              AccountTitleCode = moveOrder.AccountCode,
+        //                              AccountTitle = moveOrder.AccountTitles,
+        //                              EmpId = moveOrder.EmpId,
+        //                              Fullname = moveOrder.FullName,
+        //                              AssetTag = moveOrder.AssetTag,
+        //                              CIPNo = moveOrder.Cip_No,
+        //                              Helpdesk = moveOrder.HelpdeskNo,
+        //                              Rush = moveOrder.Rush
+        //                          };
+
+        //    var moveOrderTransacted = await moveOrderConsol.ToListAsync();
+
+
+        //    if (!string.IsNullOrEmpty(DateFrom) && !string.IsNullOrEmpty(DateTo))
+        //    {
+        //        var dateFrom = DateTime.Parse(DateFrom).Date;
+        //        var dateTo = DateTime.Parse(DateTo).Date;
+
+
+        //        moveOrderConsol = moveOrderConsol
+        //            .Where(x => x.TransactionDate.Date >= dateFrom && x.TransactionDate.Date <= dateTo)
+        //            ;
+
+        //    }
+
+        //    var result = moveOrderTransacted.SelectMany(x => new List<ConsolidateFinanceReportDto>
+        //    {
+
+        //            new ConsolidateFinanceReportDto
+        //            {
+
+        //             Id = x.Id,
+        //             TransactionDate = x.TransactionDate,
+        //             ItemCode = x.ItemCode,
+        //             ItemDescription = x.ItemDescription,
+        //             Uom = x.Uom,
+        //             Category = x.Category,
+        //             Quantity = x.Quantity,
+        //             UnitCost = x.UnitCost,
+        //             LineAmount = x.LineAmount,
+        //             Source = x.Source,
+        //              TransactionType = x.TransactionType,
+        //             Reason = x.Reason,
+        //             Reference = x.Reference,
+        //             SupplierName = x.SupplierName,
+        //             EncodedBy = x.EncodedBy,
+        //             CompanyCode = x.CompanyCode,
+        //             CompanyName = x.CompanyName,
+        //             DepartmentCode = x.DepartmentCode,
+        //             DepartmentName = x.DepartmentName,
+        //             LocationCode = x.LocationCode,
+        //             LocationName = x.LocationName,
+        //             AccountTitleCode = x.AccountTitleCode,
+        //             AccountTitle = x.AccountTitle,
+        //             EmpId = x.EmpId,
+        //             Fullname = x.Fullname,
+        //             AssetTag = x.AssetTag,
+        //             CIPNo = x.CIPNo,
+        //             Helpdesk = x.Helpdesk,
+        //             Rush = x.Rush
+
+        //            }
+        //     });
+
+
+
+
+        //    if (!string.IsNullOrEmpty(Search))
+        //    {
+        //        result = result.Where(x => x.ItemCode.ToLower().Contains(Search.ToLower())
+        //        || x.ItemDescription.ToLower().Contains(Search.ToLower())
+        //        || x.Source.ToString().Contains(Search)
+        //        || x.TransactionType.ToLower().Contains(Search.ToLower()))
+        //              ;
+        //    }
+
+        //    result = result
+        //        .OrderBy(x => x.TransactionDate.Date)
+        //        .ThenBy(x => x.ItemCode);
+
+
+        //    return result.ToList();
+        //}
+
+        public async Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateFinanceReport(string DateFrom, string DateTo, string Search, bool gl, string adjustment_Month)
         {
-            var dateStart = DateTime.Parse(DateFrom).Date;
-            var dateEnd = DateTime.Parse(DateTo).Date;
-            var moveOrderConsol = from moveOrder in _context.MoveOrders
-                                  join transact in _context.TransactOrder
-                                  on moveOrder.OrderNo equals transact.OrderNo
 
-                                  join warehouse in _context.WarehouseReceived
-                                  on moveOrder.WarehouseId equals warehouse.Id
-                                  where transact.PreparedDate >= dateStart && transact.PreparedDate <= dateEnd && transact.IsTransact == true
-                                  select new
-                                  {
-                                      Id = moveOrder.Id,
-                                      TransactionDate = transact.PreparedDate.Value,
-                                      ItemCode = moveOrder.ItemCode,
-                                      ItemDescription = moveOrder.ItemDescription,
-                                      Uom = moveOrder.Uom,
-                                      Category = moveOrder.Category,
-                                      Quantity = Math.Round(moveOrder.QuantityOrdered, 2),
-                                      UnitCost = moveOrder.UnitPrice,
-                                      LineAmount = Math.Round(moveOrder.UnitPrice * moveOrder.QuantityOrdered, 2),
-                                      Source = Convert.ToString(transact.OrderNo),
-                                      TransactionType = "Move Order",
-                                      Reason = "",
-                                      Reference = moveOrder.ItemRemarks,
-                                      SupplierName = "",
-                                      EncodedBy = transact.PreparedBy,
-                                      CompanyCode = moveOrder.CompanyCode,
-                                      CompanyName = moveOrder.CompanyName,
-                                      DepartmentCode = moveOrder.DepartmentCode,
-                                      DepartmentName = moveOrder.DepartmentName,
-                                      LocationCode = moveOrder.LocationCode,
-                                      LocationName = moveOrder.LocationName,
-                                      AccountTitleCode = moveOrder.AccountCode,
-                                      AccountTitle = moveOrder.AccountTitles,
-                                      EmpId = moveOrder.EmpId,
-                                      Fullname = moveOrder.FullName,
-                                      AssetTag = moveOrder.AssetTag,
-                                      CIPNo = moveOrder.Cip_No,
-                                      Helpdesk = moveOrder.HelpdeskNo,
-                                      Rush = moveOrder.Rush
-                                  };
-
-            var moveOrderTransacted = await moveOrderConsol.ToListAsync();
-
-
-            if (!string.IsNullOrEmpty(DateFrom) && !string.IsNullOrEmpty(DateTo))
+            if (!DateTime.TryParseExact(adjustment_Month, "yyyy-MM",
+                                            CultureInfo.InvariantCulture, DateTimeStyles.None,
+                                            out DateTime adjustmentMonth))
             {
-                var dateFrom = DateTime.Parse(DateFrom).Date;
-                var dateTo = DateTime.Parse(DateTo).Date;
-
-
-                moveOrderConsol = moveOrderConsol
-                    .Where(x => x.TransactionDate.Date >= dateFrom && x.TransactionDate.Date <= dateTo)
-                    ;
-
+                throw new ArgumentException("Adjustment_month must be in the format yyyy-MM");
             }
 
-            var result = moveOrderTransacted.SelectMany(x => new List<ConsolidateFinanceReportDto>
-            {
+            var startDate = new DateTime(adjustmentMonth.Year, adjustmentMonth.Month, 1);
+            var endDate = startDate.AddMonths(1);
 
-                    new ConsolidateFinanceReportDto
-                    {
-
-                     Id = x.Id,
-                     TransactionDate = x.TransactionDate,
-                     ItemCode = x.ItemCode,
-                     ItemDescription = x.ItemDescription,
-                     Uom = x.Uom,
-                     Category = x.Category,
-                     Quantity = x.Quantity,
-                     UnitCost = x.UnitCost,
-                     LineAmount = x.LineAmount,
-                     Source = x.Source,
-                      TransactionType = x.TransactionType,
-                     Reason = x.Reason,
-                     Reference = x.Reference,
-                     SupplierName = x.SupplierName,
-                     EncodedBy = x.EncodedBy,
-                     CompanyCode = x.CompanyCode,
-                     CompanyName = x.CompanyName,
-                     DepartmentCode = x.DepartmentCode,
-                     DepartmentName = x.DepartmentName,
-                     LocationCode = x.LocationCode,
-                     LocationName = x.LocationName,
-                     AccountTitleCode = x.AccountTitleCode,
-                     AccountTitle = x.AccountTitle,
-                     EmpId = x.EmpId,
-                     Fullname = x.Fullname,
-                     AssetTag = x.AssetTag,
-                     CIPNo = x.CIPNo,
-                     Helpdesk = x.Helpdesk,
-                     Rush = x.Rush
-
-                    }
-             });
-
-
-
-
-            if (!string.IsNullOrEmpty(Search))
-            {
-                result = result.Where(x => x.ItemCode.ToLower().Contains(Search.ToLower())
-                || x.ItemDescription.ToLower().Contains(Search.ToLower())
-                || x.Source.ToString().Contains(Search)
-                || x.TransactionType.ToLower().Contains(Search.ToLower()))
-                      ;
-            }
-
-            result = result
-                .OrderBy(x => x.TransactionDate.Date)
-                .ThenBy(x => x.ItemCode);
-
-
-            return result.ToList();
-        }
-
-        public async Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateFinanceReport(string DateFrom, string DateTo, string Search)
-        {
             var dateStart = DateTime.Parse(DateFrom).Date;
             var dateEnd = DateTime.Parse(DateTo).Date.AddDays(1);  
          
@@ -1908,8 +1920,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                   on moveOrder.OrderNo equals transact.OrderNo
                                   join w in _context.WarehouseReceived
                                   on moveOrder.WarehouseId equals w.Id
+                                  join u in _context.Users
+                                  on transact.PreparedBy equals u.FullName
 
-                                  where transact.PreparedDate >= dateStart && transact.PreparedDate <= dateEnd && moveOrder.IsTransact == true
+                                  where transact.PreparedDate >= dateStart && transact.PreparedDate <= dateEnd && moveOrder.IsTransact == true 
                                   select new ConsolidateFinanceReportDto
                                   {
                                       Id = transact.Id,
@@ -1929,6 +1943,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                       EncodedBy = transact.PreparedBy,
                                       CompanyCode = moveOrder.CompanyCode,
                                       CompanyName = moveOrder.CompanyName,
+                                      ServiceProvider = u.FullName,
+                                      ServiceProviderCode = u.EmpId,
                                       DepartmentCode = moveOrder.DepartmentCode,
                                       DepartmentName = moveOrder.DepartmentName,
                                       LocationCode = moveOrder.LocationCode,
@@ -1941,6 +1957,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                       CIPNo = moveOrder.Cip_No,
                                       Helpdesk = moveOrder.HelpdeskNo,
                                       Rush = moveOrder.Rush
+
                                   };
 
             
@@ -2303,7 +2320,166 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             reports = reports
                 .OrderBy(x => x.TransactionDate.Date)
                 .ThenBy(x => x.ItemCode);
-                
+
+
+            //gl
+            //if (gl != false)
+            //{
+            //    IReadOnlyList<ElixirToGLDTO> result = consolidateList.SelectMany(x => new List<ElixirToGLDTO>
+            //    {
+
+            //        //debit
+            //        new ElixirToGLDTO
+            //        {
+            //            SyncId = "ETD-" + (x.Id.ToString() ?? string.Empty) + "-D",
+            //            Mark1 = string.Empty,
+            //            Mark2 = string.Empty,
+            //            AssetCIP = x.CIPNo ?? string.Empty,
+            //            AccountingTag = string.Empty,
+            //            TransactionDate = x.TransactionDate.ToString(),
+            //            ClientSupplier = x.SupplierName ?? string.Empty,
+            //            AccountTitleCode = "115998",
+            //            AccountTitle = "Materials & Supplies Inventory",
+            //            CompanyCode = "0001",
+            //            Company = "RDFFLFI",
+            //            DivisionCode = /*x.DivisionCode ?? */string.Empty,
+            //            Division = /*x.Division ??*/ string.Empty,
+            //            DepartmentCode = x.DepartmentCode ?? string.Empty,
+            //            Department = x.DepartmentName ?? string.Empty,
+            //            UnitCode = string.Empty,
+            //            Unit = string.Empty,
+            //            SubUnitCode = string.Empty,
+            //            SubUnit = string.Empty,
+            //            LocationCode = x.LocationCode ?? string.Empty,
+            //            Location = x.LocationName ?? string.Empty,
+            //            PONumber = x.Category ?? string.Empty,
+            //            RRNumber = x?.Helpdesk.ToString(),
+            //            ReferenceNo = string.Empty,
+            //            ItemCode = x.ItemCode ?? string.Empty,
+            //            ItemDescription = x.ItemDescription ?? string.Empty,
+            //            Quantity = x.Quantity,
+            //            UOM = x.Uom ?? string.Empty,
+            //            UnitPrice = x?.UnitCost ?? 0,
+            //            LineAmount = x.UnitCost * x.Quantity,
+            //            VoucherJournal = string.Empty,
+            //            AccountType = "Inventoriables",
+            //            DRCR = "Debit",
+            //            AssetCode = string.Empty,
+            //            Asset= string.Empty,
+            //            ServiceProviderCode = x.ServiceProviderCode,
+            //            ServiceProvider = x.ServiceProvider,
+            //            BOA = "Inventoriables",
+            //            Allocation = string.Empty,
+            //            AccountGroup = string.Empty,
+            //            AccountSubGroup = string.Empty,
+            //            FinancialStatement = string.Empty,
+            //            UnitResponsible = string.Empty,
+            //            Batch = string.Empty,
+            //            LineDescription = string.Empty,
+            //            PayrollPeriod = string.Empty,
+            //            Position = string.Empty,
+            //            PayrollType = string.Empty,
+            //            PayrollType2 = string.Empty,
+            //            DepreciationDescription = string.Empty,
+            //            RemainingDepreciationValue = string.Empty,
+            //            UsefulLife = string.Empty,
+            //            Month = x?.TransactionDate.ToString("MM") ?? string.Empty,
+            //            Year = x?.TransactionDate.ToString("yyyy") ?? string.Empty,
+            //            Particulars = string.Empty,
+            //            Month2 = x?.TransactionDate.ToString("yyyy,MM") ?? string.Empty,
+            //            FarmType = string.Empty,
+            //            Adjustment = string.Empty,
+            //            From = string.Empty,
+            //            ChangeTo = string.Empty,
+            //            Reason = string.Empty,
+            //            ChekingRemarks = string.Empty,
+            //            BankName = string.Empty,
+            //            ChequeNumber = string.Empty,
+            //            ChequeVoucherNumber = string.Empty,
+            //            ReleasedDate = string.Empty,
+            //            ChequeDate = string.Empty,
+            //            BOA2 = "Inventoriables",
+            //            System = "Elixir - ETD",
+            //            Books = "Journal Book",
+            //        },
+            //        //credit
+            //        new ElixirToGLDTO
+            //        {
+            //            SyncId = "ETD-" + (x.Id.ToString() ?? string.Empty) + "-D",
+            //            Mark1 = string.Empty,
+            //            Mark2 = string.Empty,
+            //            AssetCIP = x.CIPNo ?? string.Empty,
+            //            AccountingTag = string.Empty,
+            //            TransactionDate = x.TransactionDate.ToString(),
+            //            ClientSupplier = x.SupplierName ?? string.Empty,
+            //            AccountTitleCode = "115998",
+            //            AccountTitle = "Materials & Supplies Inventory",
+            //            CompanyCode = "0001",
+            //            Company = "RDFFLFI",
+            //            DivisionCode = /*x.DivisionCode ?? */string.Empty,
+            //            Division = /*x.Division ??*/ string.Empty,
+            //            DepartmentCode = x.DepartmentCode ?? string.Empty,
+            //            Department = x.DepartmentName ?? string.Empty,
+            //            UnitCode = string.Empty,
+            //            Unit = string.Empty,
+            //            SubUnitCode = string.Empty,
+            //            SubUnit = string.Empty,
+            //            LocationCode = x.LocationCode ?? string.Empty,
+            //            Location = x.LocationName ?? string.Empty,
+            //            PONumber = x.Category ?? string.Empty,
+            //            RRNumber = x?.Helpdesk.ToString(),
+            //            ReferenceNo = string.Empty,
+            //            ItemCode = x.ItemCode ?? string.Empty,
+            //            ItemDescription = x.ItemDescription ?? string.Empty,
+            //            Quantity = x.Quantity,
+            //            UOM = x.Uom ?? string.Empty,
+            //            UnitPrice = x?.UnitCost ?? 0,
+            //            LineAmount = x.UnitCost * x.Quantity,
+            //            VoucherJournal = string.Empty,
+            //            AccountType = "Inventoriables",
+            //            DRCR = "Credit",
+            //            AssetCode = string.Empty,
+            //            Asset= string.Empty,
+            //            ServiceProviderCode = x.ServiceProviderCode,
+            //            ServiceProvider = x.ServiceProvider,
+            //            BOA = "Inventoriables",
+            //            Allocation = string.Empty,
+            //            AccountGroup = string.Empty,
+            //            AccountSubGroup = string.Empty,
+            //            FinancialStatement = string.Empty,
+            //            UnitResponsible = string.Empty,
+            //            Batch = string.Empty,
+            //            LineDescription = string.Empty,
+            //            PayrollPeriod = string.Empty,
+            //            Position = string.Empty,
+            //            PayrollType = string.Empty,
+            //            PayrollType2 = string.Empty,
+            //            DepreciationDescription = string.Empty,
+            //            RemainingDepreciationValue = string.Empty,
+            //            UsefulLife = string.Empty,
+            //            Month = x?.TransactionDate.ToString("MM") ?? string.Empty,
+            //            Year = x?.TransactionDate.ToString("yyyy") ?? string.Empty,
+            //            Particulars = string.Empty,
+            //            Month2 = x?.TransactionDate.ToString("yyyy,MM") ?? string.Empty,
+            //            FarmType = string.Empty,
+            //            Adjustment = string.Empty,
+            //            From = string.Empty,
+            //            ChangeTo = string.Empty,
+            //            Reason = string.Empty,
+            //            ChekingRemarks = string.Empty,
+            //            BankName = string.Empty,
+            //            ChequeNumber = string.Empty,
+            //            ChequeVoucherNumber = string.Empty,
+            //            ReleasedDate = string.Empty,
+            //            ChequeDate = string.Empty,
+            //            BOA2 = "Inventoriables",
+            //            System = "Elixir - ETD",
+            //            Books = "Journal Book",
+            //        }
+            //    }).ToList();
+
+            //    return result.ToList();
+            //}
 
             return reports.ToList();
         } 

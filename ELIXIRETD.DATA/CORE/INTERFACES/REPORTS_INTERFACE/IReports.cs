@@ -36,8 +36,8 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.REPORTS_INTERFACE
 
         Task<PagedList<DtoTransactReports>> TransactedMoveOrderReport(UserParams userParams, string DateFrom, string DateTo, string Search);
 
-        Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateFinanceReport(string DateFrom, string DateTo, string Search);
-        Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateGLFinanceReport(string DateFrom, string DateTo, string Search);
+        Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateFinanceReport(string DateFrom, string DateTo, string Search, bool gl, string adjustment_month);
+        //Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateGLFinanceReport(string DateFrom, string DateTo, string Search);
 
         Task<IReadOnlyList<ConsolidateAuditReportDto>> ConsolidateAuditReport(string DateFrom, string DateTo, string Search);
 
