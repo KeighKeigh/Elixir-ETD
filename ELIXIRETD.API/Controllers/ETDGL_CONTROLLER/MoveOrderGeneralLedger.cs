@@ -130,11 +130,11 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
         public class Handler : IRequestHandler<ETDGLQuery, Result<List<ETDGLResult>>>
         {
             private readonly StoreContext _context;
-            private readonly IUnitOfWork _report;
-            public Handler(StoreContext context, IUnitOfWork report)
+            
+            public Handler(StoreContext context)
             {
                 _context = context;
-                _report = report;
+                
             }
            // Type desc
           
