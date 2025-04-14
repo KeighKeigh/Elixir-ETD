@@ -63,7 +63,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ORDER_DTO.MoveOrderDto
 
         public string AssetTag {  get; set; }
 
-        public int ? HelpDeskNo { get; set; }
+        public string  HelpDeskNo { get; set; }
 
         public string Requestor { get; set; }
 

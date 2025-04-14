@@ -64,7 +64,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO
 
         public string Cip_No { get; set; }
 
-        public int? HelpdeskNo { get; set; }
+        public string HelpdeskNo { get; set; }
 
         public string Rush { get; set; }
 

@@ -32,7 +32,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             public async Task<Unit> Handle(ConsolidateFinanceExportCommand command, CancellationToken cancellationToken)
             {
 
-                var consolidate = await _report.Reports.ConsolidateFinanceReport(command.DateFrom, command.DateTo, command.Search, command.gl, command.adjustment_month);
+                var consolidate = await _report.Reports.ConsolidateFinanceReport(command.DateFrom, command.DateTo, command.Search);
 
 
                 using (var workbook = new XLWorkbook())

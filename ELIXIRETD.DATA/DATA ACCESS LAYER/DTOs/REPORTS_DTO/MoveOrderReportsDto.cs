@@ -43,7 +43,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO
         public string FullName { get; set; }
         public string AssetTag { get; set; }
         public string Cip_No { get; set; }
-        public int? HelpdeskNo { get; set; }
+        public string HelpdeskNo { get; set; }
         public string IsRush { get; set; }
         public string Remarks { get; set; }
 

@@ -92,7 +92,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 
         public string AssetTag { get; set; }
 
-        public int ? HelpdeskNo { get; set; }
+        public string HelpdeskNo { get; set; }
 
 
         public string Requestor { get; set; }

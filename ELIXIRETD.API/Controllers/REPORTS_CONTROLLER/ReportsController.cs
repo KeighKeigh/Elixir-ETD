@@ -295,9 +295,9 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
 
         [HttpGet]
         [Route("ConsolidationFinanceReports")]
-        public async Task<IActionResult> ConsolidationFinanceReports([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search, bool gl, string adjustment_month)
+        public async Task<IActionResult> ConsolidationFinanceReports([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
-            var reports = await _unitofwork.Reports.ConsolidateFinanceReport(DateFrom,DateTo,Search,gl,adjustment_month);
+            var reports = await _unitofwork.Reports.ConsolidateFinanceReport(DateFrom,DateTo,Search);
 
             return Ok(reports);
         }

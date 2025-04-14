@@ -40,7 +40,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string AccountTitle { get; set; }
         public string AssetTag { get; set; }
         public string CIPNo { get; set; }
-        public int? Helpdesk { get; set; }
+        public string Helpdesk { get; set; }
         public string Rush { get; set; }
 
     }
