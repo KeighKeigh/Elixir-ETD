@@ -99,7 +99,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             public string FinancialStatement { get; set; }
             public string UnitResponsible { get; set; }
             public string Batch { get; set; }
-            public string LineDescription { get; set; }
+            public string Remarks { get; set; }
             public string PayrollPeriod { get; set; }
             public string Position { get; set; }
             public string PayrollType { get; set; }
@@ -222,7 +222,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         FinancialStatement = "Balance Sheet",
                         UnitResponsible = "MAU",
                         Batch = x.Reason ?? string.Empty,
-                        LineDescription = x.LineDescription ?? string.Empty,
+                        Remarks = x.Remarks ?? string.Empty,
                         PayrollPeriod = string.Empty,
                         Position = x.Position ?? string.Empty,
                         PayrollType = string.Empty,
@@ -284,7 +284,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         LineAmount = -(x?.LineAmount) ?? 0,
                         VoucherJournal = string.Empty,
                         AccountType = "Inventoriables",
-                        DRCR = "Credit",
+                        DRCR = "Credit",  
                         AssetCode = x.AssetCode ?? string.Empty,
                         Asset= string.Empty,
                         ServiceProviderCode = x.ServiceProviderCode ?? string.Empty,
@@ -296,7 +296,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         FinancialStatement = "Balance Sheet",
                         UnitResponsible = "MAU",
                         Batch = x.Reason ?? string.Empty,
-                        LineDescription = x.LineDescription ?? string.Empty,
+                        Remarks = x.Remarks ?? string.Empty,
                         PayrollPeriod = string.Empty,
                         Position = string.Empty,
                         PayrollType = string.Empty,
@@ -362,7 +362,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   ServiceProvider = t.PreparedBy,
                                   ServiceProviderCode = u.EmpId,
                                   ReferenceNo = (m.Id.ToString() ?? "") + (m.EmpId ?? ""),
-                                  LineDescription = m.ItemRemarks
+                                  Remarks = m.ItemRemarks
                                   
 
                               });
@@ -390,7 +390,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     UnitPrice = x.warehouse.UnitPrice,
                     LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
                     CheckingRemarks = "Miscellaneous Receipt",
-                    LineDescription = x.receipt.Details,
+                    Remarks = x.receipt.Details,
                     DivisionCode = x.receipt.CompanyCode,
                     Division = x.receipt.CompanyName,
                     DepartmentCode = x.receipt.DepartmentCode,
@@ -470,7 +470,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
 
                         CheckingRemarks = "Borrow",
                         Reason = x.borrow.Remarks,
-                        LineDescription = x.borrow.Details,
+                        Remarks = x.borrow.Details,
 
                         DivisionCode = "",
                         Division = "",
@@ -568,7 +568,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
 
                         CheckingRemarks = "Returned",
                         Reason = "",
-                        LineDescription = "",
+                        Remarks = "",
 
                         DivisionCode = x.borrowDetail.CompanyCode,
                         Division = x.borrowDetail.CompanyName,
@@ -609,7 +609,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
 
                         CheckingRemarks = "Returned",
                         Reason = x.FuelRegister.Remarks,
-                        LineDescription = "",
+                        Remarks = "",
 
                         DivisionCode = x.FuelRegister.Company_Code,
                         Division = x.FuelRegister.Company_Name,
@@ -628,333 +628,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                 return await result.ToListAsync();
             }
 
-            //var moveOrderTransactions = from m in _context.MoveOrders
-            //                            join t in _context.TransactOrder
-            //                            on m.OrderNo equals t.OrderNo
-            //                            join w in _context.WarehouseReceived
-            //                            on m.WarehouseId equals w.Id
-            //                            join u in _context.Users
-            //                            on t.PreparedBy equals u.FullName
-
-            //                            where t.PreparedDate >= startDate && t.PreparedDate <= endDate && m.IsTransact == true
-            //                            //where t.IsActive == true && t.IsTransact == true
-            //                            //where t.PreparedDate >= startDate && t.PreparedDate <= endDate
-            //                            //where w.IsActive == true
-            //                            //where m.PreparedDate >= startDate && m.PreparedDate <= endDate
-            //                            //where m.IsActive == true && m.IsTransact == true
-
-
-
-            //                            select new ETDGLResult
-            //                            {
-            //                                SyncId = m.Id.ToString(),
-            //                                TransactionDate = t.PreparedDate,
-            //                                ClientSupplier = m.CustomerName,
-            //                                PONumber = m.Category,
-            //                                RRNumber = m.HelpdeskNo.ToString(),
-            //                                ItemCode = w.ItemCode,
-            //                                ItemDescription = w.ItemDescription,
-            //                                Quantity = m.QuantityOrdered,
-            //                                UnitPrice = w.UnitPrice,
-            //                                LineAmount = w.UnitPrice * m.QuantityOrdered,
-            //                                UOM = w.Uom,
-            //                                ChekingRemarks = "Move Order",
-            //                                DivisionCode = m.CompanyCode,
-            //                                Division = m.CompanyName,
-            //                                LocationCode = m.LocationCode,
-            //                                Location = m.LocationName,
-            //                                AccountTitle = m.AccountTitles,
-            //                                AccountTitleCode = m.AccountCode,
-            //                                DepartmentCode = m.DepartmentCode,
-            //                                Department = m.DepartmentName,
-            //                                AssetCIP = m.Cip_No,
-            //                                Batch = m.ItemRemarks,
-            //                                ServiceProvider = u.FullName,
-            //                                ServiceProviderCode = u.EmpId,
-            //                                ReferenceNo = m.Id + m.EmpId,
-            //                                LineDescription = m.ItemRemarks
-
-            //                            };
-
-            //var receiptConsol = _context.MiscellaneousReceipts
-            //.AsNoTracking()
-            //.GroupJoin(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
-            //.SelectMany(x => x.warehouse.DefaultIfEmpty(), (x, warehouse) => new { x.receipt, warehouse })
-            //.Where(x => x.warehouse.IsActive == true && x.warehouse.TransactionType == "MiscellaneousReceipt")
-            //.Select(x => new ETDGLResult
-            //{
-            //    SyncId = x.warehouse.Id.ToString(),
-            //    TransactionDate = x.receipt.TransactionDate,
-            //    ItemCode = x.warehouse.ItemCode,
-            //    ItemDescription = x.warehouse.ItemDescription,
-            //    UOM = x.warehouse.Uom,
-            //    PONumber = "",
-            //    Quantity = x.warehouse.ActualGood,
-            //    UnitPrice = x.warehouse.UnitPrice,
-            //    LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
-
-            //    ChekingRemarks = "Miscellaneous Receipt",
-            //    LineDescription = x.receipt.Details,
-
-
-            //    DivisionCode = x.receipt.CompanyCode,
-            //    Division = x.receipt.CompanyName,
-            //    DepartmentCode = x.receipt.DepartmentCode,
-            //    Department = x.receipt.DepartmentName,
-            //    LocationCode = x.receipt.LocationCode,
-            //    Location = x.receipt.LocationName,
-            //    AccountTitleCode = x.warehouse.AccountCode,
-            //    AccountTitle = x.warehouse.AccountTitles,
-
-
-
-            //    RRNumber = 0.ToString(),
-            //    AssetCIP = "",
-
-            //    //Remarks = x.receipt.Remarks,
-
-            //});
-
-            //var issueConsol = _context.MiscellaneousIssues
-            //.AsNoTracking()
-            //.Join(_context.MiscellaneousIssueDetail, miscDatail => miscDatail.Id, issue => issue.IssuePKey,
-            //(miscDetail, issue) => new { miscDetail, issue })
-            //.Where(x => x.issue.IsActive == true)
-            //.Select(x => new ETDGLResult
-            //{
-            //    SyncId = x.issue.Id.ToString(),
-            //    TransactionDate = x.miscDetail.TransactionDate.Date,
-            //    ItemCode = x.issue.ItemCode,
-            //    ItemDescription = x.issue.ItemDescription,
-            //    UOM = x.issue.Uom,
-            //    PONumber = "",
-            //    Quantity = Math.Round(x.issue.Quantity, 2),
-            //    UnitPrice = x.issue.UnitPrice,
-            //    LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2),
-
-            //    ChekingRemarks = "Miscellaneous Issue",
-            //    Reason = x.issue.Remarks,
-
-            //    DivisionCode = x.miscDetail.CompanyCode,
-            //    Division = x.miscDetail.CompanyName,
-            //    DepartmentCode = x.miscDetail.DepartmentCode,
-            //    Department = x.miscDetail.DepartmentName,
-            //    LocationCode = x.miscDetail.LocationCode,
-            //    Location = x.miscDetail.LocationName,
-            //    AccountTitleCode = x.issue.AccountCode,
-            //    AccountTitle = x.issue.AccountTitles,
-
-            //    AssetCIP = "",
-            //    RRNumber = 0.ToString(),
-
-
-            //});
-
-            //var borrowedConsol = _context.BorrowedIssues
-            //    .AsNoTracking()
-            //    .Join(_context.BorrowedIssueDetails, borrow => borrow.Id, borrowDetail => borrowDetail.BorrowedPKey,
-            //    (borrow, borrowDetail) => new { borrow, borrowDetail })
-            //    .Where(x => x.borrowDetail.IsActive == true)
-            //    .Select(x => new ETDGLResult
-            //    {
-            //        SyncId = x.borrowDetail.Id.ToString(),
-            //        TransactionDate = x.borrowDetail.PreparedDate.Date,
-            //        ItemCode = x.borrowDetail.ItemCode,
-            //        ItemDescription = x.borrowDetail.ItemDescription,
-            //        UOM = x.borrowDetail.Uom,
-            //        PONumber = "",
-            //        Quantity = Math.Round(x.borrowDetail.Quantity, 2),
-            //        UnitPrice = x.borrowDetail.UnitPrice,
-            //        LineAmount = Math.Round(x.borrowDetail.UnitPrice * x.borrowDetail.Quantity, 2),
-
-            //        ChekingRemarks = "Borrow",
-            //        Reason = x.borrow.Remarks,
-            //        LineDescription = x.borrow.Details,
-
-            //        DivisionCode = "",
-            //        Division = "",
-            //        DepartmentCode = "",
-            //        Department = "",
-            //        LocationCode = "",
-            //        Location = "",
-            //        AccountTitleCode = "",
-            //        AccountTitle = "",
-
-            //        AssetCIP = "",
-            //        RRNumber = 0.ToString(),
-            //        //Remarks = x.borrow.Remarks,
-
-
-            //    });
-
-            //var consumeList = _context.BorrowedConsumes
-            //    .Where(x => x.IsActive == true)
-            //    .Select(x => new BorrowedConsolidatedDto
-            //    {
-            //        Id = x.Id,
-            //        BorrowedId = x.BorrowedItemPkey,
-            //        ItemCode = x.ItemCode,
-            //        ItemDescription = x.ItemDescription,
-            //        Uom = x.Uom,
-            //        Consumed = x.Consume,
-            //        CompanyCode = x.CompanyCode,
-            //        CompanyName = x.CompanyName,
-            //        DepartmentCode = x.DepartmentCode,
-            //        DepartmentName = x.DepartmentName,
-            //        LocationCode = x.LocationCode,
-            //        LocationName = x.LocationName,
-            //        AccountCode = x.AccountCode,
-            //        AccountTitles = x.AccountTitles,
-            //        EmpId = x.EmpId,
-            //        FullName = x.FullName,
-            //        ReportNumber = x.ReportNumber,
-
-            //    });
-
-            //var returnList = _context.BorrowedIssueDetails
-            //    .Where(x => x.IsActive == true && x.IsApprovedReturned == true)
-            //    .GroupJoin(consumeList, borrowDetails => borrowDetails.Id, consume => consume.BorrowedId
-            //    , (borrowDetails, consume) => new { borrowDetails, consume })
-            //    .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.borrowDetails, consume })
-            //    .Select(x => new BorrowedConsolidatedDto
-            //    {
-            //        Id = x.borrowDetails.Id,
-            //        BorrowedId = x.borrowDetails.BorrowedPKey,
-            //        ItemCode = x.borrowDetails.ItemCode,
-            //        ItemDescription = x.borrowDetails.ItemDescription,
-            //        Uom = x.borrowDetails.Uom,
-            //        BorrowedQuantity = x.borrowDetails.Quantity != null ? x.borrowDetails.Quantity : 0,
-            //        Consumed = x.consume.Consumed != null ? x.consume.Consumed : 0,
-            //        CompanyCode = x.consume.CompanyCode,
-            //        CompanyName = x.consume.CompanyName,
-            //        DepartmentCode = x.consume.DepartmentCode,
-            //        DepartmentName = x.consume.DepartmentName,
-            //        LocationCode = x.consume.LocationCode,
-            //        LocationName = x.consume.LocationName,
-            //        AccountCode = x.consume.AccountCode,
-            //        AccountTitles = x.consume.AccountTitles,
-            //        EmpId = x.consume.EmpId,
-            //        FullName = x.consume.FullName,
-            //        ReportNumber = x.consume.ReportNumber,
-            //        UnitPrice = x.borrowDetails.UnitPrice
-
-            //    });
-
-            //var borrowedIssueList = _context.BorrowedIssues
-            //    .AsNoTracking()
-            //    .Where(x => x.IsActive == true);
-
-            //var returnedConsol = returnList
-            //    .GroupJoin(borrowedIssueList, borrowDetail => borrowDetail.BorrowedId, borrow => borrow.Id,
-            //    (borrowDetail, borrow) => new { borrowDetail, borrow })
-            //    .SelectMany(x => x.borrow.DefaultIfEmpty(), (x, borrow) => new { x.borrowDetail, borrow })
-            //    .Select(x => new ETDGLResult
-            //    {
-
-            //        SyncId = x.borrowDetail.Id.ToString(),
-            //        TransactionDate = x.borrow.PreparedDate.Date,
-            //        ItemCode = x.borrowDetail.ItemCode,
-            //        ItemDescription = x.borrowDetail.ItemDescription,
-            //        UOM = x.borrowDetail.Uom,
-            //        PONumber = "",
-            //        Quantity = x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed,
-            //        UnitPrice = x.borrowDetail.UnitPrice,
-            //        LineAmount = Math.Round(x.borrowDetail.UnitPrice.Value * x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed, 2),
-
-            //        ChekingRemarks = "Returned",
-            //        Reason = "",
-            //        LineDescription = "",
-
-            //        DivisionCode = x.borrowDetail.CompanyCode,
-            //        Division = x.borrowDetail.CompanyName,
-            //        DepartmentCode = x.borrowDetail.DepartmentCode,
-            //        Department = x.borrowDetail.DepartmentName,
-            //        LocationCode = x.borrowDetail.LocationCode,
-            //        Location = x.borrowDetail.LocationName,
-            //        AccountTitleCode = x.borrowDetail.AccountCode,
-            //        AccountTitle = x.borrowDetail.AccountTitles,
-
-            //        AssetCIP = "",
-            //        RRNumber = 0.ToString(),
-
-            //    });
-
-
-            //var fuelRegisterConsol =  _context.FuelRegisterDetails
-            //    .Include(m => m.Material)
-            //    .ThenInclude(id => id.ItemCategory)
-            //    .Include(w => w.Warehouse_Receiving)
-            //    .Where(r => r.FuelRegister.Is_Transact == true)
-            //    .Select(x => new ETDGLResult
-            //    {
-
-            //        SyncId = x.Id.ToString(),
-            //        TransactionDate = x.FuelRegister.Transact_At.Value.Date,
-            //        ItemCode = x.Material.ItemCode,
-            //        ItemDescription = x.Material.ItemDescription,
-            //        UOM = x.Material.Uom.UomCode,
-            //        PONumber = "",
-            //        Quantity = x.Liters != null ? x.Liters : 0,
-            //        UnitPrice = x.Warehouse_Receiving.UnitPrice,
-            //        LineAmount = Math.Round(x.Warehouse_Receiving.UnitPrice * x.Liters.Value, 2),
-
-            //        ChekingRemarks = "Returned",
-            //        Reason = x.FuelRegister.Remarks,
-            //        LineDescription = "",
-
-            //        DivisionCode = x.FuelRegister.Company_Code,
-            //        Division = x.FuelRegister.Company_Name,
-            //        DepartmentCode = x.FuelRegister.Department_Code,
-            //        Department = x.FuelRegister.Department_Name,
-            //        LocationCode = x.FuelRegister.Location_Code,
-            //        Location = x.FuelRegister.Location_Name,
-            //        AccountTitleCode = x.FuelRegister.Account_Title_Code,
-            //        AccountTitle = x.FuelRegister.Account_Title_Code,
-
-            //        AssetCIP = "",
-            //        RRNumber = 0.ToString(),
-
-
-            //    });
-
-
-            //if (!string.IsNullOrEmpty(startDate.ToString()) && !string.IsNullOrEmpty(endDate.ToString()))
-            //{
-            //    var dateFrom = DateTime.Parse(startDate.ToString()).Date;
-            //    var dateTo = DateTime.Parse(endDate.ToString()).Date;
-
-
-
-            //    moveOrderTransactions = moveOrderTransactions
-            //        .Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo)
-            //        ;
-
-            //    receiptConsol = receiptConsol
-            //        .Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo)
-            //        ;
-
-            //    issueConsol = issueConsol
-            //         .Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo)
-            //        ;
-
-            //    borrowedConsol = borrowedConsol
-            //        .Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo)
-            //        ;
-
-            //    returnedConsol = returnedConsol
-            //        .Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo)
-            //        ;
-
-            //    fuelRegisterConsol = fuelRegisterConsol
-            //        .Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo)
-            //        ;
-
-            //}
-
-            //var consolidateList = moveOrderTransactions.Concat(await receiptConsol.ToListAsync()).Concat(await issueConsol.ToListAsync())
-            //    .Concat(await borrowedConsol.ToListAsync())
-            //    .Concat(await returnedConsol.ToListAsync())
-            //    .Concat(await fuelRegisterConsol.ToListAsync());
+            
         }
     }
 }

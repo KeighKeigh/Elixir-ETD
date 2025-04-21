@@ -55,6 +55,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
 
+        public static PagedList<T> Create(IQueryable<T> source, int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1) pageNumber = 1; // Ensure page number is at least 1
+            if (pageSize < 1) pageSize = 10;    // Default to 10 if pageSize is invalid
+
+            var count = source.Count();
+            var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PagedList<T>(items, count, pageNumber, pageSize);
+        }
 
     }
 }

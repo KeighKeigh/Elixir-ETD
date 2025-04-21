@@ -305,6 +305,33 @@ namespace ELIXIRETD.API.Controllers.WAREHOUSE_CONTROLLER
             return Ok(posummaryResult);
         }
 
+        //[HttpGet]
+        //[Route("UpdatedPoSummary")]
+        //public async Task<ActionResult<IEnumerable<PoSummaryDto>>> UpdatedPoSummary([FromQuery] UserParams userParams, [FromQuery] string search)
+        //{
+
+        //    //if (search == null)
+
+        //    //    return await GetAllPoWithPagination(userParams);
+
+        //    var posummary = await _unitOfWork.Receives.UpdatedPoSummary(userParams, search);
+
+        //    Response.AddPaginationHeader(posummary.CurrentPage, posummary.PageSize, posummary.TotalCount, posummary.TotalPages, posummary.HasNextPage, posummary.HasPreviousPage);
+
+        //    var posummaryResult = new
+        //    {
+        //        posummary,
+        //        posummary.CurrentPage,
+        //        posummary.PageSize,
+        //        posummary.TotalCount,
+        //        posummary.TotalPages,
+        //        posummary.HasNextPage,
+        //        posummary.HasPreviousPage
+        //    };
+
+        //    return Ok(posummaryResult);
+        //}
+
 
 
     }

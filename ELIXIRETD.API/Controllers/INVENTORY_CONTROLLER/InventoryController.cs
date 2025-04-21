@@ -87,6 +87,29 @@ namespace ELIXIRETD.API.Controllers.INVENTORY_CONTROLLER
             return Ok(inventoryResult);
         }
 
+        [HttpGet]
+        [Route("updated-mrp")]
+        public async Task<ActionResult<IEnumerable<DtoMRP>>> UpdatedMRP([FromQuery] UserParams userParams, [FromQuery] string search)
+        {
+
+            var inventory = await _unitofwork.Inventory.UpdatedMRP(userParams, search);
+
+            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
+
+            var inventoryResult = new
+            {
+                inventory,
+                inventory.CurrentPage,
+                inventory.PageSize,
+                inventory.TotalCount,
+                inventory.TotalPages,
+                inventory.HasNextPage,
+                inventory.HasPreviousPage
+            };
+
+            return Ok(inventoryResult);
+        }
+
         //[HttpGet]
         //[Route("GetMRPOrig")]
         //public async Task<ActionResult<IEnumerable<DtoMRP>>> GetMRPOrig([FromQuery] UserParams userParams, [FromQuery] string search)

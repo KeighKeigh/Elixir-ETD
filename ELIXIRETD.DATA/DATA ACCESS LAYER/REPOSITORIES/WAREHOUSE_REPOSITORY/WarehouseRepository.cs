@@ -220,8 +220,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    QuantityOrdered = posummary.Ordered,
                                    IsActive = posummary.IsActive,
                                    ActualRemaining = 0,
-                                   UnitPrice = posummary.UnitPrice != null ? posummary.UnitPrice : 0 ,
-                                   TotalReject = receive.TotalReject != null ? receive.TotalReject : 0,
+                                   UnitPrice = posummary.UnitPrice != 0 ? posummary.UnitPrice : 0 ,
+                                   TotalReject = receive.TotalReject != 0 ? receive.TotalReject : 0,
                                    ActualGood = receive != null && receive.IsActive != false ? receive.ActualDelivered : 0,
                                    LotSectionId = material.LotSectionId,
                                    LotSection = material.LotSection.SectionName,
@@ -943,5 +943,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                 return new PagedList<WarehouseReceivingDto>(allResults, allResults.Count, 1, allResults.Count);
             }
         }
+
+        //public async Task<PagedList<WarehouseReceivingDto>> UpdatedPoSummary(UserParams userParams, string search)
+        //{
+
+        //}
     }
 }

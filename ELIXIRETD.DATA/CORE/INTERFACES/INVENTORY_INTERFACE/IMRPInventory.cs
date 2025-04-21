@@ -20,7 +20,7 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.INVENTORY_INTERFACE
         Task<PagedList<DtoMRP>> GetMRP(UserParams userParams, string search);
         //Task<PagedList<DtoMRP>> GetMRPOrig(UserParams userParams, string search);
 
-
+        Task<PagedList<DtoMRP>> UpdatedMRP(UserParams userParams, string search);
 
     }
 }

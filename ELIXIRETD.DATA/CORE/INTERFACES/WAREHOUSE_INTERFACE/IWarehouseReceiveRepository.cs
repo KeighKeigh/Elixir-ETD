@@ -1,4 +1,5 @@
 ﻿using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.IMPORT_DTO;
+using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.INVENTORY_DTO.MRP;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ORDER_DTO.Notification_Dto;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.WAREHOUSE_DTO;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
@@ -42,6 +43,7 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.WAREHOUSE_INTERFACE
 
         //PO Summary
         Task<PagedList<WarehouseReceivingDto>> GetPoSummary(UserParams userParams, string search);
+        //Task<PagedList<WarehouseReceivingDto>> UpdatedPoSummary(UserParams userParams, string search);
 
     }
 }
