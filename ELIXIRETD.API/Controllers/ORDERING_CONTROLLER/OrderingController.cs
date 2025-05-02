@@ -45,7 +45,7 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
                 foreach (Ordering items in order)
                 {
 
-                    if (order.Count(x => x.TrasactId == items.TrasactId && x.ItemCode == items.ItemCode && x.Customercode == items.Customercode && x.CustomerType == items.CustomerType) > 1)
+                    if (order.Count(x => x.TrasactId == items.TrasactId && x.ItemCode == items.ItemCode && x.Customercode == items.Customercode && x.CustomerType == items.CustomerType && x.IsCancel == false && x.IsActive == true) > 1)
                     {
                         DuplicateList.Add(items);
                         continue;

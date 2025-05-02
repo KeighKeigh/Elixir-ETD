@@ -15,8 +15,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             public string DateFrom { get; set; }
 
             public string Search { get; set; }
-            public bool gl { get; set; }
-            public string adjustment_month { get; set; }
             
         }
 

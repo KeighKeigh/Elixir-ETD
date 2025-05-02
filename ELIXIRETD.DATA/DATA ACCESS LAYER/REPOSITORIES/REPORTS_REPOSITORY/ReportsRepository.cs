@@ -1795,8 +1795,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                   on moveOrder.WarehouseId equals w.Id
                                   join u in _context.Users
                                   on transact.PreparedBy equals u.FullName
-
-                                  where transact.PreparedDate >= dateStart && transact.PreparedDate <= dateEnd && moveOrder.IsTransact == true 
+                                  where moveOrder.IsTransact == true
                                   select new ConsolidateFinanceReportDto
                                   {
                                       Id = transact.Id,
@@ -1822,15 +1821,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                       DepartmentName = moveOrder.DepartmentName,
                                       LocationCode = moveOrder.LocationCode,
                                       LocationName = moveOrder.LocationName,
-                                      AccountTitleCode = moveOrder.AccountCode,
-                                      AccountTitle = moveOrder.AccountTitles,
+                                      AccountTitleCode = moveOrder.AccountCode != null ? moveOrder.AccountCode : "537620",
+                                      AccountTitle = moveOrder.AccountTitles != null ? moveOrder.AccountTitles : "SE - R & M - Transport Vehicles",
                                       EmpId = moveOrder.EmpId,
                                       Fullname = moveOrder.FullName,
                                       AssetTag = moveOrder.AssetTag,
                                       CIPNo = moveOrder.Cip_No,
                                       Helpdesk = moveOrder.HelpdeskNo,
                                       Rush = moveOrder.Rush
-
                                   };
 
             
@@ -1917,7 +1915,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Join(_context.BorrowedIssueDetails, borrow => borrow.Id, borrowDetail => borrowDetail.BorrowedPKey,
                 (borrow, borrowDetail) => new { borrow, borrowDetail })
-                .Where(x => x.borrowDetail.IsActive == true)
+                .Where(x => x.borrowDetail.IsActive == true && x.borrow.IsReturned == false)
                 .Select(x => new ConsolidateFinanceReportDto
                 {
                     Id = x.borrowDetail.Id,
@@ -2008,7 +2006,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
             var borrowedIssueList =  _context.BorrowedIssues
                 .AsNoTracking()
-                .Where(x => x.IsActive == true);
+                .Where(x => x.IsActive == true && x.IsReturned == true);
 
             var returnedConsol =  returnList
                 .GroupJoin(borrowedIssueList, borrowDetail => borrowDetail.BorrowedId, borrow => borrow.Id,
@@ -2195,164 +2193,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .ThenBy(x => x.ItemCode);
 
 
-            //gl
-            //if (gl != false)
-            //{
-            //    IReadOnlyList<ElixirToGLDTO> result = consolidateList.SelectMany(x => new List<ElixirToGLDTO>
-            //    {
-
-            //        //debit
-            //        new ElixirToGLDTO
-            //        {
-            //            SyncId = "ETD-" + (x.Id.ToString() ?? string.Empty) + "-D",
-            //            Mark1 = string.Empty,
-            //            Mark2 = string.Empty,
-            //            AssetCIP = x.CIPNo ?? string.Empty,
-            //            AccountingTag = string.Empty,
-            //            TransactionDate = x.TransactionDate.ToString(),
-            //            ClientSupplier = x.SupplierName ?? string.Empty,
-            //            AccountTitleCode = "115998",
-            //            AccountTitle = "Materials & Supplies Inventory",
-            //            CompanyCode = "0001",
-            //            Company = "RDFFLFI",
-            //            DivisionCode = /*x.DivisionCode ?? */string.Empty,
-            //            Division = /*x.Division ??*/ string.Empty,
-            //            DepartmentCode = x.DepartmentCode ?? string.Empty,
-            //            Department = x.DepartmentName ?? string.Empty,
-            //            UnitCode = string.Empty,
-            //            Unit = string.Empty,
-            //            SubUnitCode = string.Empty,
-            //            SubUnit = string.Empty,
-            //            LocationCode = x.LocationCode ?? string.Empty,
-            //            Location = x.LocationName ?? string.Empty,
-            //            PONumber = x.Category ?? string.Empty,
-            //            RRNumber = x?.Helpdesk.ToString(),
-            //            ReferenceNo = string.Empty,
-            //            ItemCode = x.ItemCode ?? string.Empty,
-            //            ItemDescription = x.ItemDescription ?? string.Empty,
-            //            Quantity = x.Quantity,
-            //            UOM = x.Uom ?? string.Empty,
-            //            UnitPrice = x?.UnitCost ?? 0,
-            //            LineAmount = x.UnitCost * x.Quantity,
-            //            VoucherJournal = string.Empty,
-            //            AccountType = "Inventoriables",
-            //            DRCR = "Debit",
-            //            AssetCode = string.Empty,
-            //            Asset= string.Empty,
-            //            ServiceProviderCode = x.ServiceProviderCode,
-            //            ServiceProvider = x.ServiceProvider,
-            //            BOA = "Inventoriables",
-            //            Allocation = string.Empty,
-            //            AccountGroup = string.Empty,
-            //            AccountSubGroup = string.Empty,
-            //            FinancialStatement = string.Empty,
-            //            UnitResponsible = string.Empty,
-            //            Batch = string.Empty,
-            //            LineDescription = string.Empty,
-            //            PayrollPeriod = string.Empty,
-            //            Position = string.Empty,
-            //            PayrollType = string.Empty,
-            //            PayrollType2 = string.Empty,
-            //            DepreciationDescription = string.Empty,
-            //            RemainingDepreciationValue = string.Empty,
-            //            UsefulLife = string.Empty,
-            //            Month = x?.TransactionDate.ToString("MM") ?? string.Empty,
-            //            Year = x?.TransactionDate.ToString("yyyy") ?? string.Empty,
-            //            Particulars = string.Empty,
-            //            Month2 = x?.TransactionDate.ToString("yyyy,MM") ?? string.Empty,
-            //            FarmType = string.Empty,
-            //            Adjustment = string.Empty,
-            //            From = string.Empty,
-            //            ChangeTo = string.Empty,
-            //            Reason = string.Empty,
-            //            ChekingRemarks = string.Empty,
-            //            BankName = string.Empty,
-            //            ChequeNumber = string.Empty,
-            //            ChequeVoucherNumber = string.Empty,
-            //            ReleasedDate = string.Empty,
-            //            ChequeDate = string.Empty,
-            //            BOA2 = "Inventoriables",
-            //            System = "Elixir - ETD",
-            //            Books = "Journal Book",
-            //        },
-            //        //credit
-            //        new ElixirToGLDTO
-            //        {
-            //            SyncId = "ETD-" + (x.Id.ToString() ?? string.Empty) + "-D",
-            //            Mark1 = string.Empty,
-            //            Mark2 = string.Empty,
-            //            AssetCIP = x.CIPNo ?? string.Empty,
-            //            AccountingTag = string.Empty,
-            //            TransactionDate = x.TransactionDate.ToString(),
-            //            ClientSupplier = x.SupplierName ?? string.Empty,
-            //            AccountTitleCode = "115998",
-            //            AccountTitle = "Materials & Supplies Inventory",
-            //            CompanyCode = "0001",
-            //            Company = "RDFFLFI",
-            //            DivisionCode = /*x.DivisionCode ?? */string.Empty,
-            //            Division = /*x.Division ??*/ string.Empty,
-            //            DepartmentCode = x.DepartmentCode ?? string.Empty,
-            //            Department = x.DepartmentName ?? string.Empty,
-            //            UnitCode = string.Empty,
-            //            Unit = string.Empty,
-            //            SubUnitCode = string.Empty,
-            //            SubUnit = string.Empty,
-            //            LocationCode = x.LocationCode ?? string.Empty,
-            //            Location = x.LocationName ?? string.Empty,
-            //            PONumber = x.Category ?? string.Empty,
-            //            RRNumber = x?.Helpdesk.ToString(),
-            //            ReferenceNo = string.Empty,
-            //            ItemCode = x.ItemCode ?? string.Empty,
-            //            ItemDescription = x.ItemDescription ?? string.Empty,
-            //            Quantity = x.Quantity,
-            //            UOM = x.Uom ?? string.Empty,
-            //            UnitPrice = x?.UnitCost ?? 0,
-            //            LineAmount = x.UnitCost * x.Quantity,
-            //            VoucherJournal = string.Empty,
-            //            AccountType = "Inventoriables",
-            //            DRCR = "Credit",
-            //            AssetCode = string.Empty,
-            //            Asset= string.Empty,
-            //            ServiceProviderCode = x.ServiceProviderCode,
-            //            ServiceProvider = x.ServiceProvider,
-            //            BOA = "Inventoriables",
-            //            Allocation = string.Empty,
-            //            AccountGroup = string.Empty,
-            //            AccountSubGroup = string.Empty,
-            //            FinancialStatement = string.Empty,
-            //            UnitResponsible = string.Empty,
-            //            Batch = string.Empty,
-            //            LineDescription = string.Empty,
-            //            PayrollPeriod = string.Empty,
-            //            Position = string.Empty,
-            //            PayrollType = string.Empty,
-            //            PayrollType2 = string.Empty,
-            //            DepreciationDescription = string.Empty,
-            //            RemainingDepreciationValue = string.Empty,
-            //            UsefulLife = string.Empty,
-            //            Month = x?.TransactionDate.ToString("MM") ?? string.Empty,
-            //            Year = x?.TransactionDate.ToString("yyyy") ?? string.Empty,
-            //            Particulars = string.Empty,
-            //            Month2 = x?.TransactionDate.ToString("yyyy,MM") ?? string.Empty,
-            //            FarmType = string.Empty,
-            //            Adjustment = string.Empty,
-            //            From = string.Empty,
-            //            ChangeTo = string.Empty,
-            //            Reason = string.Empty,
-            //            ChekingRemarks = string.Empty,
-            //            BankName = string.Empty,
-            //            ChequeNumber = string.Empty,
-            //            ChequeVoucherNumber = string.Empty,
-            //            ReleasedDate = string.Empty,
-            //            ChequeDate = string.Empty,
-            //            BOA2 = "Inventoriables",
-            //            System = "Elixir - ETD",
-            //            Books = "Journal Book",
-            //        }
-            //    }).ToList();
-
-            //    return result.ToList();
-            //}
+            
 
             return reports.ToList();
         } 
@@ -2655,7 +2496,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Fullname = x.borrowDetail.FullName,
                     AssetTag = "",
                     CIPNo = "",
-                    Helpdesk = "",
+                    Helpdesk = "", 
                     Rush = ""
 
                 }).ToList();

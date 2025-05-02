@@ -160,16 +160,12 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                 var moveOrderTask = await MoveOrderTransactions(startDate, endDate);
                 var receiptTask = await ReceiptTransactions(startDate, endDate);
                 var issueTask = await IssueTransactions(startDate, endDate);
-                var borrowedTask = await BorrowedTransactions(startDate, endDate);
-                var returnedTask = await ReturnedTransactions(startDate, endDate);
                 var fuelTask = await FuelTransactions(startDate, endDate);
 
                  //Task.WhenAll(moveOrderTask, receiptTask, issueTask, borrowedTask, returnedTask, fuelTask);
 
 
                 var consolidateList = moveOrderTask.Concat(receiptTask).Concat(issueTask)
-                    .Concat(borrowedTask)
-                    .Concat(returnedTask)
                     .Concat(fuelTask);
 
                 var result =  consolidateList.SelectMany(x => new List<ETDGLResult>
@@ -178,7 +174,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     //debit
                     new ETDGLResult
                     {
-                        SyncId = "ETD-" + (x.SyncId.ToString() ?? string.Empty) + "-D",
+                        SyncId = "ETD-" + (x.SyncId ?? string.Empty) + "-D",
                         Mark1 = string.Empty,
                         Mark2 = string.Empty,
                         AssetCIP = x.AssetCIP ?? string.Empty,
@@ -252,7 +248,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     //credit
                     new ETDGLResult
                     {
-                        SyncId = "ETD-" + (x.SyncId.ToString() ?? string.Empty) + "-C",
+                        SyncId = "ETD-" + (x.SyncId ?? string.Empty) + "-C",
                         Mark1 = string.Empty,
                         Mark2 = string.Empty,
                         AssetCIP = x.AssetCIP ?? string.Empty,
@@ -334,36 +330,36 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                               join t in _context.TransactOrder on m.OrderNo equals t.OrderNo
                               join w in _context.WarehouseReceived on m.WarehouseId equals w.Id
                               join u in _context.Users on t.PreparedBy equals u.FullName
-                              where t.PreparedDate >= startDate && t.PreparedDate <= endDate && m.IsTransact == true
-                              select new ETDGLResult
+                              where t.PreparedDate >= startDate && t.PreparedDate <= endDate && m.IsTransact == true 
+                               select new ETDGLResult
                               {
-                                  SyncId = m.Id.ToString(),
+                                  SyncId = "MO-" + m.Id.ToString() ,
                                   TransactionDate = t.PreparedDate,
                                   ClientSupplier = m.CustomerName,
                                   PONumber = m.Category,
-                                  RRNumber = m.HelpdeskNo.ToString(),
+                                  RRNumber = m.HelpdeskNo,
                                   ItemCode = w.ItemCode,
                                   ItemDescription = w.ItemDescription,
                                   Quantity = m.QuantityOrdered,
                                   UnitPrice = w.UnitPrice,
-                                  LineAmount = (w.UnitPrice  * m.QuantityOrdered),
+                                  LineAmount = (w.UnitPrice * m.QuantityOrdered),
                                   UOM = w.Uom,
                                   CheckingRemarks = "Move Order",
                                   DivisionCode = m.CompanyCode,
                                   Division = m.CompanyName,
                                   LocationCode = m.LocationCode,
                                   Location = m.LocationName,
-                                  AccountTitle = m.AccountTitles,
-                                  AccountTitleCode = m.AccountCode,
+                                  AccountTitle = m.AccountTitles != null ? m.AccountTitles : "SE - R & M - Transport Vehicles",
+                                  AccountTitleCode = m.AccountCode != null ? m.AccountCode : "537620",
                                   DepartmentCode = m.DepartmentCode,
                                   Department = m.DepartmentName,
                                   AssetCIP = m.Cip_No,
                                   Batch = m.ItemRemarks,
                                   ServiceProvider = t.PreparedBy,
                                   ServiceProviderCode = u.EmpId,
-                                  ReferenceNo = (m.Id.ToString() ?? "") + (m.EmpId ?? ""),
+                                  ReferenceNo = m.EmpId != null ? (m.Id.ToString() ?? "") + (m.EmpId ?? "") : m.Id.ToString(),
                                   Remarks = m.ItemRemarks
-                                  
+
 
                               });
 
@@ -380,7 +376,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                 && x.receipt.TransactionDate >= startDate && x.receipt.TransactionDate <= endDate)
                 .Select(x => new ETDGLResult
                 {
-                    SyncId = x.warehouse.Id.ToString(),
+                    SyncId = "MR-" + x.warehouse.Id.ToString(),
                     TransactionDate = x.receipt.TransactionDate,
                     ItemCode = x.warehouse.ItemCode,
                     ItemDescription = x.warehouse.ItemDescription,
@@ -417,7 +413,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                 .Where(x => x.issue.IsActive == true && x.miscDetail.TransactionDate >= startDate && x.miscDetail.TransactionDate <= endDate)
                 .Select(x => new ETDGLResult
                 {
-                    SyncId = x.issue.Id.ToString(),
+                    SyncId = "MI-" + x.issue.Id.ToString(),
                     TransactionDate = x.miscDetail.TransactionDate.Date,
                     ItemCode = x.issue.ItemCode,
                     ItemDescription = x.issue.ItemDescription,
@@ -452,10 +448,12 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             {
                 var result =  _context.BorrowedIssues
                     .AsNoTracking()
-                    .Join(_context.BorrowedIssueDetails, borrow => borrow.Id, borrowDetail => borrowDetail.BorrowedPKey,
-                    (borrow, borrowDetail) => new { borrow, borrowDetail }).Join(_context.Users, x => x.borrow.PreparedBy, user => user.FullName,
-            (x, user) => new { x.borrow, x.borrowDetail, user })
-                    .Where(x => x.borrowDetail.IsActive == true && x.borrowDetail.PreparedDate >= startDate && x.borrowDetail.PreparedDate <= endDate)
+                    .GroupJoin(_context.BorrowedIssueDetails, borrow => borrow.Id, borrowDetail => borrowDetail.BorrowedPKey,
+                    (borrow, borrowDetail) => new { borrow, borrowDetail })
+                    .SelectMany(x => x.borrowDetail.DefaultIfEmpty(), (x, borrowDetail) => new {x.borrow, borrowDetail })
+                    .GroupJoin(_context.Users, x => x.borrow.PreparedBy, user => user.FullName, (x, user) => new { x.borrow, x.borrowDetail, user })
+                    .SelectMany(x => x.user.DefaultIfEmpty(), (x, user) => new {x.borrow, x.borrowDetail, user })
+                    .Where(x => x.borrowDetail.IsActive == true && x.borrowDetail.PreparedDate >= startDate && x.borrowDetail.PreparedDate <= endDate && x.borrow.IsReturned == false)
                     .Select(x => new ETDGLResult
                     {
                         SyncId = x.borrowDetail.Id.ToString(),
@@ -547,12 +545,12 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
 
                 var borrowedIssueList = _context.BorrowedIssues
                     .AsNoTracking()
-                    .Where(x => x.IsActive == true);
+                    .Where(x => x.IsActive == true && x.IsReturned == true);
 
                 var result =  returnList
                     .GroupJoin(borrowedIssueList, borrowDetail => borrowDetail.BorrowedId, borrow => borrow.Id,
                     (borrowDetail, borrow) => new { borrowDetail, borrow })
-                    .SelectMany(x => x.borrow.DefaultIfEmpty(), (x, borrow) => new { x.borrowDetail, borrow }).Where(x => x.borrow.PreparedDate >= startDate && x.borrow.PreparedDate >= endDate)
+                    .SelectMany(x => x.borrow.DefaultIfEmpty(), (x, borrow) => new { x.borrowDetail, borrow }).Where(x => x.borrow.PreparedDate >= startDate && x.borrow.PreparedDate <= endDate)
                     .Select(x => new ETDGLResult
                     {
 
@@ -597,7 +595,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     .Select(x => new ETDGLResult
                     {
 
-                        SyncId = x.Id.ToString(),
+                        SyncId = "R-" + x.Id.ToString(),
                         TransactionDate = x.FuelRegister.Transact_At.Value.Date,
                         ItemCode = x.Material.ItemCode,
                         ItemDescription = x.Material.ItemDescription,

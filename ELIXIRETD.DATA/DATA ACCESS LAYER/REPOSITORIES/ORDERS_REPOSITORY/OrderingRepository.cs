@@ -533,13 +533,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
         public async Task<bool> ValidateExistOrderandItemCode(int TransactId, string ItemCode, string customertype, string itemdescription, string customercode)
         {
-            var validate = await _context.Orders.Where(x => x.TrasactId == TransactId)
-                                                    .Where(x => x.Customercode == customercode)
-                                                    .Where(x => x.CustomerType == customertype)
-                                                    .Where(x => x.ItemCode == ItemCode)
-                                                    //.Where(x => x.CustomerType == CustomerType)
-                                                    .Where(x => x.ItemdDescription == itemdescription)
-                                                    .FirstOrDefaultAsync();
+            var validate = await _context.Orders.Where(x => x.TrasactId == TransactId
+                                                       && x.Customercode == customercode
+                                                       && x.CustomerType == customertype
+                                                       && x.ItemCode == ItemCode
+                                                       && x.ItemdDescription == itemdescription
+                                                       && x.IsActive == true
+                                                       && x.IsCancel == false)
+                                                      .FirstOrDefaultAsync();
+                                                    
 
             if (validate == null)
                 return false;
