@@ -50,5 +50,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.FUEL_REGISTER_DTO
 
         public string Transact_By { get; set; }
 
+        public string issuanceDate { get; set; }
+        public string cipNo { get; set; }
+        public string dieselPONumber { get; set; }
+        public string fuelPump { get; set; }
+
     }
 }

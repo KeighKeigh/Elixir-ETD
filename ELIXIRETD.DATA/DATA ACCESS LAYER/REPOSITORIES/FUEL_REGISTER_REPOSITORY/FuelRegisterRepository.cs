@@ -10,6 +10,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.FUEL_REGISTER_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
 {
@@ -58,6 +59,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 fuelDetailsExist.Liters = fuel.Liters;
                 fuelDetailsExist.Warehouse_ReceivingId = fuelDetailsExist.Warehouse_ReceivingId;
                 fuelDetailsExist.Modified_By = fuel.Modified_By;
+                fuelDetailsExist.dieselPONumber = fuel.dieselPONumber;
+                fuelDetailsExist.fuelPump = fuel.fuelPump;
 
             }
             else
@@ -68,6 +71,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Liters = fuel.Liters,
                     Warehouse_ReceivingId = fuel.Warehouse_ReceivingId,
                     Added_By = fuel.Added_By,
+                    dieselPONumber = fuel.dieselPONumber,
+                    fuelPump = fuel.fuelPump
                 };
 
                 await _context.FuelRegisterDetails.AddAsync(newFuelDetails);
@@ -106,6 +111,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 fuelRegisterExist.Account_Title_Name = fuel.Account_Title_Name;
                 fuelRegisterExist.EmpId = fuel.EmpId;
                 fuelRegisterExist.Fullname = fuel.Fullname;
+                fuelRegisterExist.cipNo = fuel.cipNo;
+                //fuelRegisterExist.dieselPONumber = fuel.dieselPONumber;
+                //fuelRegisterExist.fuelPump = fuel.fuelPump;
+                fuelRegisterExist.issuanceDate = DateTime.ParseExact(fuel.issuanceDate, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
 
             }
             else
@@ -136,6 +145,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Transact_By = fuel.Transact_By,
                     Odometer = fuel.Odometer,
                     AssetId = fuel.AssetId,
+                    cipNo = fuel.cipNo,
+                    issuanceDate = DateTime.ParseExact(fuel.issuanceDate, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture)
 
                 };
 

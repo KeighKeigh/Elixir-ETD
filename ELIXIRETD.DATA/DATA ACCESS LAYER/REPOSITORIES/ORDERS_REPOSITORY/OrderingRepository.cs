@@ -2160,7 +2160,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
         }
 
 
-
+        //kkadjust
         public async Task<bool> SavePreparedMoveOrder(MoveOrder order)
         {
             var existing = await _context.Orders.Where(x => x.TrasactId == order.OrderNo)
@@ -2181,13 +2181,24 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
             foreach (var x in existingsMoveOrders)
             {
-                x.Department = order.Department;
-                x.CompanyCode = order.CompanyCode;
-                x.CompanyName = order.CompanyName;
-                x.DepartmentCode = order.DepartmentCode;
-                x.DepartmentName = order.DepartmentName;
-                x.LocationCode = order.LocationCode;
-                x.LocationName = order.LocationName;
+
+                var oneCharging = _context.OneRdfs.FirstOrDefault(y => y.code == x.One_Charging);
+
+                
+                x.Department = oneCharging.department_id;
+                x.DepartmentCode = oneCharging.department_code;
+                x.DepartmentName = oneCharging.department_name;
+                x.CompanyCode = oneCharging.company_code;
+                x.CompanyName = oneCharging.company_name;
+                x.LocationCode = oneCharging.location_code;
+                x.LocationName = oneCharging.location_name;
+                //x.Department = order.Department;
+                //x.CompanyCode = order.CompanyCode;
+                //x.CompanyName = order.CompanyName;
+                //x.DepartmentCode = order.DepartmentCode;
+                //x.DepartmentName = order.DepartmentName;
+                //x.LocationCode = order.LocationCode;
+                //x.LocationName = order.LocationName;
                 x.ApprovedDate = DateTime.Now;
                 x.ApproveDateTempo = DateTime.Now;
                 x.IsApprove = true;
@@ -2603,6 +2614,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
         }
 
+
+        //kk adjust
         public async Task<bool> ApprovalForMoveOrders(MoveOrder moveorder)
         {
             var existing = await _context.MoveOrders.Where(x => x.OrderNo == moveorder.OrderNo)
@@ -2613,10 +2626,19 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
             foreach (var items in existing)
             {
+                var oneCharging = _context.OneRdfs.FirstOrDefault(x => x.code == items.One_Charging);
 
                 items.ApprovedDate = DateTime.Now;
                 items.ApproveDateTempo = DateTime.Now;
                 items.IsApprove = true;
+                items.Department = oneCharging.department_id;
+                items.DepartmentCode = oneCharging.department_code;
+                items.DepartmentName = oneCharging.department_name;
+                items.CompanyCode = oneCharging.company_code;
+                items.CompanyName = oneCharging.company_name;
+                items.LocationCode = oneCharging.location_code;
+                items.LocationName = oneCharging.location_name;
+                
 
             }
 

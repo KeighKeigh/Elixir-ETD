@@ -49,6 +49,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.FUEL_REGISTER_MODEL
         public bool Is_Active { get; set; } = true;
         public string Remarks { get; set; }
 
+        public string cipNo { get; set; }
+        public DateTime? issuanceDate { get; set; }
+
         public ICollection<FuelRegisterDetail> FuelRegisterDetails { get; set; }
 
     }

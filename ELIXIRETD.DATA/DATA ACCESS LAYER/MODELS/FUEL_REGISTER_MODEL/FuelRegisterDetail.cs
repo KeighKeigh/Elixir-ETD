@@ -26,6 +26,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.FUEL_REGISTER_MODEL
         public string Modified_By { get; set; }
         public DateTime? Updated_At { get; set; }
         public bool Is_Active { get; set; } = true;
+        public string dieselPONumber { get; set; }
+        public string fuelPump { get; set; }
 
     }
 }

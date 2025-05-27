@@ -13,6 +13,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIRETD.DATA.Migrations;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 {
@@ -854,13 +855,20 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Approve_By = r.FuelRegister.Approve_By,
                     Transact_At = r.FuelRegister.Transact_At,
                     Remarks = r.FuelRegister.Remarks,
-
+                    cipNo = r.FuelRegister.cipNo,
+                    //dieselPONumber = r.FuelRegister.dieselPONumber,
+                    //fuelPump = r.FuelRegister.fuelPump,
+                    issuanceDate = r.FuelRegister.issuanceDate.Value.ToString("yyyy-MM-dd hh:mm tt"),
                 });
+
+
+            DateTime from = DateTime.ParseExact(DateFrom, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
+            DateTime to = DateTime.ParseExact(DateTo, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
 
             if (!string.IsNullOrEmpty(DateTo) && !string.IsNullOrEmpty(DateFrom))
             {
                 results = results
-                    .Where(r => r.Transact_At.Value.Date >= Convert.ToDateTime(DateFrom).Date && r.Transact_At.Value.Date <= Convert.ToDateTime(DateTo).Date);
+                    .Where(r => r.Transact_At.Value >= from && r.Transact_At.Value <= to);
             }
 
             if (!string.IsNullOrEmpty(Search))

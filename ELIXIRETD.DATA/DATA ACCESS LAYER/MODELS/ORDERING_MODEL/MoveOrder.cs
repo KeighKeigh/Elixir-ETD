@@ -109,6 +109,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 
         public bool? Is_Asset_Tag { get; set; }
 
+        public string One_Charging { get; set; }
+
 
     }
 }

@@ -4,6 +4,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIRETD.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250526024850_AddNewTableForOneRdf")]
+    partial class AddNewTableForOneRdf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,12 +392,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<DateTime?>("Updated_At")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("cipNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("issuanceDate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssetId");
@@ -437,12 +433,6 @@ namespace ELIXIRETD.DATA.Migrations
 
                     b.Property<int?>("Warehouse_ReceivingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("dieselPONumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fuelPump")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -746,76 +736,52 @@ namespace ELIXIRETD.DATA.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
 
+                    b.Property<int?>("BusinessUnit")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DateAdded")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("business_unit_code")
+                    b.Property<string>("DepartmentCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("business_unit_id")
+                    b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("business_unit_name")
+                    b.Property<string>("DepartmentName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("code")
+                    b.Property<string>("LocationCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("company_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("company_id")
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("company_name")
+                    b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("deleted_at")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("department_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_id")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("department_unit_id")
+                    b.Property<int?>("SubUnit")
                         .HasColumnType("int");
 
-                    b.Property<string>("department_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("location_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("location_id")
+                    b.Property<int?>("SyncId")
                         .HasColumnType("int");
 
-                    b.Property<string>("location_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("sub_unit_id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("sub_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("sync_id")
+                    b.Property<int?>("Unit")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -968,9 +934,6 @@ namespace ELIXIRETD.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LocationName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("One_Charging")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")

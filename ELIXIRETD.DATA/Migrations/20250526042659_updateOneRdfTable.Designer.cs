@@ -4,6 +4,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIRETD.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250526042659_updateOneRdfTable")]
+    partial class updateOneRdfTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,12 +392,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<DateTime?>("Updated_At")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("cipNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("issuanceDate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssetId");
@@ -437,12 +433,6 @@ namespace ELIXIRETD.DATA.Migrations
 
                     b.Property<int?>("Warehouse_ReceivingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("dieselPONumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("fuelPump")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -749,9 +739,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<DateTime?>("DateAdded")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("business_unit_code")
                         .HasColumnType("nvarchar(max)");
 
@@ -773,8 +760,8 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<string>("company_name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("deleted_at")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("deleted_at")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("department_code")
                         .HasColumnType("nvarchar(max)");
@@ -794,14 +781,14 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<string>("department_unit_name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("locationN_nme")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("location_code")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("location_id")
                         .HasColumnType("int");
-
-                    b.Property<string>("location_name")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
@@ -968,9 +955,6 @@ namespace ELIXIRETD.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LocationName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("One_Charging")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")

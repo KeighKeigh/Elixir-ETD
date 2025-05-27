@@ -20,7 +20,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
 
         public string Uom { get; set; }
         public string Item_Categories { get; set; }
-
         public int? Warehouse_ReceivingId { get; set; }
 
         public decimal Unit_Cost { get; set; }
@@ -53,6 +52,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public DateTime? Transact_At { get; set; }
 
         public string Remarks { get; set; }
+        public string issuanceDate { get; set; }
+        public string cipNo { get; set; }
+
 
     }
 }
