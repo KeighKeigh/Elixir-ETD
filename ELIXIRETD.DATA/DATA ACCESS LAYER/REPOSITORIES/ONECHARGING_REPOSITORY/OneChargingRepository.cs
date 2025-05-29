@@ -1,5 +1,6 @@
 ﻿using ELIXIRETD.DATA.CORE.INTERFACES.ONECHARGING_INTERFACE;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO;
+using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
 {
-    internal class OneChargingRepository : IOneChargingRepository
+    public class OneChargingRepository : IOneChargingRepository
     {
         private readonly StoreContext _context;
         public OneChargingRepository(StoreContext context)
@@ -101,6 +102,48 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+
+        public async Task<PagedList<OneChargingDto>> GetOneChargingPagination(UserParams userParams, bool? status, string search)
+        {
+            var result = _context.OneRdfs.Select(x => new OneChargingDto
+            {
+                code = x.code,
+                name = x.name,
+                company_code = x.company_code,
+                company_name = x.company_name,
+                company_id = x.company_id,
+                business_unit_code = x.business_unit_code,
+                business_unit_name = x.business_unit_name,
+                business_unit_id = x.business_unit_id,
+                department_code = x.department_code,
+                department_name = x.department_name,
+                department_id = x.department_id,
+                department_unit_code = x.department_unit_code,
+                department_unit_name = x.department_unit_name,
+                department_unit_id = x.department_unit_id,
+                sub_unit_code = x.sub_unit_code,
+                sub_unit_name = x.sub_unit_name,
+                sub_unit_id = x.sub_unit_id,
+                location_code = x.location_code,
+                location_name = x.location_name,
+                location_id = x.location_id,
+                IsActive = x.IsActive,
+
+            });
+
+            if (status != null)
+            {
+                result = result.Where(x => x.IsActive == status);
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                result = result.Where(x => Convert.ToString(x.code).ToLower().Contains(search.Trim().ToLower())
+                                        || Convert.ToString(x.name).ToLower().Contains(search.Trim().ToLower()));
+            }
+            return await PagedList<OneChargingDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
     }
 }

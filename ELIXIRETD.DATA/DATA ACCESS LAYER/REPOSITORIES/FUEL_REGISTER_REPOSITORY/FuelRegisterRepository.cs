@@ -114,7 +114,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 fuelRegisterExist.cipNo = fuel.cipNo;
                 //fuelRegisterExist.dieselPONumber = fuel.dieselPONumber;
                 //fuelRegisterExist.fuelPump = fuel.fuelPump;
-                fuelRegisterExist.issuanceDate = DateTime.ParseExact(fuel.issuanceDate, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
+                fuelRegisterExist.issuanceDate = fuel.issuanceDate;
 
             }
             else
@@ -146,7 +146,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Odometer = fuel.Odometer,
                     AssetId = fuel.AssetId,
                     cipNo = fuel.cipNo,
-                    issuanceDate = DateTime.ParseExact(fuel.issuanceDate, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture)
+                    issuanceDate = fuel.issuanceDate
 
                 };
 
@@ -594,6 +594,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
 
 
             var results =  _context.FuelRegisters
+                .AsNoTrackingWithIdentityResolution()
                 .Include(r => r.FuelRegisterDetails)
                 .ThenInclude(r => r.Material)
                 .Include(r => r.FuelRegisterDetails)
@@ -602,7 +603,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 .Select(f => new GetFuelRegisterDto
                 {
                     Id = f.Id,
-                    Source = f.Source,
+                    Source = "Diesel Tank (Head Office)",
                     RequestorId = f.RequestorId,
                     RequestorName = f.RequestorName,
                     GetFuelDetails = f.FuelRegisterDetails
@@ -617,6 +618,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                         Warehouse_ReceivingId = f.Warehouse_ReceivingId,
                         Unit_Cost = f.Warehouse_Receiving.UnitPrice,
                         Liters = f.Liters.Value,
+                        dieselPONumber = f.dieselPONumber,
+                        fuelPump = f.fuelPump
+                        
+                        
 
                     }).ToList(),
                     Asset = f.Asset.AssetCode,
@@ -644,7 +649,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Is_Transact = f.Is_Transact,
                     Transact_At = f.Transact_At,
                     Transact_By = f.Transact_By,
-                    Remarks = f.Remarks
+                    Remarks = f.Remarks,
+                    issuanceDate = f.issuanceDate.Value.ToString("MM/dd/yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                    cipNo = f.cipNo,
+                    Month = f.issuanceDate.Value.ToString("yyMM")
+                    
+                    
+
+
 
                 });
 
@@ -817,6 +829,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Created_At = f.Created_At,
                     Modified_By = f.Modified_By,
                     Updated_At = f.Updated_At,
+                    dieselPONumber = f.dieselPONumber,
+                    fuelPump = f.fuelPump
                
 
                 }).ToListAsync();

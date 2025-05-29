@@ -827,7 +827,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .Select(r => new FuelRegisterReportsDto
                 {
                     Id = r.Id,
-                    Source = r.FuelRegister.Source,
+                    Source = "Diesel Tank (Head Office)",
                     RequestorId = r.FuelRegister.RequestorId,
                     RequestorName = r.FuelRegister.RequestorName,
                     Item_Code = r.Material.ItemCode,
@@ -837,6 +837,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Warehouse_ReceivingId = r.Warehouse_ReceivingId,
                     Unit_Cost = r.Warehouse_Receiving.UnitPrice,
                     Liters = r.Liters.Value,
+                    lineAmount = Math.Round((r.Warehouse_Receiving.UnitPrice * r.Liters.Value), 2),
                     Asset = r.FuelRegister.Asset.AssetCode,
                     Odometer = r.FuelRegister.Odometer,
                     Company_Code = r.FuelRegister.Company_Code,
@@ -856,19 +857,20 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Transact_At = r.FuelRegister.Transact_At,
                     Remarks = r.FuelRegister.Remarks,
                     cipNo = r.FuelRegister.cipNo,
-                    //dieselPONumber = r.FuelRegister.dieselPONumber,
-                    //fuelPump = r.FuelRegister.fuelPump,
-                    issuanceDate = r.FuelRegister.issuanceDate.Value.ToString("yyyy-MM-dd hh:mm tt"),
+                    dieselPONumber = r.dieselPONumber,
+                    fuelPump = r.fuelPump,
+                    issuanceDate = r.FuelRegister.issuanceDate.Value.ToString("MM/dd/yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                    Month = r.FuelRegister.issuanceDate.Value.ToString("yyMM")
                 });
 
 
-            DateTime from = DateTime.ParseExact(DateFrom, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
-            DateTime to = DateTime.ParseExact(DateTo, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
+            //DateTime from = DateTime.ParseExact(DateFrom, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
+            //DateTime to = DateTime.ParseExact(DateTo, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
 
             if (!string.IsNullOrEmpty(DateTo) && !string.IsNullOrEmpty(DateFrom))
             {
                 results = results
-                    .Where(r => r.Transact_At.Value >= from && r.Transact_At.Value <= to);
+                    .Where(r => r.Transact_At.Value.Date >= Convert.ToDateTime(DateFrom).Date && r.Transact_At.Value.Date <= Convert.ToDateTime(DateTo).Date);
             }
 
             if (!string.IsNullOrEmpty(Search))

@@ -22,9 +22,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string Item_Categories { get; set; }
         public int? Warehouse_ReceivingId { get; set; }
 
-        public decimal Unit_Cost { get; set; }
+        public decimal? Unit_Cost { get; set; }
 
-        public decimal Liters { get; set; }
+        public decimal? Liters { get; set; }
         public string Asset { get; set; }
 
         public decimal? Odometer { get; set; }
@@ -54,6 +54,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string Remarks { get; set; }
         public string issuanceDate { get; set; }
         public string cipNo { get; set; }
+        public string dieselPONumber { get; set; }
+        public string fuelPump { get; set; }
+        public string Month { get; set; }
+        public decimal? lineAmount { get; set; }
 
 
     }
