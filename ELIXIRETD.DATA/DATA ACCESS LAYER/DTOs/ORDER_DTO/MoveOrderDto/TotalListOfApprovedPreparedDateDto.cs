@@ -33,6 +33,7 @@
         public bool IsRush { get; set; }
 
         public string Rush { get; set; }
+        public string OneChargingCode { get; set; }
 
 
     }

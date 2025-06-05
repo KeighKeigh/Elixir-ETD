@@ -19,7 +19,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.FUEL_REGISTER_DTO
         public string Added_By { get; set; }
         public string Modified_By { get; set; }
         public string dieselPONumber { get; set; }
-        public string fuelPump { get; set; }
+        public int? fuelPump { get; set; }
 
 
     }

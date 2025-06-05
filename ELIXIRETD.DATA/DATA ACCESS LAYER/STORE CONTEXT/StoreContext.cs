@@ -53,6 +53,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<FuelRegisterDetail> FuelRegisterDetails { get; set; }
         public virtual DbSet<Asset> Assets { get; set; }
         public virtual DbSet<OneRdf> OneRdfs { get; set; }
+        public virtual DbSet<OneAccountTitle> OneAccountTitles { get; set; }
 
 
 

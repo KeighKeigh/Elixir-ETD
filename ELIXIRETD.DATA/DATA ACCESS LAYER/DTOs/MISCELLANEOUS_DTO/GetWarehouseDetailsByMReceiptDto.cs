@@ -57,5 +57,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.MISCELLANEOUS_DTO
         //public string TransactionType { get; set; } 
 
         public string Details { get; set; }
+
+        public string CodeAccountTitle { get; set; }
+
+        public string OneChargingCode { get; set; }
+        public string one_charging_name { get; set; }
+        public string business_unit_code { get; set; }
+        public string business_unit_name { get; set; }
+        public string department_unit_code { get; set; }
+        public string department_unit_name { get; set; }
+        public string sub_unit_code { get; set; }
+        public string sub_unit_name { get; set; }
     }
 }

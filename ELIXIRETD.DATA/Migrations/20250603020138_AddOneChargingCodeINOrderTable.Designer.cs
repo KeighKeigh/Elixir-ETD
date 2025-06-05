@@ -4,6 +4,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIRETD.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250603020138_AddOneChargingCodeINOrderTable")]
+    partial class AddOneChargingCodeINOrderTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,12 +44,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<int>("BorrowedPkey")
                         .HasColumnType("int");
 
-                    b.Property<string>("BusinessUnitCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BusinessUnitName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CompanyCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -61,12 +57,6 @@ namespace ELIXIRETD.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DepartmentName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepartmentUnitCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepartmentUnitName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmpId")
@@ -93,20 +83,8 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OneChargingCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OneChargingName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("ReportNumber")
                         .HasColumnType("int");
-
-                    b.Property<string>("SubUnitCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubUnitName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(max)");
@@ -342,12 +320,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<int?>("AssetId")
                         .HasColumnType("int");
 
-                    b.Property<string>("BusinessUnitCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BusinessUnitName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Company_Code")
                         .HasColumnType("nvarchar(max)");
 
@@ -356,12 +328,6 @@ namespace ELIXIRETD.DATA.Migrations
 
                     b.Property<DateTime>("Created_At")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("DepartmentUnitCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepartmentUnitName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Department_Code")
                         .HasColumnType("nvarchar(max)");
@@ -399,12 +365,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<decimal?>("Odometer")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("OneChargingCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OneChargingName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Reject_By")
                         .HasColumnType("nvarchar(max)");
 
@@ -421,12 +381,6 @@ namespace ELIXIRETD.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Source")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubUnitCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubUnitName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("Transact_At")
@@ -635,9 +589,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OneChargingCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PreparedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -655,27 +606,6 @@ namespace ELIXIRETD.DATA.Migrations
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
-
-                    b.Property<string>("business_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("business_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("one_charging_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_name")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -781,9 +711,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OneChargingCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PreparedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -805,64 +732,12 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<string>("TransactionType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("business_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("business_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("one_charging_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("supplier")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("MiscellaneousReceipts");
-                });
-
-            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneAccountTitle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("AccountTitleCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AccountTitleName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Delete")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("SyncId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OneAccountTitles");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneRdf", b =>
@@ -1151,27 +1026,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("business_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("business_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("one_charging_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("MoveOrders");
@@ -1219,9 +1073,6 @@ namespace ELIXIRETD.DATA.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Cip_No")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodeAccountTitle")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyCode")
@@ -1360,27 +1211,6 @@ namespace ELIXIRETD.DATA.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Uom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("business_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("business_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("department_unit_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("one_charging_name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("sub_unit_name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

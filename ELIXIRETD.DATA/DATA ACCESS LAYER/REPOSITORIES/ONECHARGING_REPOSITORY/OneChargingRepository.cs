@@ -61,7 +61,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
                 location_name = x.location_name,
                 location_id = x.location_id,
                 deleted_at = x.deleted_at,
-                IsActive = x.deleted_at != null ? false : true,
+                IsActive = string.IsNullOrEmpty(x.deleted_at) ? true : false,
 
             }).ToList();
 
@@ -94,7 +94,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
                     updatedata.location_name = datas.location_name;
                     updatedata.location_id = datas.location_id;
                     updatedata.deleted_at = datas.deleted_at;
-                    updatedata.IsActive = datas.deleted_at != null ? false : true;
+                    updatedata.IsActive = string.IsNullOrEmpty(datas.deleted_at) ? true : false;
                 }
 
             }
@@ -144,6 +144,81 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
                                         || Convert.ToString(x.name).ToLower().Contains(search.Trim().ToLower()));
             }
             return await PagedList<OneChargingDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<bool> AddAccountTitle(List<OneAccountTitleDto> data)
+        {
+            var allCommands = data;
+
+            var incomingSyncIds = allCommands
+                .Where(x => x.syncId != null)
+                .Select(x => x.syncId)
+                .ToList();
+            var existingSyncIds = await _context.OneAccountTitles
+                .Where(x => incomingSyncIds.Contains(x.SyncId))
+                .Select(x => x.SyncId).ToListAsync();
+
+            var updateSync = allCommands.Where(x => existingSyncIds.Contains(x.syncId)).ToList();
+            var newSync = allCommands.Where(x => !existingSyncIds.Contains(x.syncId)).ToList();
+
+
+            var dataSync = newSync.Select(x => new OneAccountTitle
+            {
+                code = x.code,
+                AccountTitleName = x.accountTitleName,
+                AccountTitleCode = x.accountTitleCode,
+                SyncId = x.syncId,
+                Delete = x.delete,
+                IsActive = string.IsNullOrEmpty(x.delete) ? true : false,
+
+            }).ToList();
+
+
+            await _context.OneAccountTitles.AddRangeAsync(dataSync);
+
+            foreach (OneAccountTitleDto datas in updateSync)
+            {
+                var updatedata = _context.OneAccountTitles.FirstOrDefault(o => o.SyncId == datas.syncId);
+                if (updatedata != null)
+                {
+                    updatedata.code = datas.code;
+                    updatedata.AccountTitleName = datas.accountTitleName;
+                    updatedata.AccountTitleCode = datas.accountTitleCode;
+                    updatedata.Delete = datas.delete;
+                    updatedata.IsActive = datas.delete != null ? false : true;
+                }
+
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        public async Task<PagedList<OneAccountTitleDto>> GetAccountTitle(UserParams userParams, bool? status, string search)
+        {
+            var result = _context.OneAccountTitles.Select(x => new OneAccountTitleDto
+            {
+                code = x.code,
+                accountTitleCode = x.AccountTitleCode,
+                accountTitleName = x.AccountTitleName,
+                isActive = x.IsActive,
+
+            });
+
+            if (status != null)
+            {
+                result = result.Where(x => x.isActive == status);
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                result = result.Where(x => Convert.ToString(x.code).ToLower().Contains(search.Trim().ToLower())
+                                        || Convert.ToString(x.accountTitleName).ToLower().Contains(search.Trim().ToLower())
+                                        || Convert.ToString(x.accountTitleCode).ToLower().Contains(search.Trim().ToLower()));
+            }
+            return await PagedList<OneAccountTitleDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
     }
 }

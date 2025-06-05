@@ -60,5 +60,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public int? AgingDays { get; set; }
         public bool IsActive { get; set; }
         public decimal ? UnitPrice { get; set; }
+        public string OneChargingName { get; set; }
+        public string BusinessUnitCode { get; set; }
+        public string BusinessUnitName { get; set; }
+        public string DepartmentUnitCode { get; set; }
+        public string DepartmentUnitName { get; set; }
+        public string SubUnitCode { get; set; }
+        public string SubUnitName { get; set; }
     }
 }

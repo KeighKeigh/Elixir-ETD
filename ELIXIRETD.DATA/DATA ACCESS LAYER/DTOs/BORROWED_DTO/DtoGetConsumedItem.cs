@@ -46,7 +46,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.BORROWED_DTO
         public decimal ReturnedQuantity { get; set; }
 
         public int ? ReportNumber { get; set; }
-
-
+        public string OneChargingCode { get; set; }
+        public string OneChargingName { get; set; }
+        public string BusinessUnitCode { get; set; }
+        public string BusinessUnitName { get; set; }
+        public string DepartmentUnitCode { get; set; }
+        public string DepartmentUnitName { get; set; }
+        public string SubUnitCode { get; set; }
+        public string SubUnitName { get; set; }
     }
 }

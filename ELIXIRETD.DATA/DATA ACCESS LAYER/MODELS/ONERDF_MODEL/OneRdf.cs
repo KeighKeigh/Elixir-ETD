@@ -34,5 +34,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL
         public DateTime? DateAdded { get; set; } = DateTime.Now;
 
         public bool? IsActive { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

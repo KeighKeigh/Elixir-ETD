@@ -87,6 +87,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
 
         public async Task<FuelRegister> CreateFuelRegister(CreateFuelRegisterDto fuel)
         {
+            var borrowedOne = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == fuel.OneChargingCode);
            
 
             var fuelRegisterExist = await _context.FuelRegisters
@@ -101,12 +102,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 fuelRegisterExist.Modified_By = fuel.Modified_By;
                 fuelRegisterExist.Updated_At = DateTime.Now;
                 fuelRegisterExist.Remarks = fuel.Remarks;
-                fuelRegisterExist.Company_Code = fuel.Company_Code;
-                fuelRegisterExist.Company_Name = fuel.Company_Name;
-                fuelRegisterExist.Department_Code = fuel.Department_Code;
-                fuelRegisterExist.Department_Name = fuel.Department_Name;
-                fuelRegisterExist.Location_Code = fuel.Location_Code;
-                fuelRegisterExist.Location_Name = fuel.Location_Name;
+                fuelRegisterExist.Company_Code = borrowedOne.company_code;
+                fuelRegisterExist.Company_Name = borrowedOne.company_name;
+                fuelRegisterExist.Department_Code = borrowedOne.department_code;
+                fuelRegisterExist.Department_Name = borrowedOne.department_name;
+                fuelRegisterExist.Location_Code = borrowedOne.location_code;
+                fuelRegisterExist.Location_Name = borrowedOne.location_name;
                 fuelRegisterExist.Account_Title_Code = fuel.Account_Title_Code;
                 fuelRegisterExist.Account_Title_Name = fuel.Account_Title_Name;
                 fuelRegisterExist.EmpId = fuel.EmpId;
@@ -115,6 +116,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 //fuelRegisterExist.dieselPONumber = fuel.dieselPONumber;
                 //fuelRegisterExist.fuelPump = fuel.fuelPump;
                 fuelRegisterExist.issuanceDate = fuel.issuanceDate;
+                fuelRegisterExist.OneChargingName = borrowedOne.name;
+                fuelRegisterExist.BusinessUnitCode = borrowedOne.business_unit_code;
+                fuelRegisterExist.BusinessUnitName = borrowedOne.business_unit_name;
+                fuelRegisterExist.DepartmentUnitCode = borrowedOne.department_unit_code;
+                fuelRegisterExist.DepartmentUnitName = borrowedOne.department_unit_name;
+                fuelRegisterExist.SubUnitCode = borrowedOne.sub_unit_code;
+                fuelRegisterExist.SubUnitName = borrowedOne.sub_unit_name;
+                
 
             }
             else
@@ -127,12 +136,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     RequestorName = fuel.RequestorName, 
                     Added_By = fuel.Added_By,
                     Remarks = fuel.Remarks,
-                    Company_Code = fuel.Company_Code,
-                    Company_Name = fuel.Company_Name,
-                    Department_Code = fuel.Department_Code,
-                    Department_Name = fuel.Department_Name,
-                    Location_Code = fuel.Location_Code,
-                    Location_Name = fuel.Location_Name,
+                    Company_Code = borrowedOne.company_code,
+                    Company_Name = borrowedOne.company_name,
+                    Department_Code = borrowedOne.department_code,
+                    Department_Name = borrowedOne.department_name,
+                    Location_Code = borrowedOne.location_code,
+                    Location_Name = borrowedOne.location_name,
                     Account_Title_Code = fuel.Account_Title_Code,
                     Account_Title_Name = fuel.Account_Title_Name,
                     EmpId = fuel.EmpId,
@@ -146,9 +155,17 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Odometer = fuel.Odometer,
                     AssetId = fuel.AssetId,
                     cipNo = fuel.cipNo,
-                    issuanceDate = fuel.issuanceDate
+                    issuanceDate = fuel.issuanceDate,
+                    OneChargingName = borrowedOne.name,
+                    BusinessUnitCode = borrowedOne.business_unit_code,
+                    BusinessUnitName = borrowedOne.business_unit_name,
+                    DepartmentUnitCode = borrowedOne.department_unit_code,
+                    DepartmentUnitName = borrowedOne.department_unit_name,
+                    SubUnitCode = borrowedOne.sub_unit_code,
+                    SubUnitName = borrowedOne.sub_unit_name,
 
-                };
+
+            };
 
                 await _context.FuelRegisters.AddAsync(newFuelRegister);
                 await _context.SaveChangesAsync();
@@ -652,7 +669,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     Remarks = f.Remarks,
                     issuanceDate = f.issuanceDate.Value.ToString("MM/dd/yyyy hh:mm tt", CultureInfo.InvariantCulture),
                     cipNo = f.cipNo,
-                    Month = f.issuanceDate.Value.ToString("yyMM")
+                    Month = f.issuanceDate.Value.ToString("yyMM"),
+                    OneChargingName = f.OneChargingName,
+                    BusinessUnitCode = f.BusinessUnitCode,
+                    BusinessUnitName = f.BusinessUnitName,
+                    DepartmentUnitCode = f.DepartmentUnitCode,
+                    DepartmentUnitName = f.DepartmentUnitName,
+                    SubUnitCode = f.SubUnitCode,
+                    SubUnitName = f.SubUnitName,
                     
                     
 

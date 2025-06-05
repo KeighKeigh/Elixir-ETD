@@ -27,6 +27,27 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         public async Task<bool> AddMiscellaneousReceipt(MiscellaneousReceipt receipt)
         {
+            var miscOne = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == receipt.OneChargingCode);
+            if (miscOne == null)
+            {
+                return false;
+            }
+            else
+            {
+                receipt.LocationCode = miscOne.location_code;
+                receipt.LocationName = miscOne.location_name;
+                receipt.CompanyCode = miscOne.company_code;
+                receipt.CompanyName = miscOne.company_name;
+                receipt.DepartmentCode = miscOne.department_code;
+                receipt.DepartmentName = miscOne.department_name;
+                receipt.one_charging_name = miscOne.name;
+                receipt.business_unit_code = miscOne.business_unit_code;
+                receipt.business_unit_name = miscOne.business_unit_name;
+                receipt.department_unit_code = miscOne.department_unit_code;
+                receipt.department_unit_name = miscOne.department_unit_name;
+                receipt.sub_unit_code = miscOne.sub_unit_code;
+                receipt.sub_unit_name = miscOne.sub_unit_name;
+            }
 
             receipt.IsActive = true;
             receipt.PreparedDate = DateTime.Now;
@@ -117,6 +138,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                             Remarks = x.Remarks,
                                                             IsActive= x.IsActive,
                                                             Details = x.Details
+
                                                             
                                                             
                                                         });
@@ -190,7 +212,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                           AccountTitles = x.warehouse.AccountTitles,
                           EmpId = x.warehouse.EmpId,
                           FullName = x.warehouse.FullName,
-                          Details = x.receiptparents.Details
+                          Details = x.receiptparents.Details,
+                          one_charging_name = x.receiptparents.one_charging_name,
+                          business_unit_code = x.receiptparents.business_unit_code,
+                          business_unit_name = x.receiptparents.business_unit_name,
+                          department_unit_code = x.receiptparents.department_unit_code,
+                          department_unit_name = x.receiptparents.department_unit_name,
+                          sub_unit_code = x.receiptparents.sub_unit_code,
+                          sub_unit_name = x.receiptparents.sub_unit_name,
+
 
 
                           //TransactionType = x.receiptparents.TransactionType,
@@ -211,6 +241,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                                     .Where(x => x.IsActive == true)
                                                                     .FirstOrDefaultAsync();
 
+
             details.UnitPrice = warehouseUnitcost.UnitPrice;
 
 
@@ -220,6 +251,27 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
         public async Task<bool> AddMiscellaneousIssue(MiscellaneousIssue issue)
         {
+            var miscOne = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == issue.OneChargingCode);
+            if (miscOne == null)
+            {
+                return false;
+            }
+            else
+            {
+                issue.LocationCode = miscOne.location_code;
+                issue.LocationName = miscOne.location_name;
+                issue.CompanyCode = miscOne.company_code;
+                issue.CompanyName = miscOne.company_name;
+                issue.DepartmentCode = miscOne.department_code;
+                issue.DepartmentName = miscOne.department_name;
+                issue.one_charging_name = miscOne.name;
+                issue.business_unit_code = miscOne.business_unit_code;
+                issue.business_unit_name = miscOne.business_unit_name;
+                issue.department_unit_code = miscOne.department_unit_code;
+                issue.department_unit_name = miscOne.department_unit_name;
+                issue.sub_unit_code = miscOne.sub_unit_code;
+                issue.sub_unit_name = miscOne.sub_unit_name;
+            }
             await _context.MiscellaneousIssues.AddAsync(issue);
 
             return true;
@@ -766,7 +818,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                  Id = x.Id,
                                                  Customer = x.Customer,
                                                  CustomerCode = x.Customercode,
-
                                                  TransactionDate = x.TransactionDate.ToString(),
                                                  CompanyCode = x.CompanyCode,
                                                  CompanyName = x.CompanyName,
@@ -779,6 +830,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                  //EmpId = x.EmpId,
                                                  //FullName = x.FullName,
                                                  Details  = x.Details,
+                                                 one_charging_name = "yes",
+                                                 business_unit_name = x.business_unit_name,
+                                                 business_unit_code = x.business_unit_code,
+                                                 department_unit_name = x.department_unit_name,
+                                                 department_unit_code = x.department_unit_code,
+                                                 sub_unit_name = x.sub_unit_name,
+                                                 sub_unit_code = x.sub_unit_code,
+
 
                                              });
 
@@ -814,9 +873,18 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     FullName = x.misc.FullName,
                     UnitCost = x.misc.UnitPrice,
                     TotalCost  = x.misc.UnitPrice * x.misc.Quantity,
-                    Details = x.issue.Details
-                    
-                   
+                    Details = x.issue.Details,
+                    one_charging_name = "yes",
+                    business_unit_name = x.issue.business_unit_name,
+                    business_unit_code = x.issue.business_unit_code,
+                    department_unit_name = x.issue.department_unit_name,
+                    department_unit_code = x.issue.department_unit_code,
+                    sub_unit_name = x.issue.sub_unit_name,
+                    sub_unit_code = x.issue.sub_unit_code,
+
+
+
+
                 });
 
             return await warehouse.ToListAsync();

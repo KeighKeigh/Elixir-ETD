@@ -181,18 +181,18 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         AccountingTag = string.Empty,
                         TransactionDate = x.TransactionDate,
                         ClientSupplier = x.ClientSupplier ?? string.Empty,
-                        AccountTitleCode = x.AccountTitleCode,
-                        AccountTitle = x.AccountTitle,
-                        CompanyCode = "0001",
-                        Company = "RDFFLFI",
+                        AccountTitleCode = x.AccountTitleCode ?? string.Empty,
+                        AccountTitle = x.AccountTitle ?? string.Empty,
+                        CompanyCode = x.CompanyCode ?? string.Empty,
+                        Company = x.Company ?? string.Empty,
                         DivisionCode = x.DivisionCode ?? string.Empty,
                         Division = x.Division ?? string.Empty,
                         DepartmentCode = x.DepartmentCode ?? string.Empty,
                         Department = x.Department ?? string.Empty,
                         UnitCode = x.UnitCode ?? string.Empty,
-                        Unit = string.Empty,
+                        Unit = x.Unit ?? string.Empty,
                         SubUnitCode = x.SubUnitCode ?? string.Empty,
-                        SubUnit = string.Empty,
+                        SubUnit = x.SubUnit ?? string.Empty,
                         LocationCode = x.LocationCode ?? string.Empty,
                         Location = x.Location ?? string.Empty,
                         PONumber = x.PONumber ?? string.Empty,
@@ -358,7 +358,13 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   ServiceProvider = t.PreparedBy,
                                   ServiceProviderCode = u.EmpId,
                                   ReferenceNo = m.EmpId != null ? (m.Id.ToString() ?? "") + (m.EmpId ?? "") : m.Id.ToString(),
-                                  Remarks = m.ItemRemarks
+                                  Remarks = m.ItemRemarks,
+                                  Company = m.CompanyName,
+                                  CompanyCode = m.CompanyCode,
+                                  Unit = m.department_unit_name,
+                                  UnitCode = m.department_unit_code,
+                                  SubUnit = m.sub_unit_name,
+                                  SubUnitCode = m.sub_unit_code,
 
 
                               });
@@ -399,6 +405,12 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     ServiceProviderCode = x.user.EmpId,
                     RRNumber = 0.ToString(),
                     AssetCIP = "",
+                    Company = x.receipt.CompanyName,
+                    CompanyCode = x.receipt.CompanyCode,
+                    Unit = x.receipt.department_unit_name,
+                    UnitCode = x.receipt.department_unit_code,
+                    SubUnit = x.receipt.sub_unit_name,
+                    SubUnitCode = x.receipt.sub_unit_code,
                 });
 
                 return await result.ToListAsync();
@@ -438,6 +450,12 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     ServiceProviderCode = x.user.EmpId,
                     AssetCIP = "",
                     RRNumber = 0.ToString(),
+                    Company = x.miscDetail.CompanyName,
+                    CompanyCode = x.miscDetail.CompanyCode,
+                    Unit = x.miscDetail.department_unit_name,
+                    UnitCode = x.miscDetail.department_unit_code,
+                    SubUnit = x.miscDetail.sub_unit_name,
+                    SubUnitCode = x.miscDetail.sub_unit_code,
 
 
                 });
@@ -483,6 +501,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         AssetCIP = "",
                         RRNumber = 0.ToString(),
                         //Remarks = x.borrow.Remarks,
+
 
 
                     });
@@ -620,6 +639,12 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
 
                         AssetCIP = "",
                         RRNumber = 0.ToString(),
+                        Company = x.FuelRegister.Company_Name,
+                        CompanyCode = x.FuelRegister.Company_Code,
+                        Unit = x.FuelRegister.DepartmentUnitName,
+                        UnitCode = x.FuelRegister.DepartmentUnitCode,
+                        SubUnit = x.FuelRegister.SubUnitName,
+                        SubUnitCode = x.FuelRegister.SubUnitCode,
 
 
                     });

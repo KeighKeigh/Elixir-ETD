@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
 {
     public class OneChargingDto
     {
-
-            public int? sync_id { get; set; }
+        
+        public int? sync_id { get; set; }
             public string code { get; set; }
             public string name { get; set; }
             public string company_code { get; set; }
@@ -22,8 +23,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
             public string department_name { get; set; }
             public string department_id { get; set; }
             public int? department_unit_id { get; set; }
-            public string department_unit_code { get; set; }
-            public string department_unit_name { get; set; }
+        
+        public string department_unit_code { get; set; }
+        
+        public string department_unit_name { get; set; }
             public int? sub_unit_id { get; set; }
             public string sub_unit_code { get; set; }
             public string sub_unit_name { get; set; }
@@ -32,7 +35,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
             public int? location_id { get; set; }
             public string deleted_at { get; set; }
             public bool? IsActive { get; set; }
+        //public DateTime? UpdatedAt { get; set; }
 
-        
+
     }
 }

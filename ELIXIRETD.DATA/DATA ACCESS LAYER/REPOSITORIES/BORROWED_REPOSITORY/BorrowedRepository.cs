@@ -9,6 +9,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.BORROWED_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY.Excemption;
+using DocumentFormat.OpenXml.Bibliography;
 //using EntityFramework.FunctionsExtensions.DateDiffDay;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
@@ -1160,6 +1161,20 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
 
         public async Task<bool> AddBorrowConsume(BorrowedConsume consumes)
         {
+            //var borrowedOne = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == consumes.OneChargingCode);
+            //if (borrowedOne == null)
+            //{
+            //    return false;
+            //}
+            //else
+            //{
+            //    consumes.LocationCode = borrowedOne.location_code;
+            //    consumes.LocationName = borrowedOne.location_name;
+            //    consumes.CompanyCode = borrowedOne.company_code;
+            //    consumes.CompanyName = borrowedOne.company_name;
+            //    consumes.DepartmentCode = borrowedOne.department_code;
+            //    consumes.DepartmentName = borrowedOne.department_name;
+            //}
             await _context.BorrowedConsumes.AddAsync(consumes);
 
             return true;
@@ -1239,8 +1254,23 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
 
             var remainingItem = remainingItems.FirstOrDefault(item => item.Id == consumes.BorrowedItemPkey);
 
-            if (remainingItem != null && consumes.Consume <= remainingItem.RemainingQuantity && consumes.Consume >= 0)
+            var borrowedOne = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == consumes.OneChargingCode);
+
+            if (remainingItem != null && consumes.Consume <= remainingItem.RemainingQuantity && consumes.Consume >= 0 && borrowedOne != null)
             {
+                consumes.LocationCode = borrowedOne.location_code;
+                consumes.LocationName = borrowedOne.location_name;
+                consumes.CompanyCode = borrowedOne.company_code;
+                consumes.CompanyName = borrowedOne.company_name;
+                consumes.DepartmentCode = borrowedOne.department_code;
+                consumes.DepartmentName = borrowedOne.department_name;
+                consumes.OneChargingName = borrowedOne.name;
+                consumes.BusinessUnitCode = borrowedOne.business_unit_code;
+                consumes.BusinessUnitName = borrowedOne.business_unit_name;
+                consumes.DepartmentUnitCode = borrowedOne.department_unit_code;
+                consumes.DepartmentUnitName = borrowedOne.department_unit_name;
+                consumes.SubUnitCode = borrowedOne.sub_unit_code;
+                consumes.SubUnitName = borrowedOne.sub_unit_name;
                 consumes.IsActive = true;
                 await _context.BorrowedConsumes.AddAsync(consumes);
                 return true;
@@ -1270,7 +1300,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                                               x.AccountCode,
                                                               x.AccountTitles,
                                                               x.ReportNumber,
-
+                                                              x.OneChargingName,
+                                                              x.BusinessUnitCode,
+                                                              x.BusinessUnitName,
+                                                              x.DepartmentUnitName,
+                                                              x.DepartmentUnitCode,
+                                                              x.SubUnitName,
+                                                              x.SubUnitCode,
+                                                              x.OneChargingCode,
                                                               x.IsActive
                                                           })
                                                           .Select(x => new DtoGetConsumedItem
@@ -1294,7 +1331,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                                               FullName = x.Key.FullName,
                                                               EmpId = x.Key.EmpId,
                                                               IsActive = x.Key.IsActive,
-                                                              ReportNumber = x.Key.ReportNumber
+                                                              ReportNumber = x.Key.ReportNumber,
+                                                              OneChargingName = x.Key.OneChargingName,
+                                                              BusinessUnitCode = x.Key.BusinessUnitCode,
+                                                              BusinessUnitName = x.Key.BusinessUnitName,
+                                                              DepartmentUnitCode = x.Key.DepartmentUnitCode,
+                                                              DepartmentUnitName = x.Key.DepartmentUnitName,
+                                                              SubUnitName = x.Key.SubUnitName,
+                                                              SubUnitCode = x.Key.SubUnitCode,
+                                                              OneChargingCode = x.Key.OneChargingCode
 
 
 
@@ -1311,6 +1356,22 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                                                    x.borrow.ItemDescription,
                                                                    x.borrow.Uom,
                                                                    x.borrow.Quantity,
+                                                                   x.consume.LocationCode,
+                                                                   x.consume.LocationName,
+                                                                   x.consume.DepartmentCode,
+                                                                   x.consume.DepartmentName,
+                                                                   x.consume.CompanyCode,
+                                                                   x.consume.CompanyName,
+                                                                   x.consume.OneChargingName,
+                                                                   x.consume.BusinessUnitCode,
+                                                                   x.consume.BusinessUnitName,
+                                                                   x.consume.DepartmentUnitCode,
+                                                                   x.consume.DepartmentUnitName,
+                                                                   x.consume.SubUnitName,
+                                                                   x.consume.SubUnitCode,
+                                                                   x.consume.OneChargingCode
+
+
 
                                                                }).Select(x => new DtoGetConsumedItem
                                                                {
@@ -1320,6 +1381,22 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                                                    Uom = x.Key.Uom,
                                                                    BorrowedQuantity = x.Key.Quantity != null ? x.Key.Quantity : 0,
                                                                    ItemConsumedQuantity = x.Sum(x => x.consume.ConsumedQuantity != null ? x.consume.ConsumedQuantity : 0),
+                                                                   OneChargingName = x.Key.OneChargingName,
+                                                                   BusinessUnitCode = x.Key.BusinessUnitCode,
+                                                                   BusinessUnitName = x.Key.BusinessUnitName,
+                                                                   DepartmentUnitCode = x.Key.DepartmentUnitCode,
+                                                                   DepartmentUnitName = x.Key.DepartmentUnitName,
+                                                                   SubUnitName = x.Key.SubUnitName,
+                                                                   SubUnitCode = x.Key.SubUnitCode,
+                                                                   OneChargingCode = x.Key.OneChargingCode,
+                                                                   LocationName = x.Key.LocationName,
+                                                                   LocationCode = x.Key.LocationCode,
+                                                                   DepartmentCode = x.Key.DepartmentCode,
+                                                                   DepartmentName = x.Key.DepartmentName,
+                                                                   CompanyCode = x.Key.CompanyCode,
+                                                                   CompanyName = x.Key.CompanyName,
+
+
 
                                                                });
 
@@ -1347,7 +1424,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                       x.consume.AccountTitles,
                       x.consume.FullName,
                       x.consume.EmpId,
-                      x.consume.ReportNumber
+                      x.consume.ReportNumber,
+                      x.consume.OneChargingName,
+                      x.consume.BusinessUnitCode,
+                      x.consume.BusinessUnitName,
+                      x.consume.DepartmentUnitCode,
+                      x.consume.DepartmentUnitName,
+                      x.consume.SubUnitName,
+                      x.consume.SubUnitCode,
+                      x.consume.OneChargingCode
                   })
                   .Select(x => new DtoGetConsumedItem
                   {
@@ -1370,7 +1455,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                       AccountTitles = x.Key.AccountTitles,
                       FullName = x.Key.FullName,
                       EmpId = x.Key.EmpId,
-                      ReportNumber = x.Key.ReportNumber
+                      ReportNumber = x.Key.ReportNumber,
+                      OneChargingName = x.Key.OneChargingName,
+                      BusinessUnitCode = x.Key.BusinessUnitCode,
+                      BusinessUnitName = x.Key.BusinessUnitName,
+                      DepartmentUnitCode = x.Key.DepartmentUnitCode,
+                      DepartmentUnitName = x.Key.DepartmentUnitName,
+                      SubUnitName = x.Key.SubUnitName,
+                      SubUnitCode = x.Key.SubUnitCode,
+                      OneChargingCode = x.Key.OneChargingCode
 
                   });
 
@@ -1406,24 +1499,36 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
             var remainingItems = await GetItemForReturned(borrowed.BorrowedPKey); 
             var remainingItem = remainingItems.FirstOrDefault(item => item.Id == consumes.BorrowedItemPkey);
 
+            var oneCharging = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == consumes.OneChargingCode);
 
 
           
 
-            if (remainingItem != null && borrowedconsume.Consume + remainingItem.RemainingQuantity >= consumes.Consume && consumes.Consume >= 0)
+            if (remainingItem != null && borrowedconsume.Consume + remainingItem.RemainingQuantity >= consumes.Consume && consumes.Consume >= 0 && oneCharging.IsActive == true && oneCharging.code != null)
             {
 
                 borrowedconsume.Consume = consumes.Consume;
-                borrowedconsume.DepartmentCode = consumes.DepartmentCode;
-                borrowedconsume.DepartmentName = consumes.DepartmentName;
-                borrowedconsume.CompanyCode = consumes.CompanyCode;
-                borrowedconsume.LocationCode = consumes.LocationCode;
-                borrowedconsume.LocationName = consumes.LocationName;
+                borrowedconsume.DepartmentCode = oneCharging.department_code;
+                borrowedconsume.DepartmentName = oneCharging.department_name;
+                borrowedconsume.CompanyCode = oneCharging.company_code;
+                borrowedconsume.CompanyName = oneCharging.company_name;
+                borrowedconsume.LocationCode = oneCharging.location_code;
+                borrowedconsume.LocationName = oneCharging.location_name;
                 borrowedconsume.AccountCode = consumes.AccountCode;
                 borrowedconsume.AccountTitles = consumes.AccountTitles;
                 borrowedconsume.EmpId = consumes.EmpId;
                 borrowedconsume.FullName = consumes.FullName;
                 borrowedconsume.ReportNumber = consumes.ReportNumber;
+                borrowedconsume.OneChargingCode = oneCharging.code;
+                borrowedconsume.OneChargingName = oneCharging.name;
+                borrowedconsume.BusinessUnitCode = oneCharging.business_unit_code;
+                borrowedconsume.BusinessUnitName = oneCharging.business_unit_name;
+                borrowedconsume.DepartmentUnitCode = oneCharging.department_unit_code;
+                borrowedconsume.DepartmentUnitName = oneCharging.department_unit_name;
+                borrowedconsume.SubUnitCode = oneCharging.sub_unit_code;
+                borrowedconsume.SubUnitName = oneCharging.sub_unit_name;
+
+
                 return true;
 
             }
@@ -1850,6 +1955,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
 
         public async Task<IReadOnlyList<DtoViewConsumeForReturn>> ViewConsumeForReturn(int id)
         {
+            
             var Consumed = _context.BorrowedConsumes.Where(x => x.BorrowedItemPkey == id && x.IsActive == true)
                 .Select(x => new DtoViewConsumeForReturn
                 {
@@ -1869,7 +1975,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                     AccountCode = x.AccountCode,
                     AccountTitles = x.AccountTitles,
                     FullName = x.FullName,
-                    EmpId = x.EmpId
+                    EmpId = x.EmpId,
+                    OneChargingCode = x.OneChargingCode,
+                    OneChargingName = x.OneChargingName,
+                    BusinessUnitCode = x.BusinessUnitCode,
+                    BusinessUnitName = x.BusinessUnitName,
+                    DepartmentUnitCode = x.DepartmentUnitCode,
+                    DepartmentUnitName = x.DepartmentUnitName,
+                    SubUnitCode = x.SubUnitCode,
+                    SubUnitName = x.SubUnitName
 
                 });
 

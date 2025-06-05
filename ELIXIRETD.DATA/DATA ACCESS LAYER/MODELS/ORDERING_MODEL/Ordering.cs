@@ -101,5 +101,28 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL
 
         public string Plate_No { get; set; }
 
+       
+        public string CodeAccountTitle { get; set; }
+
+        public string OneChargingCode { get; set; }
+        public string one_charging_name { get; set; }
+        public string business_unit_code { get; set; }
+        public string business_unit_name { get; set; }
+        public string department_unit_code { get; set; }
+        public string department_unit_name { get; set; }
+        public string sub_unit_code { get; set; }
+        public string sub_unit_name { get; set; }
+
+        //public string OneChargingName { get; set; }S
+        //public string BusinessUnitCode { get; set; }
+        //public string BusinessUnitName { get; set; }
+        //public string DepartmentUnitCode { get; set; }
+        //public string DepartmentUnitName { get; set; }
+        //public string SubUnitCode { get; set; }
+        //public string SubUnitName { get; set; }
+
+        
+
+
     }
 }

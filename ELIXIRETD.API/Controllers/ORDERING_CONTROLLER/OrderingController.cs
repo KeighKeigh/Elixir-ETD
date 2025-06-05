@@ -45,14 +45,16 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
                 foreach (Ordering items in order)
                 {
 
-                    if (order.Count(x => x.TrasactId == items.TrasactId && x.ItemCode == items.ItemCode && x.Customercode == items.Customercode && x.CustomerType == items.CustomerType && x.IsCancel == false && x.IsActive == true) > 1)
+                    if (order.Count(x => x.TrasactId == items.TrasactId && x.ItemCode == items.ItemCode && x.Customercode == items.Customercode && x.CustomerType == items.CustomerType && x.IsCancel == false && x.IsActive == true && x.TrasactId == items.TrasactId) > 1)
                     {
                         DuplicateList.Add(items);
                         continue;
 
                     }
-                 
-                        var validateOrderNoAndItemcode = await _unitofwork.Orders.ValidateExistOrderandItemCode(items.TrasactId, items.ItemCode , items.CustomerType , items.ItemdDescription , items.Customercode);
+
+                    
+
+                    var validateOrderNoAndItemcode = await _unitofwork.Orders.ValidateExistOrderandItemCode(items.TrasactId, /*items.ItemCode , items.CustomerType , items.ItemdDescription , items.Customercode*/ items.OrderNo);
                         var validateDateNeeded = await _unitofwork.Orders.ValidateDateNeeded(items);
                         var validateCustomerName = await _unitofwork.Orders.ValidateCustomerName(items.Customercode , items.CustomerName , items.CustomerType);
                         var validateItemCode = await _context.Materials
@@ -582,9 +584,17 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
             order.Requestor = details.Requestor;
             order.Approver = User.Identity.Name;
             order.DateApproved = Convert.ToDateTime(details.DateApproved);
+            order.one_charging_name = details.one_charging_name;
+            order.business_unit_name = details.business_unit_name;
+            order.business_unit_code = details.business_unit_code;
+            order.department_unit_name = details.department_unit_name;
+            order.department_unit_code = details.department_unit_code;
+            order.sub_unit_name = details.sub_unit_name;
+            order.sub_unit_code = details.sub_unit_code;
+            order.One_Charging = details.codeAccountTitle;
 
 
-            if(order.QuantityOrdered < 0 )
+            if (order.QuantityOrdered < 0 )
             {
                 return BadRequest("Quantity order invalid!");
             }

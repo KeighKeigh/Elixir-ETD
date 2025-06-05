@@ -170,7 +170,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                              HelpdeskNo = x.moveorder.HelpdeskNo,
                              DateApproved = x.moveorder.DateApproved.ToString(),
                              Rush = x.moveorder.Rush,
-                             Remarks = x.moveorder.Remarks
+                             Remarks = x.moveorder.Remarks,
+                             OneChargingName = x.moveorder.one_charging_name,
+                             BusinessUnitCode = x.moveorder.business_unit_code,
+                             BusinessUnitName = x.moveorder.business_unit_name,
+                             DepartmentUnitCode = x.moveorder.department_unit_code,
+                             DepartmentUnitName = x.moveorder.department_unit_name,
+                             SubUnitCode = x.moveorder.sub_unit_code,
+                             SubUnitName = x.moveorder.sub_unit_name,
 
                          });
 
@@ -252,7 +259,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     PicUp_Date = x.moveorder.transact.DeliveryDate.ToString(),
                     Rush = x.moveorder.moveorder.Rush,
                     Reference = x.moveorder.moveorder.LocationName.Contains("Common") || x.moveorder.moveorder.LocationName.Contains("Head Office") || x.moveorder.moveorder.LocationName.Contains("Central Depot") ?
-                    $" {x.moveorder.moveorder.DepartmentName} {x.moveorder.moveorder.OrderNo}" : $" {x.moveorder.moveorder.LocationName} {x.moveorder.moveorder.OrderNo}"
+                    $" {x.moveorder.moveorder.DepartmentName} {x.moveorder.moveorder.OrderNo}" : $" {x.moveorder.moveorder.LocationName} {x.moveorder.moveorder.OrderNo}",
+                    OneChargingName = x.moveorder.moveorder.one_charging_name,
+                    BusinessUnitCode = x.moveorder.moveorder.business_unit_code,
+                    BusinessUnitName = x.moveorder.moveorder.business_unit_name,
+                    DepartmentUnitCode = x.moveorder.moveorder.department_unit_code,
+                    DepartmentUnitName = x.moveorder.moveorder.department_unit_name,
+                    SubUnitCode = x.moveorder.moveorder.sub_unit_code,
+                    SubUnitName = x.moveorder.moveorder.sub_unit_name,
 
                 });
 
@@ -318,6 +332,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Cip_No = x.First().Cip_No,
                     HelpdeskNo = x.First().HelpdeskNo,
                     IsRush = !string.IsNullOrEmpty(x.First().Rush) ? "Yes" : null,
+                    OneChargingName = x.First().one_charging_name,
+                    BusinessUnitCode = x.First().business_unit_code,
+                    BusinessUnitName = x.First().sub_unit_name,
+                    DepartmentUnitCode = x.First().department_unit_code,
+                    DepartmentUnitName = x.First().department_unit_name,
+                    SubUnitCode = x.First().sub_unit_code,
+                    SubUnitName = x.First().sub_unit_name,
 
                 });
 
@@ -590,7 +611,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                 FullName = receipt.FullName,
 
                                 UnitCost = receipt.UnitPrice,
-                                TotalCost = receipt.UnitPrice * receipt.ActualDelivered
+                                TotalCost = receipt.UnitPrice * receipt.ActualDelivered,
+                                OneChargingName = receiptHeader.one_charging_name,
+                                BusinessUnitCode = receiptHeader.business_unit_code,
+                                BusinessUnitName = receiptHeader.business_unit_name,
+                                DepartmentUnitCode = receiptHeader.department_unit_code,
+                                DepartmentUnitName = receiptHeader.department_unit_name,
+                                SubUnitCode = receiptHeader.sub_unit_code,
+                                SubUnitName = receiptHeader.sub_unit_name,
 
 
                             });
@@ -639,7 +667,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                            EmpId = x.issue.EmpId,
                            FullName = x.issue.FullName,
                            UnitCost = x.issue.UnitPrice,
-                           TotalCost = x.issue.UnitPrice * x.issue.Quantity
+                           TotalCost = x.issue.UnitPrice * x.issue.Quantity,
+                           OneChargingName = x.receipt.one_charging_name,
+                           BusinessUnitCode = x.receipt.business_unit_code,
+                           BusinessUnitName = x.receipt.business_unit_name,
+                           DepartmentUnitCode = x.receipt.department_unit_code,
+                           DepartmentUnitName = x.receipt.department_unit_name,
+                           SubUnitCode = x.receipt.sub_unit_code,
+                           SubUnitName = x.receipt.sub_unit_name,
 
                        });
 
@@ -723,7 +758,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                        AccountTitles = x.AccountTitles,
                                        EmpId = x.EmpId,
                                        FullName = x.FullName,
-                                       ReportNumber = x.ReportNumber
+                                       ReportNumber = x.ReportNumber,
+                                       OneChargingName = x.OneChargingName,
+                                       BusinessUnitCode = x.BusinessUnitCode,
+                                       BusinessUnitName = x.BusinessUnitName,
+                                       DepartmentUnitCode = x.DepartmentUnitCode,
+                                       DepartmentUnitName = x.DepartmentUnitName,
+                                       SubUnitCode = x.SubUnitCode,
+                                       SubUnitName = x.SubUnitName,
 
                                    });
 
@@ -753,6 +795,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                              FullName = x.consume.FullName,
                              ReportNumber = x.consume.ReportNumber,
                              UnitCost = x.borrow.UnitPrice,
+                             OneChargingName = x.consume.OneChargingName,
+                             BusinessUnitCode = x.consume.BusinessUnitCode,
+                             BusinessUnitName = x.consume.BusinessUnitName,
+                             DepartmentUnitCode = x.consume.DepartmentUnitCode,
+                             DepartmentUnitName = x.consume.DepartmentUnitName,
+                             SubUnitCode = x.consume.SubUnitCode,
+                             SubUnitName = x.consume.SubUnitName,
 
                          });
 
@@ -799,7 +848,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                              : x.borrowed.IsApprovedDate == null ? 0 : EF.Functions.DateDiffDay(x.borrowed.IsApprovedDate, DateTime.Now),
                              IsActive = x.borrowed.IsActive,
                              UnitCost = x.returned.UnitCost,
-                             LineAmount = Math.Round(x.returned.UnitCost.Value * x.returned.Consumed, 2)
+                             LineAmount = Math.Round(x.returned.UnitCost.Value * x.returned.Consumed, 2),
+                             OneChargingName = x.returned.OneChargingName,
+                             BusinessUnitCode = x.returned.BusinessUnitCode,
+                             BusinessUnitName = x.returned.BusinessUnitName,
+                             DepartmentUnitCode = x.returned.DepartmentUnitCode,
+                             DepartmentUnitName = x.returned.DepartmentUnitName,
+                             SubUnitCode = x.returned.SubUnitCode,
+                             SubUnitName = x.returned.SubUnitName,
 
 
 
@@ -860,7 +916,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     dieselPONumber = r.dieselPONumber,
                     fuelPump = r.fuelPump,
                     issuanceDate = r.FuelRegister.issuanceDate.Value.ToString("MM/dd/yyyy hh:mm tt", CultureInfo.InvariantCulture),
-                    Month = r.FuelRegister.issuanceDate.Value.ToString("yyMM")
+                    Month = r.FuelRegister.issuanceDate.Value.ToString("yyMM"),
+                    OneChargingName = r.FuelRegister.OneChargingName,
+                    BusinessUnitCode = r.FuelRegister.BusinessUnitCode,
+                    BusinessUnitName = r.FuelRegister.BusinessUnitName,
+                    DepartmentUnitCode = r.FuelRegister.DepartmentUnitCode,
+                    DepartmentUnitName = r.FuelRegister.DepartmentUnitName,
+                    SubUnitCode = r.FuelRegister.SubUnitCode,
+                    SubUnitName = r.FuelRegister.SubUnitName,
                 });
 
 
@@ -964,7 +1027,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                            LocationName = x.First().order.LocationName,
                            AccountCode = x.First().order.AccountCode,
                            AccountTitles = x.First().order.AccountTitles,
-                           ItemRemarks = x.First().order.ItemRemarks
+                           ItemRemarks = x.First().order.ItemRemarks,
+                           OneChargingName = x.First().order.one_charging_name,
+                           BusinessUnitCode = x.First().order.business_unit_code,
+                           BusinessUnitName = x.First().order.business_unit_name,
+                           DepartmentUnitCode = x.First().order.department_unit_code,
+                           DepartmentUnitName = x.First().order.department_unit_name,
+                           SubUnitCode = x.First().order.sub_unit_code,
+                           SubUnitName = x.First().order.sub_unit_name,
+
+
                        });
 
 
@@ -1838,7 +1910,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                       AssetTag = moveOrder.AssetTag,
                                       CIPNo = moveOrder.Cip_No,
                                       Helpdesk = moveOrder.HelpdeskNo,
-                                      Rush = moveOrder.Rush
+                                      Rush = moveOrder.Rush,
+                                      OneChargingName = moveOrder.one_charging_name,
+                                      BusinessUnitName = moveOrder.business_unit_name,
+                                      BusinessUnitCode = moveOrder.business_unit_code,
+                                      DepartmentUnitName = moveOrder.department_unit_name,
+                                      DepartmentUnitCode = moveOrder.department_unit_code,
+                                      SubUnitCode = moveOrder.sub_unit_code,
+                                      SubUnitName = moveOrder.sub_unit_name
                                   };
 
             
@@ -1879,7 +1958,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     CIPNo = "",
                     Helpdesk = "",
                     //Remarks = x.receipt.Remarks,
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.receipt.one_charging_name,
+                    BusinessUnitName = x.receipt.business_unit_name,
+                    BusinessUnitCode = x.receipt.business_unit_code,
+                    DepartmentUnitName = x.receipt.department_unit_name,
+                    DepartmentUnitCode = x.receipt.department_unit_code,
+                    SubUnitCode = x.receipt.sub_unit_code,
+                    SubUnitName = x.receipt.sub_unit_name
                 });
 
             var issueConsol = _context.MiscellaneousIssues
@@ -1917,7 +2003,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = "",
                     CIPNo = "",
                     Helpdesk = "",
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.miscDetail.one_charging_name,
+                    BusinessUnitName = x.miscDetail.business_unit_name,
+                    BusinessUnitCode = x.miscDetail.business_unit_code,
+                    DepartmentUnitName = x.miscDetail.department_unit_name,
+                    DepartmentUnitCode = x.miscDetail.department_unit_code,
+                    SubUnitCode = x.miscDetail.sub_unit_code,
+                    SubUnitName = x.miscDetail.sub_unit_name
 
                 });
 
@@ -1959,6 +2052,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     //Remarks = x.borrow.Remarks,
                     Rush = ""
 
+
                 });
 
             var consumeList = _context.BorrowedConsumes
@@ -1982,6 +2076,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     EmpId = x.EmpId,
                     FullName = x.FullName,
                     ReportNumber = x.ReportNumber,
+                    OneChargingName = x.OneChargingName,
+                    BusinessUnitName = x.BusinessUnitName,
+                    BusinessUnitCode = x.BusinessUnitCode,
+                    DepartmentUnitName = x.DepartmentUnitName,
+                    DepartmentUnitCode = x.DepartmentUnitCode,
+                    SubUnitCode = x.SubUnitCode,
+                    SubUnitName = x.SubUnitName
 
                 });
 
@@ -2010,8 +2111,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     EmpId = x.consume.EmpId,
                     FullName = x.consume.FullName,
                     ReportNumber = x.consume.ReportNumber,
-                    UnitPrice = x.borrowDetails.UnitPrice
-                    
+                    UnitPrice = x.borrowDetails.UnitPrice,
+                    OneChargingName = x.consume.OneChargingName,
+                    BusinessUnitName = x.consume.BusinessUnitName,
+                    BusinessUnitCode = x.consume.BusinessUnitCode,
+                    DepartmentUnitName = x.consume.DepartmentUnitName,
+                    DepartmentUnitCode = x.consume.DepartmentUnitCode,
+                    SubUnitCode = x.consume.SubUnitCode,
+                    SubUnitName = x.consume.SubUnitName
+
                 });
 
             var borrowedIssueList =  _context.BorrowedIssues
@@ -2053,7 +2161,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = "",
                     CIPNo = "",
                     Helpdesk = "",
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.borrowDetail.OneChargingName,
+                    BusinessUnitName = x.borrowDetail.BusinessUnitName,
+                    BusinessUnitCode = x.borrowDetail.BusinessUnitCode,
+                    DepartmentUnitName = x.borrowDetail.DepartmentUnitName,
+                    DepartmentUnitCode = x.borrowDetail.DepartmentUnitCode,
+                    SubUnitCode = x.borrowDetail.SubUnitCode,
+                    SubUnitName = x.borrowDetail.SubUnitName
 
                 });
 
@@ -2094,7 +2209,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = x.FuelRegister.Asset.AssetCode,
                     CIPNo = "",
                     Helpdesk = "",
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.FuelRegister.OneChargingName,
+                    BusinessUnitName = x.FuelRegister.BusinessUnitName,
+                    BusinessUnitCode = x.FuelRegister.BusinessUnitCode,
+                    DepartmentUnitName = x.FuelRegister.DepartmentUnitName,
+                    DepartmentUnitCode = x.FuelRegister.DepartmentUnitCode,
+                    SubUnitCode = x.FuelRegister.SubUnitCode,
+                    SubUnitName = x.FuelRegister.SubUnitName
 
                 });
 
@@ -2183,9 +2305,17 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                      AssetTag = consol.AssetTag,
                      CIPNo = consol.CIPNo,
                      Helpdesk = consol.Helpdesk,
-                     Rush = consol.Rush
+                     Rush = consol.Rush,
+                     OneChargingName = consol.OneChargingName,
+                     BusinessUnitName = consol.BusinessUnitName,
+                     BusinessUnitCode = consol.BusinessUnitCode,
+                     DepartmentUnitName = consol.DepartmentUnitName,
+                     DepartmentUnitCode = consol.DepartmentUnitCode,
+                     SubUnitCode = consol.SubUnitCode,
+                     SubUnitName = consol.SubUnitName
 
-                });
+
+                 });
 
 
 
@@ -2288,7 +2418,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = x.moveOrder.AssetTag,
                     CIPNo = x.moveOrder.Cip_No,
                     Helpdesk = x.moveOrder.HelpdeskNo,
-                    Rush = x.moveOrder.Rush
+                    Rush = x.moveOrder.Rush,
+                    OneChargingName = x.moveOrder.one_charging_name,
+                    BusinessUnitName = x.moveOrder.business_unit_name,
+                    BusinessUnitCode = x.moveOrder.business_unit_code,
+                    DepartmentUnitName = x.moveOrder.department_unit_name,
+                    DepartmentUnitCode = x.moveOrder.department_unit_code,
+                    SubUnitCode = x.moveOrder.sub_unit_code,
+                    SubUnitName = x.moveOrder.sub_unit_name
 
                 }).ToList();
 
@@ -2329,7 +2466,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     CIPNo = "",
                     Helpdesk = "",
                     //Remarks = x.receipt.Remarks,
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.receipt.one_charging_name,
+                    BusinessUnitName = x.receipt.business_unit_name,
+                    BusinessUnitCode = x.receipt.business_unit_code,
+                    DepartmentUnitName = x.receipt.department_unit_name,
+                    DepartmentUnitCode = x.receipt.department_unit_code,
+                    SubUnitCode = x.receipt.sub_unit_code,
+                    SubUnitName = x.receipt.sub_unit_name
                 }).ToList();
 
             var issueConsol = _context.MiscellaneousIssues
@@ -2368,7 +2512,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = "",
                     CIPNo = "",
                     Helpdesk = "",
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.miscDetail.one_charging_name,
+                    BusinessUnitName = x.miscDetail.business_unit_name,
+                    BusinessUnitCode = x.miscDetail.business_unit_code,
+                    DepartmentUnitName = x.miscDetail.department_unit_name,
+                    DepartmentUnitCode = x.miscDetail.department_unit_code,
+                    SubUnitCode = x.miscDetail.sub_unit_code,
+                    SubUnitName = x.miscDetail.sub_unit_name
 
 
                 }).ToList();
@@ -2435,6 +2586,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     EmpId = x.EmpId,
                     FullName = x.FullName,
                     ReportNumber = x.ReportNumber,
+                    OneChargingName = x.OneChargingName,
+                    BusinessUnitName = x.BusinessUnitName,
+                    BusinessUnitCode = x.BusinessUnitCode,
+                    DepartmentUnitName = x.DepartmentUnitName,
+                    DepartmentUnitCode = x.DepartmentUnitCode,
+                    SubUnitCode = x.SubUnitCode,
+                    SubUnitName = x.SubUnitName
 
                 });
 
@@ -2463,7 +2621,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     EmpId = x.consume.EmpId,
                     FullName = x.consume.FullName,
                     ReportNumber = x.consume.ReportNumber,
-                    UnitPrice = x.borrowDetails.UnitPrice
+                    UnitPrice = x.borrowDetails.UnitPrice,
+                    OneChargingName = x.consume.OneChargingName,
+                    BusinessUnitName = x.consume.BusinessUnitName,
+                    BusinessUnitCode = x.consume.BusinessUnitCode,
+                    DepartmentUnitName = x.consume.DepartmentUnitName,
+                    DepartmentUnitCode = x.consume.DepartmentUnitCode,
+                    SubUnitCode = x.consume.SubUnitCode,
+                    SubUnitName = x.consume.SubUnitName
 
                 });
 
@@ -2507,7 +2672,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = "",
                     CIPNo = "",
                     Helpdesk = "", 
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.borrowDetail.OneChargingName,
+                    BusinessUnitName = x.borrowDetail.BusinessUnitName,
+                    BusinessUnitCode = x.borrowDetail.BusinessUnitCode,
+                    DepartmentUnitName = x.borrowDetail.DepartmentUnitName,
+                    DepartmentUnitCode = x.borrowDetail.DepartmentUnitCode,
+                    SubUnitCode = x.borrowDetail.SubUnitCode,
+                    SubUnitName = x.borrowDetail.SubUnitName
 
                 }).ToList();
 
@@ -2551,7 +2723,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = x.AssetTag,
                     CIPNo = "",
                     Helpdesk = "",
-                    Rush = x.Rush
+                    Rush = x.Rush,
+                    OneChargingName = x.one_charging_name,
+                    BusinessUnitName = x.business_unit_name,
+                    BusinessUnitCode = x.business_unit_code,
+                    DepartmentUnitName = x.department_unit_name,
+                    DepartmentUnitCode = x.department_unit_code,
+                    SubUnitCode = x.sub_unit_code,
+                    SubUnitName = x.sub_unit_name
 
                 }).ToList();
 
@@ -2592,7 +2771,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AssetTag = x.FuelRegister.Asset.AssetCode,
                     CIPNo = "",
                     Helpdesk = "",
-                    Rush = ""
+                    Rush = "",
+                    OneChargingName = x.FuelRegister.OneChargingName,
+                    BusinessUnitName = x.FuelRegister.BusinessUnitName,
+                    BusinessUnitCode = x.FuelRegister.BusinessUnitCode,
+                    DepartmentUnitName = x.FuelRegister.DepartmentUnitName,
+                    DepartmentUnitCode = x.FuelRegister.DepartmentUnitCode,
+                    SubUnitCode = x.FuelRegister.SubUnitCode,
+                    SubUnitName = x.FuelRegister.SubUnitName
 
                 });
 
@@ -2646,7 +2832,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                      AssetTag = consol.AssetTag,
                      CIPNo = consol.CIPNo,
                      Helpdesk = consol.Helpdesk,
-                     Rush = consol.Rush
+                     Rush = consol.Rush,
+                     OneChargingName = consol.OneChargingName,
+                     BusinessUnitName = consol.BusinessUnitName,
+                     BusinessUnitCode = consol.BusinessUnitCode,
+                     DepartmentUnitName = consol.DepartmentUnitName,
+                     DepartmentUnitCode = consol.DepartmentUnitCode,
+                     SubUnitCode = consol.SubUnitCode,
+                     SubUnitName = consol.SubUnitName
 
                  }).ToList();
 

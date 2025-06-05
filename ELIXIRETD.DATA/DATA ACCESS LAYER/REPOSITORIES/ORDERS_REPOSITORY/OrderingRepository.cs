@@ -531,15 +531,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
         }
 
-        public async Task<bool> ValidateExistOrderandItemCode(int TransactId, string ItemCode, string customertype, string itemdescription, string customercode)
+        public async Task<bool> ValidateExistOrderandItemCode(int TransactId,/* string ItemCode, string customertype, string itemdescription, string customercode*/int OrderNo)
         {
             var validate = await _context.Orders.Where(x => x.TrasactId == TransactId
-                                                       && x.Customercode == customercode
-                                                       && x.CustomerType == customertype
-                                                       && x.ItemCode == ItemCode
-                                                       && x.ItemdDescription == itemdescription
+                                                       && x.OrderNo == OrderNo
                                                        && x.IsActive == true
-                                                       && x.IsCancel == false)
+                                                       && x.IsCancel == false
+                                                    )
                                                       .FirstOrDefaultAsync();
                                                     
 
@@ -659,9 +657,42 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
             var existing = await _context.Customers
                 .FirstOrDefaultAsync(x => x.CustomerName == Orders.CustomerName,cancellation);
+            var orderOneCharging = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == Orders.OneChargingCode);
+            //var accountOnceCharging = await _context.OneAccountTitles.FirstOrDefaultAsync(x => x.code == Orders.CodeAccountTitle);
+
+            //if(accountOnceCharging == null)
+            //{
+            //    return false;
+            //}
+            //else
+            //{
+            //    Orders.AccountCode = accountOnceCharging.AccountTitleCode;
+            //    Orders.AccountTitles = accountOnceCharging.AccountTitleCode;
+            //}
+
+
+
+            if(orderOneCharging != null)
+            {
+                Orders.LocationCode = orderOneCharging.location_code;
+                Orders.LocationName = orderOneCharging.location_name;
+                Orders.Department = orderOneCharging.department_name;
+                Orders.DepartmentCode = orderOneCharging.department_code;
+                Orders.CompanyCode = orderOneCharging.company_code;
+                Orders.CompanyName = orderOneCharging.company_name;
+                Orders.one_charging_name = orderOneCharging.name;
+                Orders.business_unit_code = orderOneCharging.business_unit_code;
+                Orders.business_unit_name = orderOneCharging.business_unit_name;
+                Orders.department_unit_code = orderOneCharging.department_unit_code;
+                Orders.department_unit_name = orderOneCharging.department_unit_name;
+                Orders.sub_unit_code = orderOneCharging.sub_unit_code;
+                Orders.sub_unit_name = orderOneCharging.sub_unit_name;
+            }
 
             if (existing == null)
+            {
                 return false;
+            }
 
             Orders.IsActive = true;
             Orders.StandartQuantity = Orders.QuantityOrdered;
@@ -1397,6 +1428,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
         public async Task<PagedList<TotalListOfApprovedPreparedDateDto>> TotalListOfApprovedPreparedDateNoSearch(UserParams userParams, bool status)
         {
 
+            
+
             var orders = _context.Orders.GroupBy(x => new
             {
                 x.TrasactId,
@@ -1415,7 +1448,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.CompanyCode,
                 x.LocationCode,
                 x.LocationName,
-                x.Rush
+                x.Rush,
+                x.OneChargingCode
 
 
             })
@@ -1423,6 +1457,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
             .Where(x => x.Key.IsActive == true)
             .Where(x => x.Key.PreparedDate != null)
             .Where(x => x.Key.IsMove == false)
+            
 
             .Select(x => new TotalListOfApprovedPreparedDateDto
             {
@@ -1444,6 +1479,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
                 IsRush = x.Key.Rush != null ? true : false,
                 Rush = x.Key.Rush,
+                OneChargingCode = x.Key.OneChargingCode,
 
             }).Where(x => x.IsRush == status);
 
@@ -2077,7 +2113,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     AssetTag = x.AssetTag,
                     DateApproved = x.DateApproved.ToString(),
                     Approver = x.Approver,
-                    Requestor = x.Requestor
+                    Requestor = x.Requestor,
+                    codeAccountTitle = x.CodeAccountTitle,
+                    one_charging_name = x.one_charging_name,
+                    business_unit_code = x.business_unit_code,
+                    business_unit_name = x.business_unit_name,
+                    department_unit_code = x.department_unit_code,
+                    department_unit_name = x.department_unit_name,
+                    sub_unit_code = x.sub_unit_code,
+                    sub_unit_name = x.sub_unit_name
+                    
 
 
                 });
@@ -2169,6 +2214,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
             var existingsMoveOrders = await _context.MoveOrders.Where(x => x.OrderNo == order.OrderNo)
                                                               .Where(x => x.IsPrepared == true)
                                                               .ToListAsync();
+            
 
             if (!existingsMoveOrders.Any())
                 return false;
@@ -2182,23 +2228,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
             foreach (var x in existingsMoveOrders)
             {
 
-                var oneCharging = _context.OneRdfs.FirstOrDefault(y => y.code == x.One_Charging);
 
-                
-                x.Department = oneCharging.department_id;
-                x.DepartmentCode = oneCharging.department_code;
-                x.DepartmentName = oneCharging.department_name;
-                x.CompanyCode = oneCharging.company_code;
-                x.CompanyName = oneCharging.company_name;
-                x.LocationCode = oneCharging.location_code;
-                x.LocationName = oneCharging.location_name;
-                //x.Department = order.Department;
-                //x.CompanyCode = order.CompanyCode;
-                //x.CompanyName = order.CompanyName;
-                //x.DepartmentCode = order.DepartmentCode;
-                //x.DepartmentName = order.DepartmentName;
-                //x.LocationCode = order.LocationCode;
-                //x.LocationName = order.LocationName;
+                x.Department = order.Department;
+                x.CompanyCode = order.CompanyCode;
+                x.CompanyName = order.CompanyName;
+                x.DepartmentCode = order.DepartmentCode;
+                x.DepartmentName = order.DepartmentName;
+                x.LocationCode = order.LocationCode;
+                x.LocationName = order.LocationName;
                 x.ApprovedDate = DateTime.Now;
                 x.ApproveDateTempo = DateTime.Now;
                 x.IsApprove = true;
@@ -2211,6 +2248,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.IsReject = null;
                 x.Approver = order.Approver;
                 x.PreparedBy = order.PreparedBy;
+                x.one_charging_name = order.one_charging_name;
+                x.business_unit_code = order.business_unit_code;
+                x.business_unit_name = order.business_unit_name;
+                x.department_unit_code = order.department_unit_code;
+                x.department_unit_name = order.department_unit_name;
+                x.sub_unit_code = order.sub_unit_code;
+                x.sub_unit_name = order.sub_unit_name;
 
             }
 
@@ -2626,19 +2670,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
             foreach (var items in existing)
             {
-                var oneCharging = _context.OneRdfs.FirstOrDefault(x => x.code == items.One_Charging);
+                
 
                 items.ApprovedDate = DateTime.Now;
                 items.ApproveDateTempo = DateTime.Now;
                 items.IsApprove = true;
-                items.Department = oneCharging.department_id;
-                items.DepartmentCode = oneCharging.department_code;
-                items.DepartmentName = oneCharging.department_name;
-                items.CompanyCode = oneCharging.company_code;
-                items.CompanyName = oneCharging.company_name;
-                items.LocationCode = oneCharging.location_code;
-                items.LocationName = oneCharging.location_name;
-                
+
 
             }
 
@@ -3468,6 +3505,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
             return true;
 
         }
+
+
         
     }
 }

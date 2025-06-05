@@ -69,6 +69,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         ,"Account Title"
                         ,"EmpId"
                         ,"FullName"
+                        ,"One Charging Name"
+                        ,"Business Unit Code"
+                        ,"Business Unit Name"
+                        ,"Department Unit Code"
+                        ,"Department Unit Name"
+                        ,"Sub Unit Code"
+                        ,"Sub Unit Name"
                         //,"IsRush"
 
                     };
@@ -119,6 +126,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         row.Cell(27).Value = moveOrder[index - 1].AccountTitles;
                         row.Cell(28).Value = moveOrder[index - 1].EmpId;
                         row.Cell(29).Value = moveOrder[index - 1].FullName;
+                        row.Cell(30).Value = moveOrder[index - 1].OneChargingName;
+                        row.Cell(31).Value = moveOrder[index - 1].BusinessUnitCode;
+                        row.Cell(32).Value = moveOrder[index - 1].BusinessUnitName;
+                        row.Cell(33).Value = moveOrder[index - 1].DepartmentUnitCode;
+                        row.Cell(34).Value = moveOrder[index - 1].DepartmentUnitName;
+                        row.Cell(35).Value = moveOrder[index - 1].SubUnitCode;
+                        row.Cell(36).Value = moveOrder[index - 1].SubUnitName;
+
 
                         row.Cell(11).Style.NumberFormat.Format = "0.00%";
 

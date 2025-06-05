@@ -53,6 +53,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string Helpdesk { get; set; }
         //public string Remarks { get; set; }
         public string Rush { get; set; }
+        public string OneChargingName { get; set; }
+        public string BusinessUnitCode { get; set; }
+        public string BusinessUnitName { get; set; }
+        public string DepartmentUnitCode { get; set; }
+        public string DepartmentUnitName { get; set; }
+        public string SubUnitCode { get; set; }
+        public string SubUnitName { get; set; }
 
     }
 }

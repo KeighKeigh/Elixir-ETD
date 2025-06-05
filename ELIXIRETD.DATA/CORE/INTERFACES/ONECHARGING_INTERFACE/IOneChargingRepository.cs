@@ -12,5 +12,7 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.ONECHARGING_INTERFACE
     {
         Task<bool> AddDataOneCharging(List<OneChargingDto> data);
         Task<PagedList<OneChargingDto>> GetOneChargingPagination(UserParams userParams, bool? status, string search);
+        Task<bool> AddAccountTitle(List<OneAccountTitleDto> data);
+        Task<PagedList<OneAccountTitleDto>> GetAccountTitle(UserParams userParams, bool? status, string search);
     }
 }

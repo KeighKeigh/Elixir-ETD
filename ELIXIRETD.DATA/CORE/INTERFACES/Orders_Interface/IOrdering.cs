@@ -99,7 +99,7 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.Orders
 
 
         //============================ Validation ====================================================================
-        Task<bool> ValidateExistOrderandItemCode(int TransactId, string ItemCode, string customertype, string itemdescription, string customercode);
+        Task<bool> ValidateExistOrderandItemCode(int TransactId, /*string ItemCode, string customertype, string itemdescription, string customercode*/int OrderNo);
         Task<bool> ValidateDateNeeded(Ordering orders);
 
         Task<bool> ValidateCustomerCode(string Customer);
@@ -178,6 +178,8 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.Orders
 
 
         Task<bool> IsAssetTag(IsAssetTagDto id);
+
+        //Task<Ordering> CreateOrderOneCharging(List<Ordering> orders);
 
 
 
