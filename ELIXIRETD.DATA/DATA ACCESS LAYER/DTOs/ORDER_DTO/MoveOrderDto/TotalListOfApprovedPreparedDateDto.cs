@@ -33,7 +33,13 @@
         public bool IsRush { get; set; }
 
         public string Rush { get; set; }
-        public string OneChargingCode { get; set; }
+        
+        public string BusinessUnitCode { get; set; }
+        public string BusinessUnitName { get; set; }
+        public string DepartmentUnitCode { get; set; }
+        public string DepartmentUnitName { get; set; }
+        public string SubUnitCode { get; set; }
+        public string SubUnitName { get; set; }
 
 
     }

@@ -556,7 +556,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Cip_No = x.moveOrder.moveOrder.moveOrder.Cip_No,
                     HelpdeskNo = x.moveOrder.moveOrder.moveOrder.HelpdeskNo,
                     IsRush = x.moveOrder.moveOrder.moveOrder.IsRush,
-                    Remarks = x.moveOrder.moveOrder.order.Remarks
+                    Remarks = x.moveOrder.moveOrder.order.Remarks,
+                    BusinessUnitName = x.moveOrder.moveOrder.moveOrder.BusinessUnitName,
+                    BusinessUnitCode = x.moveOrder.moveOrder.moveOrder.BusinessUnitCode,
+                    DepartmentUnitName = x.moveOrder.moveOrder.moveOrder.DepartmentUnitName,
+                    DepartmentUnitCode = x.moveOrder.moveOrder.moveOrder.DepartmentUnitCode,
+                    SubUnitCode = x.moveOrder.moveOrder.moveOrder.SubUnitCode,
+                    SubUnitName = x.moveOrder.moveOrder.moveOrder.SubUnitName,
                 });
 
 

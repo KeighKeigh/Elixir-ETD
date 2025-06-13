@@ -31,6 +31,15 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ORDER_DTO
         public string LocationCode { get; set; }
         public string LocationName { get; set; }
 
+        public string BusinessUnitName { get; set; }
+        public string BusinessUnitCode { get; set; }
+
+        public string DepartmentUnitCode { get; set; }
+        public string DepartmentUnitName { get; set; }
+
+        public string SubUnitCode { get; set; }
+        public string SubUnitName { get; set; }
+
         public List<ListOrders> ListOrder { get; set; }
 
         public class ListOrders

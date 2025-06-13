@@ -536,7 +536,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
             var validate = await _context.Orders.Where(x => x.TrasactId == TransactId
                                                        && x.OrderNo == OrderNo
                                                        && x.IsActive == true
-                                                       && x.IsCancel == false
+                                                       && x.IsCancel == null || false
                                                     )
                                                       .FirstOrDefaultAsync();
                                                     
@@ -904,6 +904,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                                             DepartmentName = x.First().Department,
                                             LocationCode = x.First().LocationCode,
                                             LocationName = x.First().LocationName,
+                                            BusinessUnitCode = x.First().business_unit_code,
+                                            BusinessUnitName = x.First().business_unit_name,
+                                            DepartmentUnitCode = x.First().department_unit_code,
+                                            DepartmentUnitName = x.First().department_unit_name,
+                                            SubUnitCode = x.First().sub_unit_code,
+                                            SubUnitName = x.First().sub_unit_name,
 
                                             ListOrder = x.Select(x => new DtoViewListOfMirOrders.ListOrders
                                             {
@@ -1449,7 +1455,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.LocationCode,
                 x.LocationName,
                 x.Rush,
-                x.OneChargingCode
+                x.business_unit_code,
+                x.business_unit_name,
+                x.department_unit_code,
+                x.department_unit_name,
+                x.sub_unit_code,
+                x.sub_unit_name
 
 
             })
@@ -1479,7 +1490,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
                 IsRush = x.Key.Rush != null ? true : false,
                 Rush = x.Key.Rush,
-                OneChargingCode = x.Key.OneChargingCode,
+                BusinessUnitCode = x.Key.business_unit_code,
+                BusinessUnitName = x.Key.business_unit_name,
+                DepartmentUnitCode = x.Key.department_unit_code,
+                DepartmentUnitName = x.Key.department_unit_name,
+                SubUnitCode = x.Key.sub_unit_code,
+                SubUnitName = x.Key.sub_unit_name,
 
             }).Where(x => x.IsRush == status);
 
@@ -1506,7 +1522,14 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.CompanyCode,
                 x.LocationCode,
                 x.LocationName,
-                x.Rush
+                x.Rush,
+                x.business_unit_code,
+                x.business_unit_name,
+                x.department_unit_code,
+                x.department_unit_name,
+                x.sub_unit_code,
+                x.sub_unit_name
+
             })
             .Where(x => x.Key.IsApproved == true)
             .Where(x => x.Key.IsActive == true)
@@ -1530,6 +1553,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 LocationName = x.Key.LocationName,
                 IsRush = x.Key.Rush != null ? true : false,
                 Rush = x.Key.Rush,
+                BusinessUnitCode = x.Key.business_unit_code,
+                BusinessUnitName = x.Key.business_unit_name,
+                DepartmentUnitCode = x.Key.department_unit_code,
+                DepartmentUnitName = x.Key.department_unit_name,
+                SubUnitCode = x.Key.sub_unit_code,
+                SubUnitName = x.Key.sub_unit_name,
 
             }).Where(x => x.IsRush == status)
               .Where(x => Convert.ToString(x.CustomerName).ToLower().Contains(search.Trim().ToLower())
@@ -2349,7 +2378,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.order.moveorder.CompanyCode,
                 x.order.moveorder.CompanyName,
                 x.order.moveorder.DepartmentCode,
-                x.order.moveorder.Department,
+                x.order.moveorder.DepartmentName,
                 x.order.moveorder.LocationCode,
                 x.order.moveorder.LocationName,
                 x.order.moveorder.AccountCode,
@@ -2359,6 +2388,12 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.order.moveorder.Rush,
                 x.order.moveorder.IsPrepared,
                 x.order.moveorder.IsApprove,
+                x.order.moveorder.business_unit_code,
+                x.order.moveorder.business_unit_name,
+                x.order.moveorder.department_unit_code,
+                x.order.moveorder.department_unit_name,
+                x.order.moveorder.sub_unit_code,
+                x.order.moveorder.sub_unit_name,
 
             })
             .Select(x => new ForApprovalMoveOrderListDto
@@ -2371,9 +2406,17 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 CompanyCode = x.Key.CompanyCode,
                 CompanyName = x.Key.CustomerName,
                 DepartmentCode = x.Key.DepartmentCode,
-                DepartmentName = x.Key.Department,
+                DepartmentName = x.Key.DepartmentName,
                 LocationCode = x.Key.LocationCode,
                 LocationName = x.Key.LocationName,
+
+                BusinessUnitCode = x.Key.business_unit_code,
+                BusinessUnitName = x.Key.business_unit_name,
+                DepartmentUnitCode = x.Key.department_unit_code,
+                DepartmentUnitName = x.Key.department_unit_name,
+                SubUnitCode = x.Key.sub_unit_code,
+                SubUnitName = x.Key.sub_unit_name,
+
                 AccountCode = x.Key.AccountCode,
                 AccountTitles = x.Key.AccountTitles,
                 EmpId = x.Key.EmpId,

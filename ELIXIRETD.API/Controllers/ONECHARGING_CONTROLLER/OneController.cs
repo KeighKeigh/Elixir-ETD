@@ -13,7 +13,9 @@ using static System.Net.WebRequestMethods;
 
 namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
 {
-    [Route("api/charging"), ApiController]
+    [Route("api/charging")] 
+    [ApiController]
+    [AllowAnonymous]
     public class OneController : ControllerBase
     {
 
@@ -65,7 +67,7 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
                 {
                     return Result.Failure(new Error("Failed to parse response from the source API.", "INVALID_RESPONSE"));
                 }
-
+                
                 foreach (var item in response.Data)
                 {
                     var existing = await _storeContext.OneRdfs
@@ -92,6 +94,8 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
                             location_name = item.location_name,
                             deleted_at = item.deleted_at,
                             IsActive = item.deleted_at != null ? false : true,
+                            DateAdded = item.created_at,
+                            UpdatedAt  = item.updated_at,
                         };
 
                         await _storeContext.OneRdfs.AddAsync(charging, cancellationToken);
@@ -99,17 +103,22 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
                     else if (existing.UpdatedAt != item.updated_at)
                     {
                         existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
-                        existing.code = item.code;
+                        existing.name = item.name;
+                        existing.company_code = item.company_code;
+                        existing.company_name = item.company_name;
+                        existing.business_unit_code = item.business_unit_code;
+                        existing.business_unit_name = item.business_unit_name;
+                        existing.department_code = item.department_code;
+                        existing.department_name = item.department_name;
+                        existing.department_unit_code = item.unit_code;
+                        existing.department_unit_name = item.unit_name;
+                        existing.sub_unit_code = item.sub_unit_code;
+                        existing.sub_unit_name = item.sub_unit_name;
+                        existing.location_code = item.location_code;
+                        existing.location_name = item.location_name;
+                        existing.deleted_at = item.deleted_at;
+                        existing.IsActive = item.deleted_at != null ? false : true;
+                        existing.UpdatedAt = item.updated_at;
                     }
 
 
@@ -144,9 +153,9 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
             public string sub_unit_name { get; set; } = string.Empty;
             public string location_code { get; set; } = string.Empty;
             public string location_name { get; set; } = string.Empty;
-            public DateTime created_at { get; set; }
-            public DateTime updated_at { get; set; }
-            public string deleted_at { get; set; }
+            public DateTime? created_at { get; set; }
+            public DateTime? updated_at { get; set; }
+            public DateTime? deleted_at { get; set; }
         }
     }
 }

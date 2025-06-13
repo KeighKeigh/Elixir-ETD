@@ -12,7 +12,7 @@ using ELIXIRETD.API.Authentication;
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
-
+//builder.Services.AddHttpClient<IHttpClientFactory, HttpClient>();
 
 // Add services to the container.
 
@@ -131,7 +131,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddHttpClient();
 
 
 var app = builder.Build();

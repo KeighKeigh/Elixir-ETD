@@ -33,9 +33,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
             public string location_code { get; set; }
             public string location_name { get; set; }
             public int? location_id { get; set; }
-            public string deleted_at { get; set; }
+            public DateTime? deleted_at { get; set; }
             public bool? IsActive { get; set; }
-        //public DateTime? UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
 
     }

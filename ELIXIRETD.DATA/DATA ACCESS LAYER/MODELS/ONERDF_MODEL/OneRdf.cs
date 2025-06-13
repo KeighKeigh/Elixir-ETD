@@ -30,8 +30,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL
         public string location_code { get; set; }
         public string location_name { get; set; }
         public int? location_id { get; set; }
-        public string deleted_at { get; set; }
-        public DateTime? DateAdded { get; set; } = DateTime.Now;
+        public DateTime? deleted_at { get; set; }
+        public DateTime? DateAdded { get; set; } 
 
         public bool? IsActive { get; set; }
         public DateTime? UpdatedAt { get; set; }
