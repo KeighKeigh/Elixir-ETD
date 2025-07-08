@@ -36,7 +36,7 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
                 
                 List<Ordering> DuplicateList = new List<Ordering>();
                 List<Ordering> AvailableImport = new List<Ordering>();
-                List<Ordering> CustomerNameNotExist = new List<Ordering>();
+                List<Ordering> OneChargingDoesNotExist = new List<Ordering>();
                 List<Ordering> ItemCodesExist = new List<Ordering>();
                 List<Ordering> PreviousDateNeeded = new List<Ordering>();
                 List<Ordering> AccountCodeEmpty = new List<Ordering>();
@@ -56,7 +56,8 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
 
                     var validateOrderNoAndItemcode = await _unitofwork.Orders.ValidateExistOrderandItemCode(items.TrasactId, /*items.ItemCode , items.CustomerType , items.ItemdDescription , items.Customercode*/ items.OrderNo);
                         var validateDateNeeded = await _unitofwork.Orders.ValidateDateNeeded(items);
-                        var validateCustomerName = await _unitofwork.Orders.ValidateCustomerName(items.Customercode , items.CustomerName , items.CustomerType);
+                        //var validateCustomerName = await _unitofwork.Orders.ValidateCustomerName(items.Customercode , items.CustomerName , items.CustomerType);
+                        var validateOneCharging = await _unitofwork.Orders.ValidateOneChargingName(items.OneChargingCode);
                         var validateItemCode = await _context.Materials
                         .Include(x => x.Uom)
                         .FirstOrDefaultAsync(x => x.ItemCode == items.ItemCode && x.IsActive);
@@ -71,9 +72,9 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
                         PreviousDateNeeded.Add(items);
                     }
 
-                    else if (validateCustomerName == false)
+                    else if (validateOneCharging == false)
                     {
-                        CustomerNameNotExist.Add(items);
+                        OneChargingDoesNotExist.Add(items);
                     }
 
                     else if (validateItemCode is null)
@@ -106,13 +107,13 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
                    AvailableImport,
                    DuplicateList,
                    ItemCodesExist,
-                   CustomerNameNotExist,
+                   OneChargingDoesNotExist,
                    PreviousDateNeeded,
                    AccountCodeEmpty,
                    AccountTitleEmpty
                 };
 
-                if ( DuplicateList.Count == 0&& CustomerNameNotExist.Count == 0  && ItemCodesExist.Count == 0  && PreviousDateNeeded.Count == 0 
+                if ( DuplicateList.Count == 0 && OneChargingDoesNotExist.Count == 0  && ItemCodesExist.Count == 0  && PreviousDateNeeded.Count == 0 
                     && AccountTitleEmpty.Count == 0 && AccountCodeEmpty.Count == 0)
                 {
                     await _unitofwork.CompleteAsync();
@@ -591,7 +592,7 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
             order.department_unit_code = details.department_unit_code;
             order.sub_unit_name = details.sub_unit_name;
             order.sub_unit_code = details.sub_unit_code;
-            order.One_Charging = details.codeAccountTitle;
+            order.One_Charging = details.one_charging_code;
 
 
             if (order.QuantityOrdered < 0 )

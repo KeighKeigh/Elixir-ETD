@@ -1265,6 +1265,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                 consumes.DepartmentCode = borrowedOne.department_code;
                 consumes.DepartmentName = borrowedOne.department_name;
                 consumes.OneChargingName = borrowedOne.name;
+                consumes.OneChargingCode = borrowedOne.code;
                 consumes.BusinessUnitCode = borrowedOne.business_unit_code;
                 consumes.BusinessUnitName = borrowedOne.business_unit_name;
                 consumes.DepartmentUnitCode = borrowedOne.department_unit_code;

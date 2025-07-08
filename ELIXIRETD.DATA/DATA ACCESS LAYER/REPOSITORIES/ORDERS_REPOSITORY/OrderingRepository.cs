@@ -534,10 +534,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
         public async Task<bool> ValidateExistOrderandItemCode(int TransactId,/* string ItemCode, string customertype, string itemdescription, string customercode*/int OrderNo)
         {
             var validate = await _context.Orders.Where(x => x.TrasactId == TransactId
-                                                       && x.OrderNo == OrderNo
-                                                       && x.IsActive == true
-                                                       && x.IsCancel == null || false
-                                                    )
+                                                       && x.OrderNo == OrderNo)
                                                       .FirstOrDefaultAsync();
                                                     
 
@@ -612,6 +609,17 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
             return true;
         }
+        public async Task<bool> ValidateOneChargingName(string oneChargingcode)
+        {
+            var validate = await _context.OneRdfs.Where(x => x.code == oneChargingcode)
+                                                 .Where(x => x.IsActive == true)
+                                                 .FirstOrDefaultAsync();
+
+            if (validate == null)
+                return false;
+
+            return true;
+        }
 
 
 
@@ -655,8 +663,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
         public async Task<bool> AddNewOrders(Ordering Orders, CancellationToken cancellation)
         {
 
-            var existing = await _context.Customers
-                .FirstOrDefaultAsync(x => x.CustomerName == Orders.CustomerName,cancellation);
             var orderOneCharging = await _context.OneRdfs.FirstOrDefaultAsync(x => x.code == Orders.OneChargingCode);
             //var accountOnceCharging = await _context.OneAccountTitles.FirstOrDefaultAsync(x => x.code == Orders.CodeAccountTitle);
 
@@ -687,11 +693,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 Orders.department_unit_name = orderOneCharging.department_unit_name;
                 Orders.sub_unit_code = orderOneCharging.sub_unit_code;
                 Orders.sub_unit_name = orderOneCharging.sub_unit_name;
-            }
-
-            if (existing == null)
-            {
-                return false;
+                Orders.OneChargingCode = orderOneCharging.code;
+                Orders.one_charging_name = orderOneCharging.name;
             }
 
             Orders.IsActive = true;
@@ -1460,7 +1463,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.department_unit_code,
                 x.department_unit_name,
                 x.sub_unit_code,
-                x.sub_unit_name
+                x.sub_unit_name,
+                x.OneChargingCode
 
 
             })
@@ -1496,6 +1500,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 DepartmentUnitName = x.Key.department_unit_name,
                 SubUnitCode = x.Key.sub_unit_code,
                 SubUnitName = x.Key.sub_unit_name,
+                OneChargingCode = x.Key.OneChargingCode,
 
             }).Where(x => x.IsRush == status);
 
@@ -1523,6 +1528,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.LocationCode,
                 x.LocationName,
                 x.Rush,
+                x.OneChargingCode,
+                x.one_charging_name,
                 x.business_unit_code,
                 x.business_unit_name,
                 x.department_unit_code,
@@ -1553,6 +1560,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 LocationName = x.Key.LocationName,
                 IsRush = x.Key.Rush != null ? true : false,
                 Rush = x.Key.Rush,
+                OneChargingCode = x.Key.OneChargingCode,
+                OneChargingName = x.Key.one_charging_name,
                 BusinessUnitCode = x.Key.business_unit_code,
                 BusinessUnitName = x.Key.business_unit_name,
                 DepartmentUnitCode = x.Key.department_unit_code,
@@ -2145,6 +2154,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     Requestor = x.Requestor,
                     codeAccountTitle = x.CodeAccountTitle,
                     one_charging_name = x.one_charging_name,
+                    one_charging_code = x.OneChargingCode,
                     business_unit_code = x.business_unit_code,
                     business_unit_name = x.business_unit_name,
                     department_unit_code = x.department_unit_code,
@@ -2278,6 +2288,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                 x.Approver = order.Approver;
                 x.PreparedBy = order.PreparedBy;
                 x.one_charging_name = order.one_charging_name;
+                x.One_Charging = order.One_Charging;
                 x.business_unit_code = order.business_unit_code;
                 x.business_unit_name = order.business_unit_name;
                 x.department_unit_code = order.department_unit_code;
@@ -2625,6 +2636,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     UnservedQuantity = x.First().order.StandartQuantity - x.Sum(x => x.moveOrder.QuantityOrdered),
                     UnitCost = x.Key.UnitPrice,
                     TotalCost = x.Sum(x => x.moveOrder.QuantityOrdered) * x.Key.UnitPrice,
+                    OneChargingCode = x.First().order.OneChargingCode,
+                    OneChargingName = x.First().order.one_charging_name,
                     CompanyCode = x.First().moveOrder.CompanyCode,
                     CompanyName = x.First().moveOrder.CompanyName,
                     DepartmentCode = x.First().moveOrder.DepartmentCode,
@@ -2636,7 +2649,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     ItemRemarks = x.First().moveOrder.ItemRemarks,
                     EmpId = x.First().moveOrder.EmpId,
                     FullName = x.First().moveOrder.FullName,
-                    AssetTag = x.First().moveOrder.AssetTag
+                    AssetTag = x.First().moveOrder.AssetTag,
+                    BusinessUnitCode = x.First().order.business_unit_code,
+                    BusinessUnitName = x.First().order.business_unit_name,
+                    DepartmentUnitCode = x.First().order.department_unit_code,
+                    DepartmentUnitName = x.First().order.department_unit_name,
+                    SubUnitCode = x.First().order.sub_unit_code,
+                    SubUnitName = x.First().order.sub_unit_name,
+                    cip_No = x.First().moveOrder.Cip_No,
+                    helpdeskNo = x.First().moveOrder.HelpdeskNo == null ? "0" : x.First().moveOrder.HelpdeskNo
+
 
                 }).ToListAsync();
 
@@ -2681,6 +2703,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     TUnitCost = x.First().Moveorders.tQuantity.TUnitCost,
                     TotalCost = x.First().Moveorders.Moveorders.TotalCost,
                     TTotalCost = x.First().tUnits.TTotalCost,
+                    OneChargingCode = x.First().Moveorders.Moveorders.OneChargingCode,
+                    OneChargingName = x.First().Moveorders.Moveorders.OneChargingName,
                     CompanyCode = x.First().Moveorders.Moveorders.CompanyCode,
                     CompanyName = x.First().Moveorders.Moveorders.CompanyName,
                     DepartmentCode = x.First().Moveorders.Moveorders.DepartmentCode,
@@ -2692,7 +2716,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     ItemRemarks = x.First().Moveorders.Moveorders.ItemRemarks,
                     EmpId = x.First().Moveorders.Moveorders.EmpId,
                     FullName = x.First().Moveorders.Moveorders.FullName,
-                    AssetTag = x.First().Moveorders.Moveorders.AssetTag
+                    AssetTag = x.First().Moveorders.Moveorders.AssetTag,
+                    BusinessUnitCode = x.First().Moveorders.Moveorders.BusinessUnitCode,
+                    BusinessUnitName = x.First().Moveorders.Moveorders.BusinessUnitName,
+                    DepartmentUnitCode = x.First().Moveorders.Moveorders.DepartmentUnitCode,
+                    DepartmentUnitName = x.First().Moveorders.Moveorders.DepartmentUnitName,
+                    SubUnitCode = x.First().Moveorders.Moveorders.SubUnitCode,
+                    SubUnitName = x.First().Moveorders.Moveorders.SubUnitName,
+                    cip_No = x.First().Moveorders.Moveorders.cip_No,
+                    helpdeskNo = x.First().Moveorders.Moveorders.helpdeskNo
+
 
                 }).OrderBy(x => x.ItemCode)
                 .ToList();

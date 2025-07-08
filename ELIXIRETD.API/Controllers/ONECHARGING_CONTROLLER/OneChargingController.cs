@@ -27,24 +27,6 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
             _mediator = mediator;
         }
 
-        [HttpPost]
-        [ApiKeyAuth]
-        [Route("AddOneCharging")]
-        public async Task<IActionResult> AddDataOneCharging([FromBody] List<OneChargingDto> data)
-        {
-
-
-            var addFuel = await _unitOfWork.One.AddDataOneCharging(data);
-
-            if(addFuel == false)
-            {
-                return BadRequest("error");
-            }
-
-            await _unitOfWork.CompleteAsync();
-
-            return Ok("Successfully created");
-        }
 
         [HttpGet]
         [Route("GetOneCharging")]
@@ -69,30 +51,11 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
         }
 
 
-        [HttpPost]
-        //[ApiKeyAuth]
-        [Route("AddAccountTitle")]
-        public async Task<IActionResult> AddAccountTitle([FromBody] List<OneAccountTitleDto> data)
-        {
-
-
-            var addFuel = await _unitOfWork.One.AddAccountTitle(data);
-
-            if (addFuel == false)
-            {
-                return BadRequest("error");
-            }
-
-            await _unitOfWork.CompleteAsync();
-
-            return Ok("Successfully created");
-        }
-
         [HttpGet]
         [Route("GetAccountTitle")]
-        public async Task<ActionResult<IEnumerable<OneAccountTitleDto>>> GetAccountTitle([FromQuery] UserParams userParams, bool? status, string search)
+        public async Task<ActionResult<IEnumerable<OneChargingDto>>> OneAccountTitlePagination([FromQuery] UserParams userParams, bool? status, string search)
         {
-            var oneChargingList = await _unitOfWork.One.GetAccountTitle(userParams, status, search);
+            var oneChargingList = await _unitOfWork.One.GetAccountTitlePagination(userParams, status, search);
             Response.AddPaginationHeader(oneChargingList.CurrentPage, oneChargingList.PageSize, oneChargingList.TotalCount, oneChargingList.TotalPages, oneChargingList.HasNextPage, oneChargingList.HasPreviousPage);
 
             var oneChargingResult = new
@@ -111,6 +74,6 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
         }
 
 
-        
+
     }
 }

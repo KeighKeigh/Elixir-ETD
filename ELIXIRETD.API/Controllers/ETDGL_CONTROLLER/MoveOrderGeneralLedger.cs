@@ -125,6 +125,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             public string BOA2 { get; set; }
             public string System { get; set; }
             public string Books { get; set; }
+            public string ChargingCode {  get; set; }
+            public string ChargingName { get; set; }
         }
 
         public class Handler : IRequestHandler<ETDGLQuery, Result<List<ETDGLResult>>>
@@ -242,8 +244,10 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         ReleasedDate = string.Empty,
                         ChequeDate = string.Empty,
                         BOA2 = "Inventoriables",
-                        System = "Elixir - ETD",
+                        System = "Elixir ETD",
                         Books = "Journal Book",
+                        ChargingCode = x.ChargingCode ?? string.Empty,
+                        ChargingName = x.ChargingName ?? string.Empty,
                     },
                     //credit
                     new ETDGLResult
@@ -257,8 +261,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         ClientSupplier = x.ClientSupplier ?? string.Empty,
                         AccountTitleCode = "115998",
                         AccountTitle = "Materials & Supplies Inventory",
-                        CompanyCode = "0001",
-                        Company = "RDFFLFI",
+                        CompanyCode = x.CompanyCode ?? string.Empty,
+                        Company = x.Company ?? string.Empty,
                         DivisionCode = x.DivisionCode ?? string.Empty,
                         Division = x.Division ?? string.Empty,
                         DepartmentCode = x.DepartmentCode ?? string.Empty,
@@ -316,8 +320,10 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         ReleasedDate = string.Empty,
                         ChequeDate = string.Empty,
                         BOA2 = "Inventoriables",
-                        System = "Elixir - ETD",
+                        System = "Elixir ETD",
                         Books = "Journal Book",
+                        ChargingCode = x.ChargingCode ?? string.Empty,
+                        ChargingName = x.ChargingName ?? string.Empty,
                     }
                 }).ToList();
 
@@ -345,8 +351,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   LineAmount = (w.UnitPrice * m.QuantityOrdered),
                                   UOM = w.Uom,
                                   CheckingRemarks = "Move Order",
-                                  DivisionCode = m.CompanyCode,
-                                  Division = m.CompanyName,
+                                  DivisionCode = m.business_unit_code,
+                                  Division = m.business_unit_name,
                                   LocationCode = m.LocationCode,
                                   Location = m.LocationName,
                                   AccountTitle = m.AccountTitles != null ? m.AccountTitles : "SE - R & M - Transport Vehicles",
@@ -365,9 +371,13 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   UnitCode = m.department_unit_code,
                                   SubUnit = m.sub_unit_name,
                                   SubUnitCode = m.sub_unit_code,
+                                  ChargingCode = m.One_Charging,
+                                  ChargingName = m.one_charging_name,
+                                  
+                                  
 
 
-                              });
+                               });
 
                 return await result.ToListAsync();
             }
@@ -393,8 +403,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
                     CheckingRemarks = "Miscellaneous Receipt",
                     Remarks = x.receipt.Details,
-                    DivisionCode = x.receipt.CompanyCode,
-                    Division = x.receipt.CompanyName,
+                    DivisionCode = x.receipt.business_unit_code,
+                    Division = x.receipt.business_unit_name,
                     DepartmentCode = x.receipt.DepartmentCode,
                     Department = x.receipt.DepartmentName,
                     LocationCode = x.receipt.LocationCode,
@@ -411,6 +421,9 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     UnitCode = x.receipt.department_unit_code,
                     SubUnit = x.receipt.sub_unit_name,
                     SubUnitCode = x.receipt.sub_unit_code,
+                    ChargingCode = x.receipt.OneChargingCode,
+                    ChargingName = x.receipt.one_charging_name
+
                 });
 
                 return await result.ToListAsync();
@@ -438,8 +451,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     CheckingRemarks = "Miscellaneous Issue",
                     Reason = x.issue.Remarks,
 
-                    DivisionCode = x.miscDetail.CompanyCode,
-                    Division = x.miscDetail.CompanyName,
+                    DivisionCode = x.miscDetail.business_unit_code,
+                    Division = x.miscDetail.business_unit_name,
                     DepartmentCode = x.miscDetail.DepartmentCode,
                     Department = x.miscDetail.DepartmentName,
                     LocationCode = x.miscDetail.LocationCode,
@@ -456,6 +469,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     UnitCode = x.miscDetail.department_unit_code,
                     SubUnit = x.miscDetail.sub_unit_name,
                     SubUnitCode = x.miscDetail.sub_unit_code,
+                    ChargingCode = x.miscDetail.OneChargingCode,
+                    ChargingName = x.miscDetail.one_charging_name
 
 
                 });
@@ -628,8 +643,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         Reason = x.FuelRegister.Remarks,
                         Remarks = "",
 
-                        DivisionCode = x.FuelRegister.Company_Code,
-                        Division = x.FuelRegister.Company_Name,
+                        DivisionCode = x.FuelRegister.BusinessUnitCode,
+                        Division = x.FuelRegister.BusinessUnitName,
                         DepartmentCode = x.FuelRegister.Department_Code,
                         Department = x.FuelRegister.Department_Name,
                         LocationCode = x.FuelRegister.Location_Code,
@@ -645,7 +660,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         UnitCode = x.FuelRegister.DepartmentUnitCode,
                         SubUnit = x.FuelRegister.SubUnitName,
                         SubUnitCode = x.FuelRegister.SubUnitCode,
-
+                        ChargingCode = x.FuelRegister.OneChargingCode,
+                        ChargingName = x.FuelRegister.OneChargingName
 
                     });
                 return await result.ToListAsync();

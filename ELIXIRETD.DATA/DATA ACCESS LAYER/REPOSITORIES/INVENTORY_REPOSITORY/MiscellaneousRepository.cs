@@ -41,6 +41,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 receipt.DepartmentCode = miscOne.department_code;
                 receipt.DepartmentName = miscOne.department_name;
                 receipt.one_charging_name = miscOne.name;
+                receipt.OneChargingCode = miscOne.code;
                 receipt.business_unit_code = miscOne.business_unit_code;
                 receipt.business_unit_name = miscOne.business_unit_name;
                 receipt.department_unit_code = miscOne.department_unit_code;
@@ -214,6 +215,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                           FullName = x.warehouse.FullName,
                           Details = x.receiptparents.Details,
                           one_charging_name = x.receiptparents.one_charging_name,
+                          OneChargingCode = x.receiptparents.OneChargingCode,
                           business_unit_code = x.receiptparents.business_unit_code,
                           business_unit_name = x.receiptparents.business_unit_name,
                           department_unit_code = x.receiptparents.department_unit_code,
@@ -265,6 +267,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                 issue.DepartmentCode = miscOne.department_code;
                 issue.DepartmentName = miscOne.department_name;
                 issue.one_charging_name = miscOne.name;
+                issue.OneChargingCode = miscOne.code;
                 issue.business_unit_code = miscOne.business_unit_code;
                 issue.business_unit_name = miscOne.business_unit_name;
                 issue.department_unit_code = miscOne.department_unit_code;

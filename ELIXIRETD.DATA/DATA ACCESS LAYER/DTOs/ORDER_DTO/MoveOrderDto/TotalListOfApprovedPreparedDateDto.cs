@@ -40,7 +40,8 @@
         public string DepartmentUnitName { get; set; }
         public string SubUnitCode { get; set; }
         public string SubUnitName { get; set; }
-
+        public string OneChargingCode { get; set; }
+        public string OneChargingName { get; set ; }
 
     }
 }

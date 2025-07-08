@@ -59,6 +59,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.FUEL_REGISTER_DTO
         public string cipNo { get; set; }
         public string Month { get; set; }
         public string OneChargingName { get; set; }
+        public string OneChargingCode { get; set; }
         public string BusinessUnitCode { get; set; }
         public string BusinessUnitName { get; set; }
         public string DepartmentUnitCode { get; set; }

@@ -2388,52 +2388,56 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
                 }).ToList();
             
-            var moveOrderConsol = _context.TransactOrder
-                .Join(_context.MoveOrders, transact => transact.OrderNo,
-                moveOrder => moveOrder.OrderNo, (transact, moveOrder) => new { transact, moveOrder })
-               .Where(x => x.transact.IsTransact == true && x.transact.IsActive == true && x.moveOrder.IsActive == true)
-               .Where(x => x.transact.DeliveryDate.Value >= dateFrom.Date && x.transact.DeliveryDate.Value <= dateTo)
-                .Select(x => new ConsolidateAuditReportDto
+            var moveOrderConsol = from moveOrder in _context.MoveOrders
+                                  join transact in _context.TransactOrder
+                                  on moveOrder.OrderNo equals transact.OrderNo
+                                  join w in _context.WarehouseReceived
+                                  on moveOrder.WarehouseId equals w.Id
+                                  join u in _context.Users
+                                  on transact.PreparedBy equals u.FullName
+                                  where moveOrder.IsTransact == true
+                                  where transact.PreparedDate.Value >= dateFrom
+                                  where transact.PreparedDate.Value <= dateTo
+                                  select new  ConsolidateAuditReportDto
                 {
-                    Id = x.transact.Id,
-                    TransactionDate = x.transact.PreparedDate.Value.Date.ToString(),
-                    ItemCode = x.moveOrder.ItemCode,
-                    ItemDescription = x.moveOrder.ItemDescription,
-                    Uom = x.moveOrder.Uom,
-                    Category = x.moveOrder.Category,
-                    Quantity = Math.Round(x.moveOrder.QuantityOrdered, 2),
-                    UnitCost = x.moveOrder.UnitPrice,
-                    LineAmount = Math.Round(x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered, 2),
-                    Source = x.transact.OrderNo.ToString(),
-                    TransactionType = "Move Order",
-                    Status = "Transacted",
-                    Reason = "",
-                    Reference = x.moveOrder.ItemRemarks,
-                    SupplierName = "",
-                    EncodedBy = x.transact.PreparedBy,
-                    CompanyCode = x.moveOrder.CompanyCode,
-                    CompanyName = x.moveOrder.CompanyName,
-                    DepartmentCode = x.moveOrder.DepartmentCode,
-                    DepartmentName = x.moveOrder.DepartmentName,
-                    LocationCode = x.moveOrder.LocationCode,
-                    LocationName = x.moveOrder.LocationName,
-                    AccountTitleCode = x.moveOrder.AccountCode,
-                    AccountTitle = x.moveOrder.AccountTitles,
-                    EmpId = x.moveOrder.EmpId,
-                    Fullname = x.moveOrder.FullName,
-                    AssetTag = x.moveOrder.AssetTag,
-                    CIPNo = x.moveOrder.Cip_No,
-                    Helpdesk = x.moveOrder.HelpdeskNo,
-                    Rush = x.moveOrder.Rush,
-                    OneChargingName = x.moveOrder.one_charging_name,
-                    BusinessUnitName = x.moveOrder.business_unit_name,
-                    BusinessUnitCode = x.moveOrder.business_unit_code,
-                    DepartmentUnitName = x.moveOrder.department_unit_name,
-                    DepartmentUnitCode = x.moveOrder.department_unit_code,
-                    SubUnitCode = x.moveOrder.sub_unit_code,
-                    SubUnitName = x.moveOrder.sub_unit_name
+                                      Id = transact.Id,
+                                      TransactionDate = transact.PreparedDate.Value.ToString(),
+                                      ItemCode = moveOrder.ItemCode,
+                                      ItemDescription = moveOrder.ItemDescription,
+                                      Uom = moveOrder.Uom,
+                                      Category = moveOrder.Category,
+                                      Quantity = Math.Round(moveOrder.QuantityOrdered, 2),
+                                      UnitCost = moveOrder.UnitPrice,
+                                      LineAmount = Math.Round(moveOrder.UnitPrice * moveOrder.QuantityOrdered, 2),
+                                      Source = Convert.ToString(transact.OrderNo),
+                                      TransactionType = "Move Order",
+                                      Reason = "",
+                                      Reference = moveOrder.ItemRemarks,
+                                      SupplierName = "",
+                                      EncodedBy = transact.PreparedBy,
+                                      CompanyCode = moveOrder.CompanyCode,
+                                      CompanyName = moveOrder.CompanyName,
+                                      DepartmentCode = moveOrder.DepartmentCode,
+                                      DepartmentName = moveOrder.DepartmentName,
+                                      LocationCode = moveOrder.LocationCode,
+                                      LocationName = moveOrder.LocationName,
+                                      AccountTitleCode = moveOrder.AccountCode != null ? moveOrder.AccountCode : "537620",
+                                      AccountTitle = moveOrder.AccountTitles != null ? moveOrder.AccountTitles : "SE - R & M - Transport Vehicles",
+                                      EmpId = moveOrder.EmpId,
+                                      Fullname = moveOrder.FullName,
+                                      AssetTag = moveOrder.AssetTag,
+                                      CIPNo = moveOrder.Cip_No,
+                                      Helpdesk = moveOrder.HelpdeskNo,
+                                      Rush = moveOrder.Rush,
+                                      OneChargingName = moveOrder.one_charging_name,
+                                      BusinessUnitName = moveOrder.business_unit_name,
+                                      BusinessUnitCode = moveOrder.business_unit_code,
+                                      DepartmentUnitName = moveOrder.department_unit_name,
+                                      DepartmentUnitCode = moveOrder.department_unit_code,
+                                      SubUnitCode = moveOrder.sub_unit_code,
+                                      SubUnitName = moveOrder.sub_unit_name
 
-                }).ToList();
+                                  };
 
             var receiptConsol = _context.MiscellaneousReceipts
                 .GroupJoin(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })

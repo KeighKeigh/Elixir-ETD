@@ -117,6 +117,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                 //fuelRegisterExist.fuelPump = fuel.fuelPump;
                 fuelRegisterExist.issuanceDate = fuel.issuanceDate;
                 fuelRegisterExist.OneChargingName = borrowedOne.name;
+                fuelRegisterExist.OneChargingCode = borrowedOne.code;
                 fuelRegisterExist.BusinessUnitCode = borrowedOne.business_unit_code;
                 fuelRegisterExist.BusinessUnitName = borrowedOne.business_unit_name;
                 fuelRegisterExist.DepartmentUnitCode = borrowedOne.department_unit_code;
@@ -157,6 +158,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     cipNo = fuel.cipNo,
                     issuanceDate = fuel.issuanceDate,
                     OneChargingName = borrowedOne.name,
+                    OneChargingCode = borrowedOne.code,
                     BusinessUnitCode = borrowedOne.business_unit_code,
                     BusinessUnitName = borrowedOne.business_unit_name,
                     DepartmentUnitCode = borrowedOne.department_unit_code,
@@ -671,6 +673,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                     cipNo = f.cipNo,
                     Month = f.issuanceDate.Value.ToString("yyMM"),
                     OneChargingName = f.OneChargingName,
+                    OneChargingCode = f.OneChargingCode,
                     BusinessUnitCode = f.BusinessUnitCode,
                     BusinessUnitName = f.BusinessUnitName,
                     DepartmentUnitCode = f.DepartmentUnitCode,

@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL
+namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
 {
-    public class OneAccountTitle
+    public class AccountTitleDto
     {
-        public int Id { get; set; }
         public int? SyncId { get; set; }
         public string AccountCode { get; set; }
         public string AccountDescription { get; set; }

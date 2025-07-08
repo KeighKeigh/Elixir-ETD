@@ -208,6 +208,7 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
         }
 
         [HttpPut]
+        [HttpPut]
         [Route("UpdateMaterials")]
         public async Task<IActionResult> UpdateRawMaterials([FromBody] Material material)
         {
