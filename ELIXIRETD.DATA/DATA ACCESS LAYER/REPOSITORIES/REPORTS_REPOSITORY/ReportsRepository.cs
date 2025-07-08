@@ -1887,7 +1887,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                   select new ConsolidateFinanceReportDto
                                   {
                                       Id = transact.Id,
-                                      TransactionDate = transact.PreparedDate.Value,
+                                      TransactionDate = transact.PreparedDate.Value.Date,
                                       ItemCode = moveOrder.ItemCode,
                                       ItemDescription = moveOrder.ItemDescription,
                                       Uom = moveOrder.Uom,

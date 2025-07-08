@@ -340,7 +340,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                select new ETDGLResult
                               {
                                   SyncId = "MO-" + m.Id.ToString() ,
-                                  TransactionDate = t.PreparedDate,
+                                  TransactionDate = t.PreparedDate.Value.Date,
                                   ClientSupplier = m.CustomerName,
                                   PONumber = m.Category,
                                   RRNumber = m.HelpdeskNo,

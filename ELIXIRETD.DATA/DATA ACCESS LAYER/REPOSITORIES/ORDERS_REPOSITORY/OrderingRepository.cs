@@ -2657,8 +2657,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     SubUnitCode = x.First().order.sub_unit_code,
                     SubUnitName = x.First().order.sub_unit_name,
                     cip_No = x.First().moveOrder.Cip_No,
-                    helpdeskNo = x.First().moveOrder.HelpdeskNo == null ? "0" : x.First().moveOrder.HelpdeskNo
-
+                    helpdeskNo = x.First().moveOrder.HelpdeskNo
 
                 }).ToListAsync();
 
