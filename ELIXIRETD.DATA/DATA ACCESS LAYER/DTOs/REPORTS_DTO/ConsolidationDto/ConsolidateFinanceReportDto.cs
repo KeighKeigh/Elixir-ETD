@@ -60,6 +60,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string DepartmentUnitName { get; set; }
         public string SubUnitCode { get; set; }
         public string SubUnitName { get; set; }
-
+        public string FinancialStatement { get; set; }
+        public string UnitResponsible { get; set; }
+        
+ 
     }
 }

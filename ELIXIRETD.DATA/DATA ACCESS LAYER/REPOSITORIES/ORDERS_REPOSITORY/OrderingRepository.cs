@@ -2854,7 +2854,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                   IsRush = x.Key.Rush != null ? true : false,
                   Rush = x.Key.Rush,
 
-              }).OrderByDescending(x => x.PreparedDate).Where(x => x.IsRush == status);
+              }).OrderBy(x => x.IsPrint).Where(x => x.IsRush == status);
 
             return await PagedList<ApprovedMoveOrderPaginationDto>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
 
@@ -2902,7 +2902,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                  IsRush = x.Key.Rush != null ? true : false,
                  Rush = x.Key.Rush,
 
-             }).Where(x => x.IsRush == status).OrderByDescending(x => x.PreparedDate)
+             }).Where(x => x.IsRush == status).OrderBy(x => x.IsPrint)
                  .Where(x => Convert.ToString(x.MIRId).ToLower().Contains(search.Trim().ToLower())
                      || Convert.ToString(x.CustomerName).ToLower().Contains(search.Trim().ToLower())
                       || Convert.ToString(x.CustomerCode).ToLower().Contains(search.Trim().ToLower()));

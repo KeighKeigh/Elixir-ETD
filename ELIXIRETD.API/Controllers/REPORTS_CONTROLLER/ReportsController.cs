@@ -24,7 +24,7 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
         private readonly IUnitOfWork _unitofwork;
         private readonly IMediator _mediator;
 
-        public ReportsController(IUnitOfWork unitofwork , IMediator mediator)
+        public ReportsController(IUnitOfWork unitofwork, IMediator mediator)
         {
             _unitofwork = unitofwork;
             _mediator = mediator;
@@ -32,9 +32,9 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
 
         [HttpGet]
         [Route("WareHouseReceivingReports")]
-        public async Task<ActionResult<IEnumerable<DtoWarehouseReceivingReports>>> WarehouseReceiveController([FromQuery] UserParams userParams, [FromQuery] string DateFrom , [FromQuery] string DateTo , [FromQuery] string Search )
+        public async Task<ActionResult<IEnumerable<DtoWarehouseReceivingReports>>> WarehouseReceiveController([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
-            var inventory = await _unitofwork.Reports.WarehouseReceivingReports(userParams, DateFrom, DateTo , Search);
+            var inventory = await _unitofwork.Reports.WarehouseReceivingReports(userParams, DateFrom, DateTo, Search);
 
             Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
@@ -79,10 +79,10 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
 
         [HttpGet]
         [Route("TransactionReport")]
-        public async Task<ActionResult<IEnumerable<DtoForTransactedReports>>> TransactionReports([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string DateTo,[FromQuery] string Search)
+        public async Task<ActionResult<IEnumerable<DtoForTransactedReports>>> TransactionReports([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
 
-            var inventory = await _unitofwork.Reports.TransactedMoveOrderReport(userParams, DateFrom, DateTo , Search);
+            var inventory = await _unitofwork.Reports.TransactedMoveOrderReport(userParams, DateFrom, DateTo, Search);
 
             Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
@@ -107,7 +107,7 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
         public async Task<IActionResult> MoveOrderReport([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
 
-            var inventory = await _unitofwork.Reports.MoveOrderReport( DateFrom, DateTo, Search);
+            var inventory = await _unitofwork.Reports.MoveOrderReport(DateFrom, DateTo, Search);
             return Ok(inventory);
 
         }
@@ -168,24 +168,24 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
         public async Task<ActionResult<IEnumerable<BorrowedTransactionReportsDto>>> BorrowedTransactionReports([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
 
-                var inventory = await _unitofwork.Reports.BorrowedTransactionReports(userParams, DateFrom, DateTo, Search);
+            var inventory = await _unitofwork.Reports.BorrowedTransactionReports(userParams, DateFrom, DateTo, Search);
 
-                Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
+            Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
-                var inventoryResult = new
-                {
-                    inventory,
-                    inventory.CurrentPage,
-                    inventory.PageSize,
-                    inventory.TotalCount,
-                    inventory.TotalPages,
-                    inventory.HasNextPage,
-                    inventory.HasPreviousPage
-                };
+            var inventoryResult = new
+            {
+                inventory,
+                inventory.CurrentPage,
+                inventory.PageSize,
+                inventory.TotalCount,
+                inventory.TotalPages,
+                inventory.HasNextPage,
+                inventory.HasPreviousPage
+            };
 
 
-                return Ok(inventoryResult);
-       
+            return Ok(inventoryResult);
+
 
         }
 
@@ -197,7 +197,7 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
         public async Task<ActionResult<IEnumerable<DtoBorrowedAndReturned>>> BorrowedReturnedReports([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
 
-            var inventory = await _unitofwork.Reports.ReturnBorrowedReports(userParams, DateFrom, DateTo ,Search );
+            var inventory = await _unitofwork.Reports.ReturnBorrowedReports(userParams, DateFrom, DateTo, Search);
 
             Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
@@ -222,7 +222,7 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
         public async Task<ActionResult<IEnumerable<FuelRegisterReportsDto>>> FuelRegisterReports([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
 
-            var inventory = await _unitofwork.Reports.FuelRegisterReports (userParams, DateFrom, DateTo, Search);
+            var inventory = await _unitofwork.Reports.FuelRegisterReports(userParams, DateFrom, DateTo, Search);
 
             Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
@@ -269,10 +269,10 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
 
         [HttpGet]
         [Route("InventoryMovementReport")]
-        public async Task<ActionResult<IEnumerable<DtoInventoryMovement>>> InventoryMovementReport([FromQuery] UserParams userParams, [FromQuery] string DateFrom , [FromQuery] string PlusOne , [FromQuery]string Search)
+        public async Task<ActionResult<IEnumerable<DtoInventoryMovement>>> InventoryMovementReport([FromQuery] UserParams userParams, [FromQuery] string DateFrom, [FromQuery] string PlusOne, [FromQuery] string Search)
         {
 
-            var inventory = await _unitofwork.Reports.InventoryMovementReports(userParams, DateFrom, PlusOne , Search);
+            var inventory = await _unitofwork.Reports.InventoryMovementReports(userParams, DateFrom, PlusOne, Search);
 
             Response.AddPaginationHeader(inventory.CurrentPage, inventory.PageSize, inventory.TotalCount, inventory.TotalPages, inventory.HasNextPage, inventory.HasPreviousPage);
 
@@ -297,12 +297,12 @@ namespace ELIXIRETD.API.Controllers.REPORTS_CONTROLLER
         [Route("ConsolidationFinanceReports")]
         public async Task<IActionResult> ConsolidationFinanceReports([FromQuery] string DateFrom, [FromQuery] string DateTo, [FromQuery] string Search)
         {
-            var reports = await _unitofwork.Reports.ConsolidateFinanceReport(DateFrom,DateTo,Search);
+            var reports = await _unitofwork.Reports.ConsolidateFinanceReport(DateFrom, DateTo, Search);
 
             return Ok(reports);
         }
 
-
+        [AllowAnonymous]
         [HttpGet("ExportConsolidateFinance")]
         public async Task<IActionResult> ExportConsolidateFinance([FromQuery] ConsolidateFinanceExportCommand command)
         {

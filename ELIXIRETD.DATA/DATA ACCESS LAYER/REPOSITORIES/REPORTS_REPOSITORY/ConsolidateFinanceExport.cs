@@ -73,6 +73,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         ,"Department Unit Name"
                         ,"Sub Unit Code"
                         ,"Sub Unit Name"
+                        ,"Financial Statement"
+                        ,"Unit Responsible"
 
                     };
 
@@ -139,6 +141,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         row.Cell(33).Value = consolidate[index - 1].DepartmentUnitName;
                         row.Cell(34).Value = consolidate[index - 1].SubUnitCode;
                         row.Cell(35).Value = consolidate[index - 1].SubUnitName;
+                        row.Cell(36).Value = consolidate[index - 1].FinancialStatement;
+                        row.Cell(37).Value = consolidate[index - 1].UnitResponsible;
 
                     }
                     worksheet.Columns().AdjustToContents();
