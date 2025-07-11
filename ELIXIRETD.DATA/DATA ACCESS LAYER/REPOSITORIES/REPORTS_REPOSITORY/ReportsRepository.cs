@@ -2068,7 +2068,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Quantity = Math.Round(x.issue.Quantity, 2),
                     UnitCost = x.issue.UnitPrice,
                     LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2),
-                    Source = Convert.ToString(x.miscDetail.Id),
+                    Source = Convert.ToString(x.issue.Id),
                     TransactionType = "Miscellaneous Issue",
                     Reason = x.issue.Remarks,
                     Reference = x.miscDetail.Details,
