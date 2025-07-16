@@ -4,6 +4,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIRETD.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250716010640_MaterialAndAccountTitlePivot")]
+    partial class MaterialAndAccountTitlePivot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1482,32 +1484,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.ToTable("TransactOrder");
                 });
 
-            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountTitleMaterial", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("AccountTitleId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MaterialId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MaterialNo")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountTitleId");
-
-                    b.HasIndex("MaterialId");
-
-                    b.ToTable("AccountTitleMaterials");
-                });
-
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Asset", b =>
                 {
                     b.Property<int>("Id")
@@ -1837,6 +1813,24 @@ namespace ELIXIRETD.DATA.Migrations
                     b.HasIndex("UomId");
 
                     b.ToTable("Materials");
+                });
+
+            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.MaterialAccountTitle", b =>
+                {
+                    b.Property<int?>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AccountTitleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("MaterialId", "AccountTitleId");
+
+                    b.HasIndex("AccountTitleId");
+
+                    b.ToTable("MaterialAccountTitles");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Reason", b =>
@@ -2295,21 +2289,6 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Navigation("Warehouse_Receiving");
                 });
 
-            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountTitleMaterial", b =>
-                {
-                    b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneAccountTitle", "AccountTitle")
-                        .WithMany("AccountTitleMaterials")
-                        .HasForeignKey("AccountTitleId");
-
-                    b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Material", "Material")
-                        .WithMany("AccountTitleMaterials")
-                        .HasForeignKey("MaterialId");
-
-                    b.Navigation("AccountTitle");
-
-                    b.Navigation("Material");
-                });
-
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.LotSection", b =>
                 {
                     b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.LotNames", "LotNames")
@@ -2342,6 +2321,25 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Navigation("LotSection");
 
                     b.Navigation("Uom");
+                });
+
+            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.MaterialAccountTitle", b =>
+                {
+                    b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneAccountTitle", "AccountTitle")
+                        .WithMany("MaterialAccountTitles")
+                        .HasForeignKey("AccountTitleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Material", "Material")
+                        .WithMany("MaterialAccountTitles")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccountTitle");
+
+                    b.Navigation("Material");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Reason", b =>
@@ -2384,12 +2382,12 @@ namespace ELIXIRETD.DATA.Migrations
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneAccountTitle", b =>
                 {
-                    b.Navigation("AccountTitleMaterials");
+                    b.Navigation("MaterialAccountTitles");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Material", b =>
                 {
-                    b.Navigation("AccountTitleMaterials");
+                    b.Navigation("MaterialAccountTitles");
                 });
 #pragma warning restore 612, 618
         }

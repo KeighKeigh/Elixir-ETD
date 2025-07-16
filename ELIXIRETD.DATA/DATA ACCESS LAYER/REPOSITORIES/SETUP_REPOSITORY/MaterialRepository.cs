@@ -1,5 +1,6 @@
 ﻿using ELIXIRETD.DATA.CORE.INTERFACES.SETUP_INTERFACE;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.INVENTORY_DTO.MRP;
+using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.SETUP_DTO;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS;
@@ -515,9 +516,26 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
                 UomId = x.UomId,
                 DateAdded = x.DateAdded.ToString("MM/dd/yyyy"),
                 AddedBy = x.AddedBy,
-                IsActive = x.IsActive
+                IsActive = x.IsActive,
+                AccountTitles = x.AccountTitleMaterials.Select(x => new OneChargingAccountTitleDto
+                {
+                    SyncId = x.AccountTitle.SyncId,
+                    AccountCode = x.AccountTitle.AccountCode,
+                    AccountDescription = x.AccountTitle.AccountDescription,
+                    AccountType = x.AccountTitle.AccountType,
+                    AccountGroup = x.AccountTitle.AccountGroup,
+                    AccountSubgroup = x.AccountTitle.AccountSubgroup,
+                    FinancialStatement = x.AccountTitle.FinancialStatement,
+                    NormalBalance = x.AccountTitle.NormalBalance,
+                    Allocation = x.AccountTitle.Allocation,
+                    Unit = x.AccountTitle.Unit,
+                    Charging = x.AccountTitle.Charging,
+                    CreatedAt = x.AccountTitle.CreatedAt,
+                    UpdatedAt = x.AccountTitle.UpdatedAt,
+                    IsActive = x.AccountTitle.IsActive
+                }).ToList()
 
-            });
+            }); 
 
 
             return await materials.ToListAsync();
@@ -692,7 +710,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             await Task.CompletedTask;
         }
 
-        public async Task<bool> AddSyncMaterial(SyncMaterialDto material)
+        public async Task<Material> AddSyncMaterial(SyncMaterialDto material)
         {
             var materials = new Material
             {
@@ -709,7 +727,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
             await _context.AddAsync(materials);
 
-            return true;
+            return materials;
         }
 
         public async Task<bool> UpdateAsyncBufferLvl(Material material)

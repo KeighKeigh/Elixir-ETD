@@ -148,9 +148,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
             return await PagedList<OneChargingDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PagedList<AccountTitleDto>> GetAccountTitlePagination(UserParams userParams, bool? status, string search)
+        public async Task<PagedList<OneChargingAccountTitleDto>> GetAccountTitlePagination(UserParams userParams, bool? status, string search)
         {
-            var result = _context.OneAccountTitles.Select(x => new AccountTitleDto
+            var result = _context.OneAccountTitles.Select(x => new OneChargingAccountTitleDto
             {
                 SyncId = x.SyncId,
                 AccountCode = x.AccountCode,
@@ -180,7 +180,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.ONECHARGING_REPOSITORY
                 result = result.Where(x => Convert.ToString(x.AccountCode).ToLower().Contains(search.Trim().ToLower())
                                         || Convert.ToString(x.AccountDescription).ToLower().Contains(search.Trim().ToLower()));
             }
-            return await PagedList<AccountTitleDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<OneChargingAccountTitleDto>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
 

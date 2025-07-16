@@ -4,6 +4,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELIXIRETD.DATA.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250716070401_addAccountMat")]
+    partial class addAccountMat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1482,14 +1484,8 @@ namespace ELIXIRETD.DATA.Migrations
                     b.ToTable("TransactOrder");
                 });
 
-            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountTitleMaterial", b =>
+            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountMat", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int?>("AccountTitleId")
                         .HasColumnType("int");
 
@@ -1499,13 +1495,11 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Property<int?>("MaterialNo")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountTitleId");
+                    b.HasKey("AccountTitleId");
 
                     b.HasIndex("MaterialId");
 
-                    b.ToTable("AccountTitleMaterials");
+                    b.ToTable("AccountMats");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Asset", b =>
@@ -2295,19 +2289,19 @@ namespace ELIXIRETD.DATA.Migrations
                     b.Navigation("Warehouse_Receiving");
                 });
 
-            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountTitleMaterial", b =>
+            modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.AccountMat", b =>
                 {
                     b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneAccountTitle", "AccountTitle")
-                        .WithMany("AccountTitleMaterials")
-                        .HasForeignKey("AccountTitleId");
+                        .WithMany("AccountMaterial")
+                        .HasForeignKey("AccountTitleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Material", "Material")
-                        .WithMany("AccountTitleMaterials")
+                    b.HasOne("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Material", null)
+                        .WithMany("AccountMaterial")
                         .HasForeignKey("MaterialId");
 
                     b.Navigation("AccountTitle");
-
-                    b.Navigation("Material");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.LotSection", b =>
@@ -2384,12 +2378,12 @@ namespace ELIXIRETD.DATA.Migrations
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL.OneAccountTitle", b =>
                 {
-                    b.Navigation("AccountTitleMaterials");
+                    b.Navigation("AccountMaterial");
                 });
 
             modelBuilder.Entity("ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL.Material", b =>
                 {
-                    b.Navigation("AccountTitleMaterials");
+                    b.Navigation("AccountMaterial");
                 });
 #pragma warning restore 612, 618
         }

@@ -27,6 +27,8 @@
         public int? LotSectionId { get; set; }
         public virtual LotSection LotSection { get; set; }
 
+        public List<AccountTitleMaterial> AccountTitleMaterials { get; set; } = new List<AccountTitleMaterial>();
+
 
     }
 }

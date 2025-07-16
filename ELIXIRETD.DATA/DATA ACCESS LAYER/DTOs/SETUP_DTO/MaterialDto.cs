@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.SETUP_DTO
 
         public int ? LotSectionId { get; set; }
         public string SectionName { get; set; }
+
+        public List<OneChargingAccountTitleDto> AccountTitles { get; set; } = new List<OneChargingAccountTitleDto>();
 
 
     }

@@ -172,7 +172,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                 var consolidateList = moveOrderTask.Concat(receiptTask).Concat(issueTask)
                     .Concat(fuelTask);
 
-                var result =  consolidateList.SelectMany(x => new List<ETDGLResult>
+                var result = consolidateList.SelectMany(x => new List<ETDGLResult>
                 {
                     
                     //debit
@@ -187,18 +187,18 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         ClientSupplier = x.ClientSupplier ?? string.Empty,
                         AccountTitleCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "115998" : x.AccountTitleCode ?? string.Empty,
                         AccountTitle = x.CheckingRemarks == "Miscellaneous Receipt" ? "Materials & Supplies Inventory" : x.AccountTitle ?? string.Empty,
-                        CompanyCode = x.CompanyCode ?? string.Empty,
-                        Company = x.Company ?? string.Empty,
-                        DivisionCode = x.DivisionCode ?? string.Empty,
-                        Division = x.Division ?? string.Empty,
-                        DepartmentCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "0703" : x.DepartmentCode ?? string.Empty,
-                        Department = x.CheckingRemarks == "Miscellaneous Receipt" ? "Engineering Services & Warehousing" : x.Department ?? string.Empty,
-                        UnitCode = x.UnitCode ?? string.Empty,
-                        Unit = x.Unit ?? string.Empty,
-                        SubUnitCode = x.SubUnitCode ?? string.Empty,
-                        SubUnit = x.SubUnit ?? string.Empty,
-                        LocationCode = x.LocationCode ?? string.Empty,
-                        Location = x.Location ?? string.Empty,
+                        CompanyCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "01" : x.CompanyCode ?? string.Empty,
+                        Company = x.CheckingRemarks == "Miscellaneous Receipt" ? "RDF" : x.Company ?? string.Empty,
+                        DivisionCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "10" : x.DivisionCode ?? string.Empty,
+                        Division = x.CheckingRemarks == "Miscellaneous Receipt" ? "RDF Corporate Service" : x.Division ?? string.Empty,
+                        DepartmentCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "0700" : x.DepartmentCode ?? string.Empty,
+                        Department = x.CheckingRemarks == "Miscellaneous Receipt" ? "Engineering and Technical" : x.Department ?? string.Empty,
+                        UnitCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "0703" : x.UnitCode ?? string.Empty,
+                        Unit = x.CheckingRemarks == "Miscellaneous Receipt" ? "Engineering Services & Warehousing" : x.Unit ?? string.Empty,
+                        SubUnitCode =x.CheckingRemarks == "Miscellaneous Receipt" ? "0073" : x.SubUnitCode ?? string.Empty,
+                        SubUnit = x.CheckingRemarks == "Miscellaneous Receipt" ? "Engineering Services & Warehousing" : x.SubUnit ?? string.Empty,
+                        LocationCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "0001" : x.LocationCode ?? string.Empty,
+                        Location = x.CheckingRemarks == "Miscellaneous Receipt" ? "Head Office" : x.Location ?? string.Empty,
                         PONumber = x.PONumber ?? string.Empty,
                         RRNumber = x.RRNumber,
                         ReferenceNo = x.ReferenceNo ?? string.Empty,
@@ -212,7 +212,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         AccountType = x.AccountType ?? string.Empty,
                         DRCR = "Debit",
                         AssetCode = string.Empty,
-                        Asset= string.Empty,
+                        Asset= x.Asset ?? string.Empty,
                         ServiceProviderCode = x.ServiceProviderCode ?? string.Empty,
                         ServiceProvider = x.ServiceProvider ?? string.Empty,
                         BOA = "Inventoriable",
@@ -248,8 +248,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         BOA2 = "Inventoriable",
                         System = "Elixir ETD",
                         Books = "Journal Book",
-                        ChargingCode = x.ChargingCode ?? string.Empty,
-                        ChargingName = x.ChargingName ?? string.Empty,
+                        ChargingCode = x.CheckingRemarks == "Miscellaneous Receipt" ? "0069" : x.ChargingCode ?? string.Empty,
+                        ChargingName = x.CheckingRemarks == "Miscellaneous Receipt" ? "Engineering Services & Warehousing" : x.ChargingName ?? string.Empty,
                     },
                     //credit
                     new ETDGLResult
@@ -261,20 +261,20 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         AccountingTag = string.Empty,
                         TransactionDate = x.TransactionDate,
                         ClientSupplier = x.ClientSupplier ?? string.Empty,
-                           AccountTitleCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.AccountTitleCode ?? string.Empty :  "115998",
-                        AccountTitle = x.CheckingRemarks == "Miscellaneous Receipt" ? x.AccountTitle ?? string.Empty : "Materials & Supplies Inventory",
-                        CompanyCode = x.CompanyCode ?? string.Empty,
-                        Company = x.Company ?? string.Empty,
-                        DivisionCode = x.DivisionCode ?? string.Empty,
-                        Division = x.Division ?? string.Empty,
-                        DepartmentCode = x.CheckingRemarks == "Miscellaneous Issue" ? "0703" : x.DepartmentCode ?? string.Empty,
-                        Department = x.CheckingRemarks == "Miscellaneous Issue" ? "Engineering Services & Warehousing" : x.Department ?? string.Empty,
-                        UnitCode = x.UnitCode ?? string.Empty,
-                        Unit = x.Unit ?? string.Empty,
-                        SubUnitCode = x.SubUnitCode ?? string.Empty,
-                        SubUnit = x.SubUnit ?? string.Empty,
-                        LocationCode = x.LocationCode ?? string.Empty,
-                        Location = x.Location ?? string.Empty,
+                        AccountTitleCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.AccountTitleCode  :  "115998",
+                        AccountTitle = x.CheckingRemarks == "Miscellaneous Receipt" ? x.AccountTitle  : "Materials & Supplies Inventory",
+                        CompanyCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.CompanyCode : "01",
+                        Company = x.CheckingRemarks == "Miscellaneous Receipt" ? x.Company : "RDF",
+                        DivisionCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.DivisionCode : "10",
+                        Division = x.CheckingRemarks == "Miscellaneous Receipt" ? x.Division : "RDF Corporate Service",
+                        DepartmentCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.DepartmentCode : "0700",
+                        Department = x.CheckingRemarks == "Miscellaneous Receipt" ? x.Department : "Engineering and Technical",
+                        UnitCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.UnitCode :  "0703",
+                        Unit = x.CheckingRemarks == "Miscellaneous Receipt" ?  x.Unit :"Engineering Services & Warehousing",
+                        SubUnitCode =x.CheckingRemarks == "Miscellaneous Receipt" ? x.SubUnitCode : "0073",
+                        SubUnit = x.CheckingRemarks == "Miscellaneous Receipt" ? x.SubUnit : "Engineering Services & Warehousing",
+                        LocationCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.LocationCode : "0001",
+                        Location = x.CheckingRemarks == "Miscellaneous Receipt" ? x.Location : "Head Office" ,
                         PONumber = x.PONumber ?? string.Empty,
                         RRNumber = x.RRNumber,
                         ReferenceNo = x.ReferenceNo ?? string.Empty,
@@ -286,9 +286,9 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         LineAmount = -(x?.LineAmount) ?? 0,
                         VoucherJournal = string.Empty,
                         AccountType = x.AccountType ?? string.Empty,
-                        DRCR = "Credit",  
+                        DRCR = "Credit",
                         AssetCode = x.AssetCode ?? string.Empty,
-                        Asset= string.Empty,
+                        Asset= x.Asset ?? string.Empty,
                         ServiceProviderCode = x.ServiceProviderCode ?? string.Empty,
                         ServiceProvider = x.ServiceProvider ?? string.Empty,
                         BOA = "Inventoriable",
@@ -324,8 +324,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         BOA2 = "Inventoriable",
                         System = "Elixir ETD",
                         Books = "Journal Book",
-                        ChargingCode = x.ChargingCode ?? string.Empty,
-                        ChargingName = x.ChargingName ?? string.Empty,
+                        ChargingCode = x.CheckingRemarks == "Miscellaneous Receipt" ? x.ChargingCode : "0069",
+                        ChargingName = x.CheckingRemarks == "Miscellaneous Receipt" ? x.ChargingName : "Engineering Services & Warehousing",
                     }
                 }).ToList();
 
@@ -386,6 +386,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   AccountSubGroup = title.AccountSubgroup,
                                   FinancialStatement = title.FinancialStatement,
                                   UnitResponsible = title.Unit,
+                                  Asset = m.AssetTag
 
 
 

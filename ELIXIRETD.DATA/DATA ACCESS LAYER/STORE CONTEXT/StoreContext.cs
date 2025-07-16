@@ -55,6 +55,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
         public virtual DbSet<OneRdf> OneRdfs { get; set; }
         public virtual DbSet<OneAccountTitle> OneAccountTitles { get; set; }
 
+        public virtual DbSet<AccountTitleMaterial> AccountTitleMaterials { get; set; }
+
+
+
+
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -70,7 +75,31 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT
 
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
 
 
+            modelBuilder.Entity<AccountTitleMaterial>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.MaterialNo); 
+
+                entity.HasOne(e => e.AccountTitle)
+                      .WithMany(at => at.AccountTitleMaterials)
+                      .HasForeignKey(e => e.AccountTitleId);
+
+            });
+        }
+
+        // Configure the many-to-many relationship
+        //modelBuilder.Entity<AccountMat>()
+        //    .HasKey(mat => new { mat.AccountTitleId });
+
+
+        //modelBuilder.Entity<AccountMat>()
+        //    .HasOne(mat => mat.AccountTitle)
+        //    .WithMany(at => at.AccountMaterial)
+        //    .HasForeignKey(mat => mat.AccountTitleId);
     }
 }

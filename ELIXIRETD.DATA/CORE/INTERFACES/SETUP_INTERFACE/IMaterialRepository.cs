@@ -128,7 +128,7 @@ namespace ELIXIRETD.DATA.CORE.INTERFACES.SETUP_INTERFACE
 
         Task UpdateAsyncMaterial(Material material);
 
-        Task<bool> AddSyncMaterial(SyncMaterialDto material);
+        Task<Material> AddSyncMaterial(SyncMaterialDto material);
 
         Task<bool> UpdateAsyncBufferLvl(Material material);
 

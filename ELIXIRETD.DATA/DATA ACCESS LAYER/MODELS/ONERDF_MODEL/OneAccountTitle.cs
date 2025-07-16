@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +25,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool? IsActive { get; set; } = true;
+
+        public List<AccountTitleMaterial> AccountTitleMaterials { get; set; } = new List<AccountTitleMaterial>();
     }
 }

@@ -1,10 +1,12 @@
 ﻿using ELIXIRETD.DATA.CORE.ICONFIGURATION;
+using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.SETUP_DTO;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.EXTENSIONS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using Microsoft.EntityFrameworkCore;
+using static ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER.AccountTitleController;
 //using System.Data.Entity;
 
 namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
@@ -756,6 +758,11 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
 
                         }
 
+                        if (item.AccountTitles != null && item.AccountTitles.Any())
+                        {
+                            await UpdateMaterialAccountTitles(existingMaterials.Material_No, item.AccountTitles);
+                        }
+
                         if (!hasChanged)
                         {
                             existingMaterials.SyncDate = DateTime.Now;
@@ -769,8 +776,13 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
 
                         item.StatusSync = "New Added";
                         availableImport.Add(item);
-                        await _unitOfWork.Materials.AddSyncMaterial(item);
 
+                        var addedMaterial = await _unitOfWork.Materials.AddSyncMaterial(item);
+
+                        if (item.AccountTitles != null && item.AccountTitles.Any())
+                        {
+                            await CreateMaterialAccountTitles(addedMaterial.Material_No, item.AccountTitles);
+                        }
 
                     }
 
@@ -822,7 +834,48 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
            
         }
 
+        private async Task CreateMaterialAccountTitles(int? materialId, List<MaterialAccountSyncDto> accountTitles)
+        {
+            foreach (var accountTitle in accountTitles)
+            {
+                var materialAccountTitle = new AccountTitleMaterial
+                {
+                    MaterialNo = materialId.Value,
+                    AccountTitleId = accountTitle.AccountTitleId
 
+                };
+
+                _context.AccountTitleMaterials.Add(materialAccountTitle);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task UpdateMaterialAccountTitles(int? materialId, List<MaterialAccountSyncDto> accountTitles)
+        {
+            var existingRelationships = await _context.AccountTitleMaterials
+                .Where(x => x.MaterialNo == materialId)
+                .ToListAsync();
+
+            _context.AccountTitleMaterials.RemoveRange(existingRelationships);
+
+            foreach (var accountTitle in accountTitles)
+            {
+                var materialAccountTitle = new AccountTitleMaterial
+                {
+                    MaterialNo = materialId.Value,
+                    AccountTitleId = accountTitle.AccountTitleId
+
+                };
+
+                _context.AccountTitleMaterials.Add(materialAccountTitle);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+
+        ///
         [HttpPut]
         [Route("UpdateAsyncBufferLvl")]
         public async Task<IActionResult> UpdateAsyncBufferLvl(Material material)

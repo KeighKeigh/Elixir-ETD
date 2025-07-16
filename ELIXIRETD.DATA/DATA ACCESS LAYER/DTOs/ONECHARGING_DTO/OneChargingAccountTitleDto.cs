@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
 {
-    public class AccountTitleDto
+    public class OneChargingAccountTitleDto
     {
         public int? SyncId { get; set; }
         public string AccountCode { get; set; }
@@ -23,5 +23,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool? IsActive { get; set; } = true;
+
     }
 }

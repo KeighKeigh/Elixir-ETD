@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.ONECHARGING_DTO;
 
 namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.SETUP_DTO
 {
@@ -33,5 +34,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.SETUP_DTO
         public DateTime SyncDate { get; set; }
 
         public string StatusSync { get; set; }
+
+        public List<MaterialAccountSyncDto> AccountTitles { get; set; } = new List<MaterialAccountSyncDto>();
     }
 }
