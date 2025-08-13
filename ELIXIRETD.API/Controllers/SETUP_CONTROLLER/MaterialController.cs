@@ -760,7 +760,7 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
 
                         if (item.AccountTitles != null && item.AccountTitles.Any())
                         {
-                            await UpdateMaterialAccountTitles(existingMaterials.Material_No, item.AccountTitles);
+                            await UpdateMaterialAccountTitles(existingMaterials.Material_No, item.AccountTitles, existingMaterials.Id);
                         }
 
                         if (!hasChanged)
@@ -781,7 +781,7 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
 
                         if (item.AccountTitles != null && item.AccountTitles.Any())
                         {
-                            await CreateMaterialAccountTitles(addedMaterial.Material_No, item.AccountTitles);
+                            await CreateMaterialAccountTitles(addedMaterial.Material_No, item.AccountTitles, addedMaterial.Id);
                         }
 
                     }
@@ -834,14 +834,16 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
            
         }
 
-        private async Task CreateMaterialAccountTitles(int? materialId, List<MaterialAccountSyncDto> accountTitles)
+        private async Task CreateMaterialAccountTitles(int? materialNo, List<MaterialAccountSyncDto> accountTitles, int? materialId)
         {
             foreach (var accountTitle in accountTitles)
             {
                 var materialAccountTitle = new AccountTitleMaterial
                 {
-                    MaterialNo = materialId.Value,
-                    AccountTitleId = accountTitle.AccountTitleId
+                    MaterialNo = materialNo.Value,
+                    AccountTitleId = accountTitle.AccountTitleId,
+                    MaterialId = materialId.Value
+                    
 
                 };
 
@@ -851,11 +853,23 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
             await _context.SaveChangesAsync();
         }
 
-        private async Task UpdateMaterialAccountTitles(int? materialId, List<MaterialAccountSyncDto> accountTitles)
+        private async Task UpdateMaterialAccountTitles(int? materialNo, List<MaterialAccountSyncDto> accountTitles, int? materialId)
         {
             var existingRelationships = await _context.AccountTitleMaterials
-                .Where(x => x.MaterialNo == materialId)
+                .Where(x => x.MaterialNo == materialNo)
                 .ToListAsync();
+
+            var incomingAccountTitleIds = accountTitles.Select(x => x.AccountTitleId).ToHashSet();
+
+            // Get the existing account title IDs
+            var existingAccountTitleIds = existingRelationships.Select(x => x.AccountTitleId).ToHashSet();
+
+         
+            if (incomingAccountTitleIds.SetEquals(existingAccountTitleIds))
+            {
+                return; 
+            }
+
 
             _context.AccountTitleMaterials.RemoveRange(existingRelationships);
 
@@ -863,8 +877,9 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
             {
                 var materialAccountTitle = new AccountTitleMaterial
                 {
-                    MaterialNo = materialId.Value,
-                    AccountTitleId = accountTitle.AccountTitleId
+                    MaterialNo = materialNo.Value,
+                    AccountTitleId = accountTitle.AccountTitleId,
+                    MaterialId = materialId.Value
 
                 };
 

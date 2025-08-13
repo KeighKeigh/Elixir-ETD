@@ -156,10 +156,10 @@ namespace ELIXIRETD.API.Controllers.SETUP_CONTROLLER
         [HttpPost("manual")]
         public async Task<IActionResult> ManualAddAsset([FromBody]ManualAddAssetDto asset)
         {
-            var assetNameAlreadyExist = await _unitOfWork.Asset.AssetNameAlreadyExist(asset.Asset_Name);
+            var assetNameAlreadyExist = await _unitOfWork.Asset.AssetNameAlreadyExist(asset.Asset_Code);
 
             if (assetNameAlreadyExist)
-                return BadRequest("Asset name already exist");
+                return BadRequest("Asset Code already exist");
 
             await _unitOfWork.Asset.ManualAddAsset(asset);
 

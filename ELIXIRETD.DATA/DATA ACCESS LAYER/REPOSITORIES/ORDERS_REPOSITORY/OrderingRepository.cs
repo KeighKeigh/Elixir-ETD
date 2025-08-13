@@ -531,10 +531,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
 
         }
 
-        public async Task<bool> ValidateExistOrderandItemCode(int TransactId,/* string ItemCode, string customertype, string itemdescription, string customercode*/int OrderNo)
+        public async Task<bool> ValidateExistOrderandItemCode(int TransactId, string ItemCode, /*string customertype, string itemdescription, string customercode*/int OrderNo)
         {
             var validate = await _context.Orders.Where(x => x.TrasactId == TransactId
-                                                       && x.OrderNo == OrderNo)
+                                                       && x.OrderNo == OrderNo
+                                                       && x.ItemCode == ItemCode)
                                                       .FirstOrDefaultAsync();
                                                     
 
@@ -2657,7 +2658,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     SubUnitCode = x.First().order.sub_unit_code,
                     SubUnitName = x.First().order.sub_unit_name,
                     cip_No = x.First().moveOrder.Cip_No,
-                    helpdeskNo = x.First().moveOrder.HelpdeskNo
+                    helpdeskNo = x.First().moveOrder.HelpdeskNo ?? "0"
 
                 }).ToListAsync();
 
@@ -2723,7 +2724,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.OrderingRepository
                     SubUnitCode = x.First().Moveorders.Moveorders.SubUnitCode,
                     SubUnitName = x.First().Moveorders.Moveorders.SubUnitName,
                     cip_No = x.First().Moveorders.Moveorders.cip_No,
-                    helpdeskNo = x.First().Moveorders.Moveorders.helpdeskNo
+                    helpdeskNo = x.First().Moveorders.Moveorders.helpdeskNo ?? "0"
 
 
                 }).OrderBy(x => x.ItemCode)

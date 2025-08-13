@@ -9,6 +9,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
+using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIRETD.DATA.Migrations;
 using Microsoft.EntityFrameworkCore;
@@ -195,9 +196,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
         public async Task<PagedList<DtoTransactReports>> TransactedMoveOrderReport(UserParams userParams, string DateFrom, string DateTo, string Search)
         {
+            var dateFrom = DateTime.Parse(DateFrom).Date;
+            var dateTo = DateTime.Parse(DateTo).Date;
 
-            var materialList = _context.Materials
-                .Include(x => x.Uom)
+            var materials = _context.Materials
+                .Include(x => x.Uom).Where(x => x.IsActive == true)
                 .Select(x => new
                 {
                     x.ItemCode,
@@ -205,86 +208,92 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     x.Uom.UomCode
                 });
 
-            var orders = _context.MoveOrders
-                .Where(x => x.IsActive == true)
-                .GroupJoin(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
-                .SelectMany(x => x.transact.DefaultIfEmpty(), (x, transact) => new { x.moveorder, transact })
-                .GroupJoin(materialList, moveorder => moveorder.moveorder.ItemCode, material => material.ItemCode, (moveorder, material) => new { moveorder, material })
-                .SelectMany(x => x.material.DefaultIfEmpty(), (x, material) => new { x.moveorder, material })
-                .Where(x => x.moveorder.transact.IsActive == true && x.moveorder.transact.IsTransact == true
-                && x.moveorder.transact.DeliveryDate.Value.Date >= DateTime.Parse(DateFrom).Date
-                && x.moveorder.transact.DeliveryDate.Value.Date <= DateTime.Parse(DateTo).Date)
+            var moveOrderConsol = _context.MoveOrders
+                .AsNoTracking()
+                .GroupJoin(_context.TransactOrder, moveOrder => moveOrder.OrderNo, transMoveOrder => transMoveOrder.OrderNo, (moveOrder, transMoveOrder) => new { moveOrder, transMoveOrder })
+                .SelectMany(x => x.transMoveOrder.DefaultIfEmpty(), (x, transMoveOrder) => new { x.moveOrder, transMoveOrder })
+                .GroupJoin(_context.Users, trans => trans.transMoveOrder.PreparedBy, user => user.FullName, (trans, user) => new { trans, user })
+                .SelectMany(x => x.user.DefaultIfEmpty(), (x, user) => new { x.trans.moveOrder, x.trans.transMoveOrder, user })
+                .GroupJoin(_context.OneAccountTitles, user => user.moveOrder.AccountCode, account => account.AccountCode, (user, account) => new { user, account })
+                .SelectMany(x => x.account.DefaultIfEmpty(), (x, account) => new { x.user.moveOrder, x.user.transMoveOrder, x.user.user, account })
+                .GroupJoin(materials, account => account.moveOrder.ItemCode, material => material.ItemCode, (account, material) => new { account, material })
+                .SelectMany(x => x.material.DefaultIfEmpty(), (x, material) => new { x.account.moveOrder, x.account.transMoveOrder, x.account.user, x.account.account, material })
+
+
+                .Where(x => x.moveOrder.IsTransact == true)
+                .Where(x => x.transMoveOrder.PreparedDate.Value.Date >= dateFrom && x.transMoveOrder.PreparedDate.Value.Date <= dateTo)
 
                 .Select(x => new DtoTransactReports
                 {
-                    MIRId = x.moveorder.moveorder.OrderNo,
-                    Id = x.moveorder.moveorder.Id,
-                    Requestor = x.moveorder.moveorder.Requestor,
-                    Approver = x.moveorder.moveorder.PreparedBy,
-                    CustomerName = x.moveorder.moveorder.CustomerName,
-                    CustomerCode = x.moveorder.moveorder.Customercode,
+                    MIRId = x.moveOrder.OrderNo,
+                    Id = x.moveOrder.Id,
+                    Requestor = x.moveOrder.Requestor,
+                    Approver = x.moveOrder.PreparedBy,
+                    CustomerName = x.moveOrder.CustomerName,
+                    CustomerCode = x.moveOrder.Customercode,
                     ItemCode = x.material.ItemCode,
                     ItemDescription = x.material.ItemDescription,
                     Uom = x.material.UomCode,
-                    Quantity = x.moveorder.moveorder.QuantityOrdered,
-                    MoveOrderDate = x.moveorder.moveorder.PreparedDate.ToString(),
-                    MoveOrderBy = x.moveorder.moveorder.PreparedBy,
-                    TransactedBy = x.moveorder.transact.PreparedBy,
+                    Quantity = x.moveOrder.QuantityOrdered,
+                    MoveOrderDate = x.moveOrder.PreparedDate.ToString(),
+                    MoveOrderBy = x.moveOrder.PreparedBy,
+                    TransactedBy = x.transMoveOrder.PreparedBy,
                     TransactionType = "Pick-Up",
-                    TransactedDate = x.moveorder.transact.PreparedDate.Value.Date,
-                    DeliveryDate = x.moveorder.transact.DeliveryDate.ToString(),
-                    CustomerType = x.moveorder.moveorder.CustomerType,
-                    DateNeeded = x.moveorder.moveorder.DateNeeded.ToString(),
-                    OrderDate = x.moveorder.moveorder.OrderDate.ToString(),
-                    CompanyCode = x.moveorder.moveorder.CompanyCode,
-                    CompanyName = x.moveorder.moveorder.CompanyName,
-                    DepartmentCode = x.moveorder.moveorder.DepartmentCode,
-                    DepartmentName = x.moveorder.moveorder.DepartmentName,
-                    LocationCode = x.moveorder.moveorder.LocationCode,
-                    LocationName = x.moveorder.moveorder.LocationName,
-                    AccountCode = x.moveorder.moveorder.AccountCode,
-                    AccountTitles = x.moveorder.moveorder.AccountTitles,
-                    EmpId = x.moveorder.moveorder.EmpId,
-                    FullName = x.moveorder.moveorder.FullName,
-                    ItemRemarks = x.moveorder.moveorder.ItemRemarks,
-                    UnitCost = x.moveorder.moveorder.UnitPrice,
-                    LineAmount = x.moveorder.moveorder.UnitPrice * x.moveorder.moveorder.QuantityOrdered,
-                    Cip_No = x.moveorder.moveorder.Cip_No,
-                    HelpDesk = x.moveorder.moveorder.HelpdeskNo,
-                    Remarks = x.moveorder.moveorder.Remarks,
-                    Status = x.moveorder.moveorder.IsTransact == true ? "Transacted" : "For Approval",
-                    Category = x.moveorder.moveorder.Category,
-                    AssetTag = x.moveorder.moveorder.AssetTag,
-                    DateApproved = x.moveorder.moveorder.ApprovedDate.ToString(),
-                    PicUp_Date = x.moveorder.transact.DeliveryDate.ToString(),
-                    Rush = x.moveorder.moveorder.Rush,
-                    Reference = x.moveorder.moveorder.LocationName.Contains("Common") || x.moveorder.moveorder.LocationName.Contains("Head Office") || x.moveorder.moveorder.LocationName.Contains("Central Depot") ?
-                    $" {x.moveorder.moveorder.DepartmentName} {x.moveorder.moveorder.OrderNo}" : $" {x.moveorder.moveorder.LocationName} {x.moveorder.moveorder.OrderNo}",
-                    OneChargingName = x.moveorder.moveorder.one_charging_name,
-                    BusinessUnitCode = x.moveorder.moveorder.business_unit_code,
-                    BusinessUnitName = x.moveorder.moveorder.business_unit_name,
-                    DepartmentUnitCode = x.moveorder.moveorder.department_unit_code,
-                    DepartmentUnitName = x.moveorder.moveorder.department_unit_name,
-                    SubUnitCode = x.moveorder.moveorder.sub_unit_code,
-                    SubUnitName = x.moveorder.moveorder.sub_unit_name,
+                    TransactedDate = x.transMoveOrder.PreparedDate.Value.Date,
+                    DeliveryDate = x.transMoveOrder.DeliveryDate.ToString(),
+                    CustomerType = x.moveOrder.CustomerType,
+                    DateNeeded = x.moveOrder.DateNeeded.ToString(),
+                    OrderDate = x.moveOrder.OrderDate.ToString(),
+                    CompanyCode = x.moveOrder.CompanyCode,
+                    CompanyName = x.moveOrder.CompanyName,
+                    DepartmentCode = x.moveOrder.DepartmentCode,
+                    DepartmentName = x.moveOrder.DepartmentName,
+                    LocationCode = x.moveOrder.LocationCode,
+                    LocationName = x.moveOrder.LocationName,
+                    AccountCode = x.moveOrder.AccountCode,
+                    AccountTitles = x.moveOrder.AccountTitles,
+                    EmpId = x.moveOrder.EmpId,
+                    FullName = x.moveOrder.FullName,
+                    ItemRemarks = x.moveOrder.ItemRemarks,
+                    UnitCost = x.moveOrder.UnitPrice,
+                    LineAmount = x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered,
+                    Cip_No = x.moveOrder.Cip_No,
+                    HelpDesk = x.moveOrder.HelpdeskNo,
+                    Remarks = x.moveOrder.Remarks,
+                    Status = x.moveOrder.IsTransact == true ? "Transacted" : "For Approval",
+                    Category = x.moveOrder.Category,
+                    AssetTag = x.moveOrder.AssetTag,
+                    DateApproved = x.moveOrder.ApprovedDate.ToString(),
+                    PicUp_Date = x.transMoveOrder.DeliveryDate.ToString(),
+                    Rush = x.moveOrder.Rush,
+                    Reference = x.moveOrder.LocationName.Contains("Common") || x.moveOrder.LocationName.Contains("Head Office") || x.moveOrder.LocationName.Contains("Central Depot") ?
+                    $" {x.moveOrder.DepartmentName} {x.moveOrder.OrderNo}" : $" {x.moveOrder.LocationName} {x.moveOrder.OrderNo}",
+                    OneChargingName = x.moveOrder.one_charging_name,
+                    BusinessUnitCode = x.moveOrder.business_unit_code,
+                    BusinessUnitName = x.moveOrder.business_unit_name,
+                    DepartmentUnitCode = x.moveOrder.department_unit_code,
+                    DepartmentUnitName = x.moveOrder.department_unit_name,
+                    SubUnitCode = x.moveOrder.sub_unit_code,
+                    SubUnitName = x.moveOrder.sub_unit_name,
+                    
 
                 });
 
             if (!string.IsNullOrEmpty(Search))
             {
-                orders = orders.Where(x => Convert.ToString(x.MIRId).ToLower().Contains(Search.Trim().ToLower())
+                moveOrderConsol = moveOrderConsol.Where(x => Convert.ToString(x.MIRId).ToLower().Contains(Search.Trim().ToLower())
                 || Convert.ToString(x.ItemCode).ToLower().Contains(Search.Trim().ToLower())
                 || Convert.ToString(x.CustomerName).ToLower().Contains(Search.Trim().ToLower())
                 || Convert.ToString(x.ItemDescription).ToLower().Contains(Search.Trim().ToLower()));
 
             }
 
-            orders = orders
+            moveOrderConsol = moveOrderConsol
                 .OrderBy(x => x.TransactedDate)
                 .ThenBy(x => x.ItemCode);
 
 
-            return await PagedList<DtoTransactReports>.CreateAsync(orders, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<DtoTransactReports>.CreateAsync(moveOrderConsol, userParams.PageNumber, userParams.PageSize);
 
         }
 
@@ -1940,61 +1949,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     UnitResponsible = x.account.Unit ,
                 });
 
-            //var moveOrderConsol = from moveOrder in _context.MoveOrders
-            //                      join transact in _context.TransactOrder on moveOrder.OrderNo equals transact.OrderNo
-            //                      join w in _context.WarehouseReceived on moveOrder.WarehouseId equals w.Id
-            //                      join u in _context.Users on transact.PreparedBy equals u.FullName
-            //                      join material in materials on moveOrder.ItemCode equals material.ItemCode
-            //                      join title in _context.OneAccountTitles on moveOrder.AccountCode equals title.AccountCode into titleGroup
-            //                      from title in titleGroup.DefaultIfEmpty()
-            //                      where moveOrder.IsTransact == true && moveOrder.IsActive == true
-
-            //                      select new ConsolidateFinanceReportDto
-            //                      {
-            //                          Id = moveOrder.Id,
-            //                          TransactionDate = transact.PreparedDate.Value.Date,
-            //                          ItemCode = moveOrder.ItemCode,
-            //                          ItemDescription = moveOrder.ItemDescription,
-            //                          Uom = moveOrder.Uom,
-            //                          Category = moveOrder.Category,
-            //                          Quantity = Math.Round(moveOrder.QuantityOrdered, 2),
-            //                          UnitCost = moveOrder.UnitPrice,
-            //                          LineAmount = Math.Round(moveOrder.UnitPrice * moveOrder.QuantityOrdered, 2),
-            //                          Source = Convert.ToString(transact.OrderNo),
-            //                          TransactionType = "Move Order",
-            //                          Reason = "",
-            //                          Reference = moveOrder.ItemRemarks,
-            //                          SupplierName = "",
-            //                          EncodedBy = transact.PreparedBy,
-            //                          CompanyCode = moveOrder.CompanyCode,
-            //                          CompanyName = moveOrder.CompanyName,
-            //                          ServiceProvider = "",
-            //                          ServiceProviderCode = "",
-            //                          DepartmentCode = moveOrder.DepartmentCode,
-            //                          DepartmentName = moveOrder.DepartmentName,
-            //                          LocationCode = moveOrder.LocationCode,
-            //                          LocationName = moveOrder.LocationName,
-            //                          AccountTitleCode = moveOrder.AccountCode != null ? moveOrder.AccountCode : "537620",
-            //                          AccountTitle = moveOrder.AccountTitles != null ? moveOrder.AccountTitles : "SE - R & M - Transport Vehicles",
-            //                          EmpId = moveOrder.EmpId,
-            //                          Fullname = moveOrder.FullName,
-            //                          AssetTag = moveOrder.AssetTag,
-            //                          CIPNo = moveOrder.Cip_No,
-            //                          Helpdesk = moveOrder.HelpdeskNo,
-            //                          Rush = moveOrder.Rush,
-            //                          OneChargingName = moveOrder.one_charging_name,
-            //                          BusinessUnitName = moveOrder.business_unit_name,
-            //                          BusinessUnitCode = moveOrder.business_unit_code,
-            //                          DepartmentUnitName = moveOrder.department_unit_name,
-            //                          DepartmentUnitCode = moveOrder.department_unit_code,
-            //                          SubUnitCode = moveOrder.sub_unit_code,
-            //                          SubUnitName = moveOrder.sub_unit_name,
-
-            //                          FinancialStatement = title.FinancialStatement,
-            //                          UnitResponsible = title.Unit,
-            //                      };
-
-
 
             var receiptConsol = _context.MiscellaneousReceipts
                 .AsNoTracking()
@@ -2047,6 +2001,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     FinancialStatement = x.accountTitle.FinancialStatement,
                     UnitResponsible = x.accountTitle.Unit,
                 }).Distinct();
+
+
 
             var issueConsol = _context.MiscellaneousIssues
                 .AsNoTracking()
@@ -2461,27 +2417,35 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var dateFrom = DateTime.Parse(DateFrom).Date;
             var dateTo = DateTime.Parse(DateTo).Date;
 
+           
+
+            var materials = _context.Materials
+                .AsNoTracking()
+                .Include(x => x.Uom)
+                .Include(x => x.ItemCategory).Where(x => x.IsActive == true);
+
             var receivingConsol = _context.WarehouseReceived
-                .Where(x => x.TransactionType == "Receiving" && x.IsActive == true)
-                .Where(x => x.ActualReceivingDate.Date >= dateFrom && x.ActualReceivingDate.Date <= dateTo)
+                .AsNoTracking()
+                .Join(materials, ware => ware.ItemCode, material => material.ItemCode, (ware, material) => new { ware, material })
+                .Where(x => x.ware.TransactionType == "Receiving" && x.ware.IsActive == true)
+                .Where(x => x.ware.ActualReceivingDate.Date >= dateFrom && x.ware.ActualReceivingDate.Date <= dateTo)
                 .Select(x => new ConsolidateAuditReportDto
                 {
-                    Id = x.Id,
-                    TransactionDate = x.ActualReceivingDate.Date.ToString(),
-                    ItemCode = x.ItemCode,
-                    ItemDescription = x.ItemDescription,
-                    Uom = x.Uom,
-                    Category = "",
-                    Quantity = x.ActualGood,
-                    UnitCost = x.UnitPrice,
-                    LineAmount = Math.Round(x.UnitPrice * x.ActualGood, 2),
-                    Source = x.PoNumber,
+                    Id = x.ware.Id,
+                    TransactionDate = x.ware.ActualReceivingDate.Date.ToString(),
+                    ItemCode = x.ware.ItemCode,
+                    ItemDescription = x.ware.ItemDescription,
+                    Uom = x.ware.Uom,
+                    Category = x.material.ItemCategory.ItemCategoryName,
+                    Quantity = x.ware.ActualGood,
+                    UnitCost = x.ware.UnitPrice,
+                    LineAmount = Math.Round(x.ware.UnitPrice * x.ware.ActualGood, 2),
+                    Source = x.ware.PoNumber,
                     TransactionType = "Receiving",
-                    Status = "",
                     Reason = "",
-                    Reference = x.SINumber,
-                    SupplierName = x.Supplier,
-                    EncodedBy = x.AddedBy,
+                    Reference = x.ware.SINumber,
+                    SupplierName = x.ware.Supplier,
+                    EncodedBy = x.ware.AddedBy,
                     CompanyCode = "10",
                     CompanyName = "RDF Corporate Services",
                     DepartmentCode = "0010",
@@ -2499,66 +2463,83 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
                 }).ToList();
 
-            var moveOrderConsol = from moveOrder in _context.MoveOrders
-                                  join transact in _context.TransactOrder
-                                  on moveOrder.OrderNo equals transact.OrderNo
-                                  join w in _context.WarehouseReceived
-                                  on moveOrder.WarehouseId equals w.Id
-                                  join u in _context.Users
-                                  on transact.PreparedBy equals u.FullName
-                                  where moveOrder.IsTransact == true
-                                  where transact.PreparedDate.Value >= dateFrom
-                                  where transact.PreparedDate.Value <= dateTo
-                                  select new ConsolidateAuditReportDto
-                                  {
-                                      Id = transact.Id,
-                                      TransactionDate = transact.PreparedDate.Value.ToString(),
-                                      ItemCode = moveOrder.ItemCode,
-                                      ItemDescription = moveOrder.ItemDescription,
-                                      Uom = moveOrder.Uom,
-                                      Category = moveOrder.Category,
-                                      Quantity = Math.Round(moveOrder.QuantityOrdered, 2),
-                                      UnitCost = moveOrder.UnitPrice,
-                                      LineAmount = Math.Round(moveOrder.UnitPrice * moveOrder.QuantityOrdered, 2),
-                                      Source = Convert.ToString(transact.OrderNo),
-                                      TransactionType = "Move Order",
-                                      Reason = "",
-                                      Reference = moveOrder.ItemRemarks,
-                                      SupplierName = "",
-                                      EncodedBy = transact.PreparedBy,
-                                      CompanyCode = moveOrder.CompanyCode,
-                                      CompanyName = moveOrder.CompanyName,
-                                      DepartmentCode = moveOrder.DepartmentCode,
-                                      DepartmentName = moveOrder.DepartmentName,
-                                      LocationCode = moveOrder.LocationCode,
-                                      LocationName = moveOrder.LocationName,
-                                      AccountTitleCode = moveOrder.AccountCode != null ? moveOrder.AccountCode : "537620",
-                                      AccountTitle = moveOrder.AccountTitles != null ? moveOrder.AccountTitles : "SE - R & M - Transport Vehicles",
-                                      EmpId = moveOrder.EmpId,
-                                      Fullname = moveOrder.FullName,
-                                      AssetTag = moveOrder.AssetTag,
-                                      CIPNo = moveOrder.Cip_No,
-                                      Helpdesk = moveOrder.HelpdeskNo,
-                                      Rush = moveOrder.Rush,
-                                      OneChargingName = moveOrder.one_charging_name,
-                                      BusinessUnitName = moveOrder.business_unit_name,
-                                      BusinessUnitCode = moveOrder.business_unit_code,
-                                      DepartmentUnitName = moveOrder.department_unit_name,
-                                      DepartmentUnitCode = moveOrder.department_unit_code,
-                                      SubUnitCode = moveOrder.sub_unit_code,
-                                      SubUnitName = moveOrder.sub_unit_name
+           
 
-                                  };
 
+            var moveOrderConsol = _context.MoveOrders
+                .AsNoTracking()
+                .GroupJoin(_context.TransactOrder, moveOrder => moveOrder.OrderNo, transMoveOrder => transMoveOrder.OrderNo, (moveOrder, transMoveOrder) => new { moveOrder, transMoveOrder })
+                .SelectMany(x => x.transMoveOrder.DefaultIfEmpty(), (x, transMoveOrder) => new { x.moveOrder, transMoveOrder })
+                .GroupJoin(_context.Users, trans => trans.transMoveOrder.PreparedBy, user => user.FullName, (trans, user) => new { trans, user })
+                .SelectMany(x => x.user.DefaultIfEmpty(), (x, user) => new { x.trans.moveOrder, x.trans.transMoveOrder, user })
+                .GroupJoin(_context.OneAccountTitles, user => user.moveOrder.AccountCode, account => account.AccountCode, (user, account) => new { user, account })
+                .SelectMany(x => x.account.DefaultIfEmpty(), (x, account) => new { x.user.moveOrder, x.user.transMoveOrder, x.user.user, account })
+                .GroupJoin(materials, account => account.moveOrder.ItemCode, material => material.ItemCode, (account, material) => new { account, material })
+                .SelectMany(x => x.material.DefaultIfEmpty(), (x, material) => new { x.account.moveOrder, x.account.transMoveOrder, x.account.user, x.account.account, material })
+
+
+                .Where(x => x.moveOrder.IsTransact == true)
+                .Where(x => x.transMoveOrder.PreparedDate.Value.Date >= dateFrom && x.transMoveOrder.PreparedDate.Value.Date <= dateTo)
+                .Select(x => new ConsolidateAuditReportDto
+                {
+                    Id = x.moveOrder.Id,
+                    TransactionDate = x.transMoveOrder.PreparedDate.Value.Date.ToString(),
+                    ItemCode = x.moveOrder.ItemCode,
+                    ItemDescription = x.moveOrder.ItemDescription,
+                    Uom = x.material.Uom.UomCode,
+                    Category = x.moveOrder.Category,
+                    Quantity = Math.Round(x.moveOrder.QuantityOrdered, 2),
+                    UnitCost = x.moveOrder.UnitPrice,
+                    LineAmount = Math.Round(x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered, 2),
+                    Source = Convert.ToString(x.transMoveOrder.OrderNo),
+                    TransactionType = "Move Order",
+                    Reason = "",
+                    Reference = x.moveOrder.ItemRemarks,
+                    SupplierName = "",
+                    EncodedBy = x.transMoveOrder.PreparedBy,
+                    CompanyCode = x.moveOrder.CompanyCode,
+                    CompanyName = x.moveOrder.CompanyName,
+                    ServiceProvider = x.user.FullName,
+                    ServiceProviderCode = x.user.EmpId,
+                    DepartmentCode = x.moveOrder.DepartmentCode,
+                    DepartmentName = x.moveOrder.DepartmentName,
+                    LocationCode = x.moveOrder.LocationCode,
+                    LocationName = x.moveOrder.LocationName,
+                    AccountTitleCode = x.moveOrder.AccountCode != null ? x.moveOrder.AccountCode : "537620",
+                    AccountTitle = x.moveOrder.AccountTitles != null ? x.moveOrder.AccountTitles : "SE - R & M - Transport Vehicles",
+                    EmpId = x.moveOrder.EmpId,
+                    Fullname = x.moveOrder.FullName,
+                    AssetTag = x.moveOrder.AssetTag,
+                    CIPNo = x.moveOrder.Cip_No,
+                    Helpdesk = x.moveOrder.HelpdeskNo,
+                    Rush = x.moveOrder.Rush,
+                    OneChargingName = x.moveOrder.one_charging_name,
+                    BusinessUnitName = x.moveOrder.business_unit_name,
+                    BusinessUnitCode = x.moveOrder.business_unit_code,
+                    DepartmentUnitName = x.moveOrder.department_unit_name,
+                    DepartmentUnitCode = x.moveOrder.department_unit_code,
+                    SubUnitCode = x.moveOrder.sub_unit_code,
+                    SubUnitName = x.moveOrder.sub_unit_name,
+                    FinancialStatement = x.account.FinancialStatement,
+                    UnitResponsible = x.account.Unit,
+                }).ToList();
+            //
+
+            
             var receiptConsol = _context.MiscellaneousReceipts
+                .AsNoTracking()
                 .GroupJoin(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
-                .SelectMany(x => x.warehouse.DefaultIfEmpty(), (x, warehouse) => new { x.receipt, warehouse })
-                .Where(x => x.receipt.TransactionDate.Date >= dateFrom && x.receipt.TransactionDate.Date <= dateTo)
+                .SelectMany(x => x.warehouse.DefaultIfEmpty(), (x, warehouse) => new { x.receipt, warehouse }).Join(_context.Users, x => x.receipt.PreparedBy, user => user.FullName,
+            (x, user) => new { x.receipt, x.warehouse, user })
+                .GroupJoin(_context.OneAccountTitles, user => user.warehouse.AccountCode, accountTitle => accountTitle.AccountCode, (user, accountTitle) => new { user, accountTitle })
+                .SelectMany(x => x.accountTitle.DefaultIfEmpty(), (x, accountTitle) => new { x.user.receipt, x.user.warehouse, x.user.user, accountTitle })
+               .Join(materials, account => account.warehouse.ItemCode, material => material.ItemCode, (x, material) => new { x.receipt, x.warehouse, x.user, x.accountTitle, material })
                 .Where(x => x.warehouse.IsActive == true && x.warehouse.TransactionType == "MiscellaneousReceipt")
+                .Where(x => x.receipt.TransactionDate.Date >= dateFrom && x.receipt.TransactionDate.Date <= dateTo)
                 .Select(x => new ConsolidateAuditReportDto
                 {
                     Id = x.warehouse.Id,
-                    TransactionDate = x.receipt.TransactionDate.Date.ToString(),
+                    TransactionDate = x.receipt.TransactionDate.ToString(),
                     ItemCode = x.warehouse.ItemCode,
                     ItemDescription = x.warehouse.ItemDescription,
                     Uom = x.warehouse.Uom,
@@ -2566,9 +2547,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Quantity = x.warehouse.ActualGood,
                     UnitCost = x.warehouse.UnitPrice,
                     LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
-                    Source = x.receipt.Id.ToString(),
+                    Source = Convert.ToString(x.receipt.Id),
                     TransactionType = "Miscellaneous Receipt",
-                    Status = "",
                     Reason = x.receipt.Remarks,
                     Reference = x.receipt.Details,
                     SupplierName = x.receipt.supplier,
@@ -2594,12 +2574,21 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     DepartmentUnitName = x.receipt.department_unit_name,
                     DepartmentUnitCode = x.receipt.department_unit_code,
                     SubUnitCode = x.receipt.sub_unit_code,
-                    SubUnitName = x.receipt.sub_unit_name
-                }).ToList();
+                    SubUnitName = x.receipt.sub_unit_name,
+                    FinancialStatement = x.accountTitle.FinancialStatement,
+                    UnitResponsible = x.accountTitle.Unit,
+                }).Distinct().ToList();
+
+            
 
             var issueConsol = _context.MiscellaneousIssues
+                .AsNoTracking()
                 .Join(_context.MiscellaneousIssueDetail, miscDatail => miscDatail.Id, issue => issue.IssuePKey,
-                (miscDetail, issue) => new { miscDetail, issue })
+                (miscDetail, issue) => new { miscDetail, issue }).Join(_context.Users, x => x.miscDetail.PreparedBy, user => user.FullName,
+            (x, user) => new { x.miscDetail, x.issue, user })
+                .GroupJoin(_context.OneAccountTitles, user => user.issue.AccountCode, accountTitle => accountTitle.AccountCode, (user, accountTitle) => new { user, accountTitle })
+                .SelectMany(x => x.accountTitle.DefaultIfEmpty(), (x, accountTitle) => new { x.user.miscDetail, x.user.issue, x.user.user, accountTitle })
+                .Join(materials, account => account.issue.ItemCode, material => material.ItemCode, (x, material) => new { x.miscDetail, x.issue, x.user, x.accountTitle, material })
                 .Where(x => x.issue.IsActive == true)
                 .Where(x => x.miscDetail.TransactionDate.Date >= dateFrom && x.miscDetail.TransactionDate.Date <= dateTo)
                 .Select(x => new ConsolidateAuditReportDto
@@ -2613,9 +2602,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Quantity = Math.Round(x.issue.Quantity, 2),
                     UnitCost = x.issue.UnitPrice,
                     LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2),
-                    Source = x.miscDetail.Id.ToString(),
+                    Source = Convert.ToString(x.issue.Id),
                     TransactionType = "Miscellaneous Issue",
-                    Status = "",
                     Reason = x.issue.Remarks,
                     Reference = x.miscDetail.Details,
                     SupplierName = "",
@@ -2640,10 +2628,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     DepartmentUnitName = x.miscDetail.department_unit_name,
                     DepartmentUnitCode = x.miscDetail.department_unit_code,
                     SubUnitCode = x.miscDetail.sub_unit_code,
-                    SubUnitName = x.miscDetail.sub_unit_name
+                    SubUnitName = x.miscDetail.sub_unit_name,
+                    FinancialStatement = x.accountTitle.FinancialStatement,
+                    UnitResponsible = x.accountTitle.Unit,
 
-
-                }).ToList();
+                }).Distinct().ToList();
 
             var borrowedConsol = _context.BorrowedIssues
                 .Join(_context.BorrowedIssueDetails, borrow => borrow.Id, borrowDetail => borrowDetail.BorrowedPKey,
@@ -2685,6 +2674,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Rush = ""
 
                 }).ToList();
+
+
 
             var consumeList = _context.BorrowedConsumes
                 .Where(x => x.IsActive == true)
@@ -2914,10 +2905,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .Concat(fuelRegisterConsol)
                 .ToList();
 
-            var materials = await _context.Materials
-                .Include(x => x.Uom)
-                .Include(x => x.ItemCategory)
-                .ToListAsync();
+           
 
             var reports = consolidateList
                 .Join(materials,
@@ -2926,10 +2914,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                  {
                      Id = consol.Id,
                      TransactionDate = consol.TransactionDate,
-                     ItemCode = material.ItemCode,
-                     ItemDescription = material.ItemDescription,
-                     Uom = material.Uom.UomCode,
-                     Category = material.ItemCategory.ItemCategoryName,
+                     ItemCode = consol.ItemCode,
+                     ItemDescription = consol.ItemDescription,
+                     Uom = consol.Uom,
+                     Category = consol.Category,
                      Quantity = consol.Quantity,
                      UnitCost = consol.UnitCost,
                      LineAmount = consol.LineAmount,

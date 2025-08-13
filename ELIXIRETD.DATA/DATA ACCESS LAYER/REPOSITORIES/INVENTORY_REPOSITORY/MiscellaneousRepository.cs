@@ -403,8 +403,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                 });
 
-
-
+            var materials = _context.Materials
+                .AsNoTracking()
+                .Include(x => x.Uom)
+                .Include(x => x.ItemCategory).Where(x => x.IsActive == true);
 
             var getAvailable = getWarehouseStocks
                               .GroupJoin(reserveOut, warehouse => warehouse.ItemCode, reserve => reserve.ItemCode, (warehouse, reserve) => new { warehouse, reserve })
@@ -416,17 +418,19 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                               .GroupJoin(issueOut, warehouse => warehouse.warehouse.warehouse.warehouse.ItemCode, issue => issue.ItemCode, (warehouse, issue) => new { warehouse, issue })
                               .SelectMany(x => x.issue.DefaultIfEmpty(), (x, issue) => new {x.warehouse, issue })
                               .GroupJoin(fuelRegister, warehouse => warehouse.warehouse.warehouse.warehouse.warehouse.ItemCode , fuel => fuel.itemCode, (warehouse,fuel) => new {warehouse,fuel })
-                              .SelectMany(x => x.fuel.DefaultIfEmpty() , (x, fuel) => new
+                              .SelectMany(x => x.fuel.DefaultIfEmpty() , (x, fuel) => new {x.warehouse, fuel })
+                              .GroupJoin(materials, warehouse => warehouse.warehouse.warehouse.warehouse.warehouse.warehouse.ItemCode, mats => mats.ItemCode, (warehouse, mats) => new {warehouse, mats })
+                              .SelectMany(x => x.mats.DefaultIfEmpty(), (x, mats) => new
                               {
-                                  itemcode = x.warehouse.warehouse.warehouse.warehouse.warehouse.ItemCode,
-                                  itemdescription = x.warehouse.warehouse.warehouse.warehouse.warehouse.ItemDescription,
-                                  uom = x.warehouse.warehouse.warehouse.warehouse.warehouse.Uom,
-                                  WarehouseActualGood = x.warehouse.warehouse.warehouse.warehouse.warehouse.ActualGood != null ? x.warehouse.warehouse.warehouse.warehouse.warehouse.ActualGood : 0,
-                                  ReserveOut = x.warehouse.warehouse.warehouse.warehouse.reserve.QuantityOrdered != null ? x.warehouse.warehouse.warehouse.warehouse.reserve.QuantityOrdered : 0,
-                                  IssueOut = x.warehouse.issue.Out != null ? x.warehouse.issue.Out : 0,
-                                  BorrowedOut = x.warehouse.warehouse.warehouse.borrowed.Out != null ? x.warehouse.warehouse.warehouse.borrowed.Out : 0,
-                                  Borrowedreturn = x.warehouse.warehouse.returned.In != null ? x.warehouse.warehouse.returned.In : 0,
-                                  fuel = fuel.Quantity != null ? fuel.Quantity : 0,
+                                  itemcode = x.warehouse.warehouse.warehouse.warehouse.warehouse.warehouse.ItemCode,
+                                  itemdescription = x.warehouse.warehouse.warehouse.warehouse.warehouse.warehouse.ItemDescription,
+                                  uom = mats.Uom.UomCode,
+                                  WarehouseActualGood = x.warehouse.warehouse.warehouse.warehouse.warehouse.warehouse.ActualGood != null ? x.warehouse.warehouse.warehouse.warehouse.warehouse.warehouse.ActualGood : 0,
+                                  ReserveOut = x.warehouse.warehouse.warehouse.warehouse.warehouse.reserve.QuantityOrdered != null ? x.warehouse.warehouse.warehouse.warehouse.warehouse.reserve.QuantityOrdered : 0,
+                                  IssueOut = x.warehouse.warehouse.issue.Out != null ? x.warehouse.warehouse.issue.Out : 0,
+                                  BorrowedOut = x.warehouse.warehouse.warehouse.warehouse.borrowed.Out != null ? x.warehouse.warehouse.warehouse.warehouse.borrowed.Out : 0,
+                                  Borrowedreturn = x.warehouse.warehouse.warehouse.returned.In != null ? x.warehouse.warehouse.warehouse.returned.In : 0,
+                                  fuel = x.warehouse.fuel.Quantity != null ? x.warehouse.fuel.Quantity : 0,
 
                               }).GroupBy(x => new
                               {

@@ -96,7 +96,10 @@ builder.Services.AddAuthentication(authOptions =>
 
     });
 
-
+//builder.Services.Configure<ApiBehaviorOptions>(options =>
+//{
+//    options.SuppressModelStateInvalidFilter = true;
+//});
 
 //builder.Services.AddCors(options =>
 //{

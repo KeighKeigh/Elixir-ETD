@@ -23,7 +23,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
 
         public DateTime TransactionDate { get; set; }
 
-
+        
         public string CompanyCode { get; set; }
         public string CompanyName { get; set; }
 
@@ -32,6 +32,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.INVENTORY_MODEL
 
         public string LocationCode { get; set; }
         public string LocationName { get; set; }
+        //public string AssetTag { get; set; }
 
         //public string AccountCode { get; set; }
         //public string AccountTitles { get; set; }

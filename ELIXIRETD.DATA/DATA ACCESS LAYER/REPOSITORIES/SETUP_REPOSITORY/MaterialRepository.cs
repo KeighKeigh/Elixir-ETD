@@ -180,6 +180,23 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
                                                   SyncDate = x.SyncDate.ToString(),
                                                   SyncStatus = x.StatusSync,
+                                                  AccountTitles = x.AccountTitleMaterials.Select(x => new OneChargingAccountTitleDto
+                                                  {
+                                                      SyncId = x.AccountTitle.SyncId,
+                                                      AccountCode = x.AccountTitle.AccountCode,
+                                                      AccountDescription = x.AccountTitle.AccountDescription,
+                                                      AccountType = x.AccountTitle.AccountType,
+                                                      AccountGroup = x.AccountTitle.AccountGroup,
+                                                      AccountSubgroup = x.AccountTitle.AccountSubgroup,
+                                                      FinancialStatement = x.AccountTitle.FinancialStatement,
+                                                      NormalBalance = x.AccountTitle.NormalBalance,
+                                                      Allocation = x.AccountTitle.Allocation,
+                                                      Unit = x.AccountTitle.Unit,
+                                                      Charging = x.AccountTitle.Charging,
+                                                      CreatedAt = x.AccountTitle.CreatedAt,
+                                                      UpdatedAt = x.AccountTitle.UpdatedAt,
+                                                      IsActive = x.AccountTitle.IsActive
+                                                  }).ToList()
 
                                               });
 
@@ -214,6 +231,23 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
                                                 SyncDate = x.SyncDate.ToString(),
                                                 SyncStatus = x.StatusSync,
+                                                AccountTitles = x.AccountTitleMaterials.Select(x => new OneChargingAccountTitleDto
+                                                {
+                                                    SyncId = x.AccountTitle.SyncId,
+                                                    AccountCode = x.AccountTitle.AccountCode,
+                                                    AccountDescription = x.AccountTitle.AccountDescription,
+                                                    AccountType = x.AccountTitle.AccountType,
+                                                    AccountGroup = x.AccountTitle.AccountGroup,
+                                                    AccountSubgroup = x.AccountTitle.AccountSubgroup,
+                                                    FinancialStatement = x.AccountTitle.FinancialStatement,
+                                                    NormalBalance = x.AccountTitle.NormalBalance,
+                                                    Allocation = x.AccountTitle.Allocation,
+                                                    Unit = x.AccountTitle.Unit,
+                                                    Charging = x.AccountTitle.Charging,
+                                                    CreatedAt = x.AccountTitle.CreatedAt,
+                                                    UpdatedAt = x.AccountTitle.UpdatedAt,
+                                                    IsActive = x.AccountTitle.IsActive
+                                                }).ToList()
 
                                             }).Where(x => x.ItemCode.ToLower().Contains(search.Trim().ToLower())
                                              || x.ItemDescription.ToLower().Contains(search.Trim().ToLower())
@@ -504,7 +538,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
         public async Task<IReadOnlyList<MaterialDto>> GetAllMaterial()
         {
 
-            var materials = _context.Materials.Select(x => new MaterialDto
+            var materials = _context.Materials
+                .Include(x => x.ItemCategory)
+        .Include(x => x.Uom)
+        .Include(x => x.AccountTitleMaterials)
+            .ThenInclude(atm => atm.AccountTitle).Select(x => new MaterialDto
             {
                 Id = x.Id,
                 ItemCode = x.ItemCode,
@@ -726,7 +764,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
             };
 
             await _context.AddAsync(materials);
-
+            await _context.SaveChangesAsync();
             return materials;
         }
 

@@ -54,7 +54,7 @@ namespace ELIXIRETD.API.Controllers.ORDERING_CONTROLLER
 
                     
 
-                    var validateOrderNoAndItemcode = await _unitofwork.Orders.ValidateExistOrderandItemCode(items.TrasactId, /*items.ItemCode , items.CustomerType , items.ItemdDescription , items.Customercode*/ items.OrderNo);
+                    var validateOrderNoAndItemcode = await _unitofwork.Orders.ValidateExistOrderandItemCode(items.TrasactId, items.ItemCode , /* items.CustomerType , items.ItemdDescription , items.Customercode*/ items.OrderNo);
                         var validateDateNeeded = await _unitofwork.Orders.ValidateDateNeeded(items);
                         //var validateCustomerName = await _unitofwork.Orders.ValidateCustomerName(items.Customercode , items.CustomerName , items.CustomerType);
                         var validateOneCharging = await _unitofwork.Orders.ValidateOneChargingName(items.OneChargingCode);

@@ -42,6 +42,11 @@ namespace ELIXIRETD.DATA.SERVICES
             return new AuthenticateResponse(user, token , _context);
         }
 
+        //public AuthenticateResponse Authenticates(AutenticateNewPassword request)
+        //{
+
+        //}
+
         public  async Task<bool> NewPassword(AutenticateNewPassword newpassword)
         {
             var newpass = await _context.Users.Where(x => x.UserName == newpassword.Username &&

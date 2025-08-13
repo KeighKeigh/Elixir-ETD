@@ -8,6 +8,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ONERDF_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using RDF.Arcana.API.Features.Authenticate.AuthXApi;
 using System;
 using static System.Net.WebRequestMethods;
 
@@ -20,16 +21,28 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
     {
 
         public readonly IMediator _mediator;
+        private readonly IConfiguration _config;
 
-        public OneController(IMediator mediator)
+        public OneController(IMediator mediator, IConfiguration config)
         {
             _mediator = mediator;
+            _config = config;
         }
-
 
         [HttpPost("sync")]
         public async Task<IActionResult> Sync()
         {
+
+            var apiKeyHeader = Request.Headers["Api-Key"].ToString();
+            var expectedApiKey = _config["Authentication:ApiKey"];
+
+
+
+            if (string.IsNullOrEmpty(apiKeyHeader) || apiKeyHeader != expectedApiKey)
+            {
+                return Unauthorized("Invalid or missing API key.");
+            }
+
             var result = await _mediator.Send(new ImportChargingCommand());
             return result.IsFailure ? BadRequest(result) : Ok(result);
 
@@ -124,7 +137,7 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
 
                 }
                 await _storeContext.SaveChangesAsync(cancellationToken);
-                return Result.Success("Charging locations synced successfully.");
+                return Result.Success("Charging synced successfully.");
             }
 
         }

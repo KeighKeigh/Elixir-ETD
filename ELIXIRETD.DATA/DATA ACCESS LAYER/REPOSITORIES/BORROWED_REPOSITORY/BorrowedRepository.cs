@@ -128,6 +128,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
 
         });
 
+            var materials = _context.Materials
+                .AsNoTracking()
+                .Include(x => x.Uom)
+                .Include(x => x.ItemCategory).Where(x => x.IsActive == true);
+
             var getAvailable = (from warehouse in getWarehouseStocks
                                 join issue in issueOut
                                 on warehouse.ItemCode equals issue.ItemCode
@@ -154,6 +159,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                 into leftJ5
                                 from fuel in leftJ5.DefaultIfEmpty()
 
+                                join mats in  materials
+                                on warehouse.ItemCode equals mats.ItemCode
+                                into leftJ6
+                                from mats in leftJ6.DefaultIfEmpty()
 
                                 group new
                                 {
@@ -164,6 +173,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                     reserve,
                                     borrowedReturned,
                                     fuel,
+                                    mats
 
                                 }
 
@@ -181,7 +191,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
 
                                     ItemCode = total.Key.ItemCode,
                                     ItemDescription = total.First().warehouse.ItemDescription,
-                                    Uom = total.First().warehouse.Uom,
+                                    Uom = total.First().mats.Uom.UomCode,
                                     RemainingStocks = total.Sum(x => x.warehouse.ActualGood) + total.Sum(x => x.borrowedReturned.In) 
                                     - total.Sum(x => x.reserve.QuantityOrdered) - total.Sum(x => x.issue.Out) - total.Sum(x => x.borrowOut.Out)
                                     - total.Sum(x => x.fuel.Quantity != null ? x.fuel.Quantity : 0),

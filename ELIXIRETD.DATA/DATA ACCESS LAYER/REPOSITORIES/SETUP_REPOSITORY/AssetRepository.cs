@@ -23,7 +23,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.SETUP_REPOSITORY
 
         public async Task<bool> AssetNameAlreadyExist(string assetName)
         {
-             return await _context.Assets.AnyAsync(x => x.AssetName == assetName);
+             return await _context.Assets.AnyAsync(x => x.AssetCode == assetName);
 
         }
 

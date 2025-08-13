@@ -27,6 +27,28 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
             _mediator = mediator;
         }
 
+        
+        [HttpPut]
+        [Route("AddOneCharging")]
+        public async Task<IActionResult> AddDataOneCharging([FromBody] List<OneChargingDto>? data)
+        {
+
+            if (data == null || !data.Any())
+            {
+                return BadRequest("Successfully Synced");
+            }
+            var addFuel = await _unitOfWork.One.AddDataOneCharging(data);
+
+            if (addFuel == false)
+            {
+                return BadRequest("error");
+            }
+
+            await _unitOfWork.CompleteAsync();
+
+            return Ok("Successfully Synced");
+        }
+
 
         [HttpGet]
         [Route("GetOneCharging")]

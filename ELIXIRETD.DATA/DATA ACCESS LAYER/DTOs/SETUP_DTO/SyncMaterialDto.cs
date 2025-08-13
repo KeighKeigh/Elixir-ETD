@@ -11,6 +11,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.SETUP_DTO
 {
     public class SyncMaterialDto
     {
+        public int? Id { get; set; }
         public int ? Material_No { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
