@@ -222,6 +222,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                           department_unit_name = x.receiptparents.department_unit_name,
                           sub_unit_code = x.receiptparents.sub_unit_code,
                           sub_unit_name = x.receiptparents.sub_unit_name,
+                          AssetTag = x.receiptparents.AssetTag,
 
 
 
@@ -843,6 +844,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                  department_unit_code = x.department_unit_code,
                                                  sub_unit_name = x.sub_unit_name,
                                                  sub_unit_code = x.sub_unit_code,
+                                                 AssetTag = x.AssetTag,
 
 
                                              });
@@ -886,6 +888,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     department_unit_code = x.issue.department_unit_code,
                     sub_unit_name = x.issue.sub_unit_name,
                     sub_unit_code = x.issue.sub_unit_code,
+                    AssetTag = x.issue.AssetTag
 
 
 

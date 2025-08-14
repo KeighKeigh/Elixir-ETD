@@ -50,7 +50,7 @@ namespace ELIXIRETD.DATA.SERVICES
         public  async Task<bool> NewPassword(AutenticateNewPassword newpassword)
         {
             var newpass = await _context.Users.Where(x => x.UserName == newpassword.Username &&
-                                                      x.Password != x.Password && x.IsActive == true)
+                                                      x.Password != x.Password && x.IsActive == true && newpassword.NewPassword != x.UserName)
                                               .FirstOrDefaultAsync();
 
             if(newpass == null) 

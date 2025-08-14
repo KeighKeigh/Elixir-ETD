@@ -58,6 +58,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.INVENTORYDTO
         public string department_unit_name { get; set; }
         public string sub_unit_code { get; set; }
         public string sub_unit_name { get; set; }
+        public string AssetTag { get; set; }
 
 
     }

@@ -55,6 +55,9 @@ namespace ELIXIRETD.API.Controllers.LOGIN_CONTROLLER
             if (request.NewPassword != request.ConfirmPassword)
                 return BadRequest("New password and confirm password do not match!");
 
+            if (request.NewPassword == request.Username || request.ConfirmPassword == request.Username)
+                return BadRequest("Password can't be the same as Username!");
+
             user.Password = request.NewPassword;
             _context.SaveChanges();
 
