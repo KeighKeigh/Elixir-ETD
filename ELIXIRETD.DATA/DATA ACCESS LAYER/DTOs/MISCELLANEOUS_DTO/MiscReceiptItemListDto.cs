@@ -11,6 +11,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.MISCELLANEOUS_DTO
         public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public string UomCode { get; set; }
-        public decimal UnitCost { get; set; }
+        public string UnitCost { get; set; }
     }
 }

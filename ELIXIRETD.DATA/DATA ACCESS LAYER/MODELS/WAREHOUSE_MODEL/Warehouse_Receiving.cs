@@ -48,10 +48,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
         public string EmpId { get; set; }
         public string FullName { get; set; }
 
-        public decimal? ActualReceiving {  get; set; }
+        public decimal? ActualReceiving { get; set; }
         public string RRNo { get; set; }
         public DateTime? RRDate { get; set; }
-        //public string AssetTag { get; set; }
+        public string PriceWithDecimal { get; set; }
+
 
 
     }

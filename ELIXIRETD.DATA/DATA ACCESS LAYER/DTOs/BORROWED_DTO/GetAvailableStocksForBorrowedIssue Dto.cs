@@ -22,7 +22,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.BORROWED_DTO
 
         public string ReceivingDate { get; set; }
 
-        public decimal UnitCost { get; set; }
+        public string UnitCost { get; set; }
 
         public decimal ActualRemaining { get; set; }
 

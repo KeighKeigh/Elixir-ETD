@@ -713,7 +713,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                   - total.Key.MoveOrderOut - total.Key.IssueOut - total.Key.BorrowedOut
                                   - total.Key.fuel,
                                   ReceivingDate = total.Key.ReceivingDate,
-                                  UnitCost = total.Key.UnitCost
+                                  UnitCost = total.Key.UnitCost.ToString()
 
                               }).Where(x => x.RemainingStocks > 0)
                                 .Where(x => x.ItemCode == itemcode);
@@ -1152,7 +1152,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                  {
                                      WarehouseId = x.WarehouseId,
                                      ItemCode = x.ItemCode,
-                                     UnitPrice = x.UnitPrice * x.ActualGood,
+                                     UnitPrice = (x.UnitPrice * x.ActualGood),
                                      ActualGood = x.ActualGood
 
                                  });
@@ -1180,7 +1180,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                     ItemCode = x.Key,
                     ItemDescription = x.First().material.ItemDescription,
                     UomCode = x.First().material.Uom.UomCode,
-                    UnitCost = decimal.Round(x.First().unitcost.UnitPrice != null ? x.First().unitcost.UnitPrice : 0, 2)
+                    UnitCost = (x.First().unitcost.UnitPrice != null ? x.First().unitcost.UnitPrice : 0).ToString()
 
                 }).OrderBy(x => x.ItemCode);
 

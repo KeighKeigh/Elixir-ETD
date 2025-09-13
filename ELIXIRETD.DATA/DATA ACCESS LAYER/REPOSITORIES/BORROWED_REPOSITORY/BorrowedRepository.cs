@@ -409,7 +409,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.BORROWED_REPOSITORY
                                     - total.Key.BorrowedOut
                                     - total.Key.fuel,
                                     ReceivingDate = total.Key.RecievingDate,
-                                    UnitCost = total.Key.UnitPrice,
+                                    UnitCost = total.Key.UnitPrice.ToString(),
 
 
                                 }).Where(x => x.RemainingStocks > 0)

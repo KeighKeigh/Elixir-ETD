@@ -36,16 +36,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
         public decimal Delivered { get; set; }
 
 
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "decimal(38,16)")]
         public decimal Billed { get; set; }
 
         public string Uom { get; set; }
 
 
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "decimal(38,20)")]
         public decimal UnitPrice { get; set; }
         public string VendorName { get; set; }
-        public string AddedBy{ get; set; }
+        public string AddedBy { get; set; }
         public bool IsActive { get; set; } = true;
         public string Reason { get; set; }
 
@@ -57,7 +57,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
         public bool? IsCancelled { get; set; }
 
 
-        public string ? RRNo { get; set; }
+        public string? RRNo { get; set; }
 
         public DateTime? RRDate { get; set; }
 
@@ -69,6 +69,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.IMPORT_MODEL
         public bool? IsReceived { get; set; } = false;
 
         //public DateTime SyncDate { get; set; } 
+
+        public string PriceWithDecimal { get; set; }
+
 
 
 

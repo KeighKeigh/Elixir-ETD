@@ -103,7 +103,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         row.Cell(4).Value = consolidate[index - 1].ItemDescription;
                         row.Cell(5).Value = consolidate[index - 1].Uom;
                         row.Cell(6).Value = consolidate[index - 1].Category;
-                        if (consolidate[index - 1].TransactionType == "Move Order" || consolidate[index - 1].TransactionType == "Miscellaneous Issue" || consolidate[index - 1].TransactionType == "Borrow")
+                        if (consolidate[index - 1].TransactionType == "Move Order" || consolidate[index - 1].TransactionType == "Miscellaneous Issue" || consolidate[index - 1].TransactionType == "Borrow" || consolidate[index - 1].TransactionType == "Fuel Register")
                         {
                             row.Cell(7).Value = "-" + consolidate[index - 1].Quantity;
                             row.Cell(9).Value = "-" + consolidate[index - 1].LineAmount;

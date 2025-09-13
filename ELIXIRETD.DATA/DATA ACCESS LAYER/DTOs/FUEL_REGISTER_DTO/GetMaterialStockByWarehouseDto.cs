@@ -14,6 +14,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.FUEL_REGISTER_DTO
         public decimal? Remaining_Stocks { get; set; }
         public string Receiving_Date { get; set; }
 
-        public decimal? Unit_Cost { get; set; }
+        public string Unit_Cost { get; set; }
     }
 }

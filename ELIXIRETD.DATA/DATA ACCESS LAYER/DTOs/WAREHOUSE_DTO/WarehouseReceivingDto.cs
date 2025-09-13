@@ -39,15 +39,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.WAREHOUSE_DTO
 
         public string LotSection { get; set; }
 
-        public decimal UnitPrice { get; set; }
+        public decimal? UnitPrice { get; set; }
         
-        public decimal TotalUnitPrice { get; set; }
+        public decimal? TotalUnitPrice { get; set; }
 
         public string TransactionType { get; set; }
 
         public DateTime ? ReceiveDate { get; set; }
 
         public decimal QuantityDelivered { get; set; }
+        public string PriceWithDecimal { get; set; }
 
 
 

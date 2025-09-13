@@ -591,7 +591,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.FUEL_REGISTER_REPOSITORY
                                     ItemCode = total.Key.ItemCode,
                                     Remaining_Stocks = total.Key.WarehouseActualGood + total.Key.borrowedreturn - total.Key.MoveOrderOut - total.Key.IssueOut - total.Key.BorrowedOut - total.Key.FuelRegister ,
                                     Receiving_Date = total.Key.RecievingDate,
-                                    Unit_Cost = total.Key.UnitPrice,
+                                    Unit_Cost = total.Key.UnitPrice.ToString(),
 
                                 }).Where(x => x.Remaining_Stocks > 0);
 

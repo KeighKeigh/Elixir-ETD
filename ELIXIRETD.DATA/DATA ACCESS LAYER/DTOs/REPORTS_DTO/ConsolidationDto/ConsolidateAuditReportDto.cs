@@ -17,10 +17,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
         public string Category { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal? Quantity { get; set; }
-        public decimal? UnitCost { get; set; }
+        public string UnitCost { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal? LineAmount { get; set; }
+        public string LineAmount { get; set; }
         public string? Source { get; set; }
         public string TransactionType { get; set; }
         public string Status { get; set; }

@@ -712,9 +712,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             }).Select(x => new WarehouseInventory
             {
                 ItemCode = x.Key.ItemCode,
-                UnitPrice = x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / x.Sum(x => x.ActualGood != null ? x.ActualGood : 0),
+                UnitPrice = (x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / x.Sum(x => x.ActualGood != null ? x.ActualGood : 0)),
                 ActualGood = x.Sum(x => x.ActualGood),
-                TotalUnitPrice = x.Sum(x => x.UnitPrice)
+                TotalUnitPrice = (x.Sum(x => x.UnitPrice))
 
 
             });

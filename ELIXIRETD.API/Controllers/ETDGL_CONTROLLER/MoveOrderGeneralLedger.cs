@@ -85,8 +85,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             public string ItemDescription { get; set; }
             public decimal? Quantity { get; set; }
             public string UOM { get; set; }
-            public decimal? UnitPrice { get; set; }
-            public decimal? LineAmount { get; set; }
+            public string UnitPrice { get; set; }
+            public string LineAmount { get; set; }
             public string VoucherJournal { get; set; }
             public string AccountType { get; set; }
             public string DRCR { get; set; }
@@ -206,8 +206,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         ItemDescription = x.ItemDescription ?? string.Empty,
                         Quantity = x?.Quantity ?? 0,
                         UOM = x.UOM ?? string.Empty,
-                        UnitPrice = x?.UnitPrice ?? 0,
-                        LineAmount = x?.LineAmount ?? 0,
+                        UnitPrice = x?.UnitPrice ?? "0",
+                        LineAmount = x?.LineAmount ?? "0",
                         VoucherJournal = string.Empty,
                         AccountType = x.AccountType ?? string.Empty,
                         DRCR = "Debit",
@@ -282,8 +282,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         ItemDescription = x.ItemDescription ?? string.Empty,
                         Quantity = x?.Quantity ?? 0,
                         UOM = x.UOM ?? string.Empty,
-                        UnitPrice = x?.UnitPrice ?? 0,
-                        LineAmount = -(x?.LineAmount) ?? 0,
+                        UnitPrice = x?.UnitPrice ?? "0",
+                        LineAmount = "-" + x?.LineAmount ?? "0",
                         VoucherJournal = string.Empty,
                         AccountType = x.AccountType ?? string.Empty,
                         DRCR = "Credit",
@@ -354,8 +354,8 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   ItemCode = w.ItemCode,
                                   ItemDescription = w.ItemDescription,
                                   Quantity = m.QuantityOrdered,
-                                  UnitPrice = w.UnitPrice,
-                                  LineAmount = (w.UnitPrice * m.QuantityOrdered),
+                                  UnitPrice = w.UnitPrice.ToString(),
+                                  LineAmount = (w.UnitPrice * m.QuantityOrdered).ToString(),
                                   UOM = w.Uom,
                                   CheckingRemarks = "Move Order",
                                   Reason = m.ItemRemarks,
@@ -369,6 +369,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                                   Department = m.DepartmentName,
                                   AssetCIP = m.Cip_No,
                                   Batch = "",
+
                                   ServiceProvider = t.PreparedBy,
                                   ServiceProviderCode = u.EmpId,
                                   ReferenceNo = m.EmpId != null ? (m.OrderNo.ToString() ?? "") + (m.EmpId ?? "") : m.OrderNo.ToString(),
@@ -423,8 +424,9 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     UOM = x.warehouse.Uom,
                     PONumber = x.material.ItemCategory.ItemCategoryName,
                     Quantity = x.warehouse.ActualGood,
-                    UnitPrice = x.warehouse.UnitPrice,
-                    LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
+                    UnitPrice = decimal.Parse(x.warehouse.PriceWithDecimal).ToString(),
+                    ClientSupplier = x.receipt.Details,
+                    LineAmount = (decimal.Parse(x.warehouse.PriceWithDecimal) * x.warehouse.ActualGood).ToString(),
                     CheckingRemarks = "Miscellaneous Receipt",
                     Reason = x.receipt.Remarks,
                     Remarks = x.receipt.Details,
@@ -487,7 +489,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     Quantity = Math.Round(x.issue.Quantity, 2),
                     UnitPrice = x.issue.UnitPrice,
                     LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2),
-
+                    ClientSupplier = x.miscDetail.Details,
                     CheckingRemarks = "Miscellaneous Issue",
                     Reason = x.issue.Remarks,
                     ReferenceNo = x.issue.Id.ToString(),
@@ -664,31 +666,31 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
             //}
             private async Task<List<ETDGLResult>> FuelTransactions(DateTime startDate, DateTime endDate)
             {
-                var result =  _context.FuelRegisterDetails
+                var result = _context.FuelRegisterDetails
                     .Include(m => m.Material)
                     .ThenInclude(id => id.ItemCategory)
                     .Include(w => w.Warehouse_Receiving)
                     .GroupJoin(_context.OneAccountTitles, fuel => fuel.FuelRegister.Account_Title_Code, accountTitle => accountTitle.AccountCode, (fuel, accountTitle) => new { fuel, accountTitle })
                 .SelectMany(x => x.accountTitle.DefaultIfEmpty(), (x, accountTitle) => new { x.fuel, accountTitle })
-                    .Where(r => r.fuel.FuelRegister.Is_Transact == true && r.fuel.FuelRegister.Transact_At >= startDate && r.fuel.FuelRegister.Transact_At <= endDate)
+                    .Where(r => r.fuel.FuelRegister.Is_Transact == true && r.fuel.FuelRegister.issuanceDate >= startDate && r.fuel.FuelRegister.issuanceDate <= endDate)
 
                     .Select(x => new ETDGLResult
                     {
 
-                        SyncId = "R-" + x.fuel.Id.ToString(),
-                        TransactionDate = x.fuel.FuelRegister.Transact_At.Value.Date,
+                        SyncId = "FR-" + x.fuel.Id.ToString(),
+                        TransactionDate = x.fuel.FuelRegister.issuanceDate.Value.Date,
                         ItemCode = x.fuel.Material.ItemCode,
                         ItemDescription = x.fuel.Material.ItemDescription,
                         UOM = x.fuel.Material.Uom.UomCode,
-                        PONumber = "",
+                        PONumber = "GASOLINE, OIL, LUBRICANT",
                         Quantity = x.fuel.Liters != null ? x.fuel.Liters : 0,
                         UnitPrice = x.fuel.Warehouse_Receiving.UnitPrice,
                         LineAmount = Math.Round(x.fuel.Warehouse_Receiving.UnitPrice * x.fuel.Liters.Value, 2),
-
-                        CheckingRemarks = "Fuel",
+                        ReferenceNo = x.fuel.dieselPONumber,
+                        CheckingRemarks = "Fuel Register",
                         Reason = x.fuel.FuelRegister.Remarks,
-                        Remarks = "",
-
+                        Remarks = x.fuel.dieselPONumber,
+                        Asset = x.fuel.FuelRegister.Asset.AssetCode,
                         DivisionCode = x.fuel.FuelRegister.BusinessUnitCode,
                         Division = x.fuel.FuelRegister.BusinessUnitName,
                         DepartmentCode = x.fuel.FuelRegister.Department_Code,
@@ -696,7 +698,7 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                         LocationCode = x.fuel.FuelRegister.Location_Code,
                         Location = x.fuel.FuelRegister.Location_Name,
                         AccountTitleCode = x.fuel.FuelRegister.Account_Title_Code,
-                        AccountTitle = x.fuel.FuelRegister.Account_Title_Code,
+                        AccountTitle = x.fuel.FuelRegister.Account_Title_Name,
 
                         AssetCIP = "",
                         RRNumber = 0.ToString(),
@@ -717,8 +719,9 @@ namespace ELIXIRETD.API.Controllers.ETDGL_CONTROLLER
                     });
                 return await result.ToListAsync();
             }
+        }
 
             
-        }
+        
     }
 }

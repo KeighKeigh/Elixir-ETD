@@ -42,8 +42,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO
 
         public string FullName { get; set; }
 
-        public decimal UnitCost { get; set; }
-        public decimal TotalCost { get; set; }
+        public string UnitCost { get; set; }
+        public string TotalCost { get; set; }
         public string OneChargingName { get; set; }
         public string BusinessUnitCode { get; set; }
         public string BusinessUnitName { get; set; }

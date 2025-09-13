@@ -220,7 +220,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                    QuantityOrdered = posummary.Ordered,
                                    IsActive = posummary.IsActive,
                                    ActualRemaining = 0,
-                                   UnitPrice = posummary.UnitPrice != 0 ? posummary.UnitPrice : 0 ,
+                                   UnitPrice = posummary.UnitPrice != 0 ? posummary.UnitPrice : 0,
+                                   PriceWithDecimal = posummary.PriceWithDecimal == null ?  posummary.UnitPrice.ToString() : posummary.PriceWithDecimal ,
                                    TotalReject = receive.TotalReject != 0 ? receive.TotalReject : 0,
                                    ActualGood = receive != null && receive.IsActive != false ? receive.ActualDelivered : 0,
                                    LotSectionId = material.LotSectionId,
@@ -243,6 +244,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  x.UnitPrice,
                                  x.LotSection,
                                  x.LotSectionId,
+                                 x.PriceWithDecimal
 
                              })
 
@@ -264,7 +266,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                                          IsActive = receive.Key.IsActive,
                                                          UnitPrice = receive.Key.UnitPrice,
                                                          LotSection = receive.Key.LotSection,
-                                                         LotSectionId = receive.Key.LotSectionId
+                                                         LotSectionId = receive.Key.LotSectionId,
+                                                         PriceWithDecimal = receive.Key.PriceWithDecimal
                                                          
                                                         
                                                      })
@@ -323,6 +326,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                  IsActive = receive.First().posummary.IsActive,
                                  TotalReject = receive.Sum(x => x.receive.TotalReject != null ? x.receive.TotalReject : 0),
                                  UnitPrice = receive.First().posummary.UnitPrice,
+                                 PriceWithDecimal = receive.First().posummary.PriceWithDecimal == null ?receive.First().posummary.UnitPrice.ToString() : receive.First().posummary.PriceWithDecimal,
                                  LotSection = receive.First().material.LotSection.SectionName,
                                  LotSectionId = receive.First().material.LotSectionId,
                                  //SINumber = receive.First().posummary.SINumber != null ? receive.First().posummary.SINumber : receive.Key.PO_Number,
@@ -550,7 +554,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                     Uom = x.Uom,
                     LotSection = x.LotSection,
                     UnitPrice = x.UnitPrice,
-                    TotalUnitPrice = x.UnitPrice * x.ActualDelivered,
+                    PriceWithDecimal = x.PriceWithDecimal == null ? x.UnitPrice.ToString() : x.PriceWithDecimal,
+                    TotalUnitPrice = x.PriceWithDecimal == null ?  x.UnitPrice * x.ActualDelivered : decimal.Parse(x.PriceWithDecimal) * x.ActualDelivered,
                     SINumber = x.SINumber,
                     TransactionType = x.TransactionType
                     
@@ -578,7 +583,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                    Uom = x.Uom,
                    LotSection = x.LotSection,
                    UnitPrice = x.UnitPrice,
-                   TotalUnitPrice = x.UnitPrice * x.ActualDelivered,
+                   PriceWithDecimal = x.PriceWithDecimal == null ? x.UnitPrice.ToString() : x.PriceWithDecimal,
+                   TotalUnitPrice = x.PriceWithDecimal == null ? x.UnitPrice * x.ActualDelivered : decimal.Parse(x.PriceWithDecimal) * x.ActualDelivered,
                    SINumber = x.SINumber,
                    TransactionType = x.TransactionType
 
@@ -909,6 +915,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.WAREHOUSE_REPOSITORY
                                     .Select(wh => (int?)wh.TotalReject).Sum() ?? 0,
 
                                  UnitPrice = po.UnitPrice,
+                                 PriceWithDecimal = po.PriceWithDecimal == null ? po.UnitPrice.ToString() : po.PriceWithDecimal,
 
                                  // Ensure correct joins for LotSection
                                  LotSection = _context.Materials

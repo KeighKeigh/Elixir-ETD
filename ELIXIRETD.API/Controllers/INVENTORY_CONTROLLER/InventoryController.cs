@@ -5,6 +5,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.SERVICES;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RDF.Arcana.API.Features.Authenticate.AuthXApi;
 
 namespace ELIXIRETD.API.Controllers.INVENTORY_CONTROLLER
 {
@@ -55,6 +56,8 @@ namespace ELIXIRETD.API.Controllers.INVENTORY_CONTROLLER
 
 
         [HttpGet]
+        [ApiKeyAuth]
+        [AllowAnonymous]
         [Route("YmirSOHList/{itemCode}")]
         public async Task<IActionResult> YmirSOHList([FromRoute] string itemCode)
         {

@@ -12,6 +12,7 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.ORDERING_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
 using ELIXIRETD.DATA.Migrations;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -90,6 +91,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     RRNumber = x.RRNo,
                     RRDate = x.RRDate.Value.Date,
                     ReceiveDate = x.ReceivingDate.ToString(),
+                    ActualReceivingDate = x.ActualReceivingDate.ToString(),
                     ItemCode = x.ItemCode,
                     ItemDescrption = x.ItemDescription,
                     Uom = x.Uom,
@@ -99,8 +101,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     SupplierName = x.Supplier,
                     TransactionType = x.TransactionType,
                     ReceivedBy = x.AddedBy,
-                    UnitPrice = x.UnitPrice,
-                    Amount = x.UnitPrice * x.ActualDelivered,
+                    UnitPrice = (x.PriceWithDecimal == null ? 0m : decimal.Parse(x.PriceWithDecimal)).ToString(),
+                    Amount = (x.PriceWithDecimal == null ? 0m : decimal.Parse(x.PriceWithDecimal) * x.ActualDelivered).ToString(),
                     SINumber = x.SINumber
                 });
 
@@ -625,8 +627,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                                 EmpId = receipt.EmpId,
                                 FullName = receipt.FullName,
 
-                                UnitCost = receipt.UnitPrice,
-                                TotalCost = receipt.UnitPrice * receipt.ActualDelivered,
+                                UnitCost = (receipt.PriceWithDecimal == null ? receipt.UnitPrice : decimal.Parse(receipt.PriceWithDecimal)).ToString(),
+                                TotalCost = (receipt.PriceWithDecimal == null ? receipt.UnitPrice * receipt.ActualDelivered : decimal.Parse(receipt.PriceWithDecimal) * receipt.ActualDelivered).ToString(),
                                 OneChargingName = receiptHeader.one_charging_name,
                                 BusinessUnitCode = receiptHeader.business_unit_code,
                                 BusinessUnitName = receiptHeader.business_unit_name,
@@ -906,9 +908,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = r.Material.Uom.UomCode,
                     Item_Categories = r.Material.ItemCategory.ItemCategoryName,
                     Warehouse_ReceivingId = r.Warehouse_ReceivingId,
-                    Unit_Cost = r.Warehouse_Receiving.UnitPrice,
+                    Unit_Cost = (r.Warehouse_Receiving.PriceWithDecimal == null ? r.Warehouse_Receiving.UnitPrice : decimal.Parse(r.Warehouse_Receiving.PriceWithDecimal)).ToString(),
                     Liters = r.Liters.Value,
-                    lineAmount = Math.Round((r.Warehouse_Receiving.UnitPrice * r.Liters.Value), 2),
+                    lineAmount = (r.Warehouse_Receiving.PriceWithDecimal == null ? r.Warehouse_Receiving.UnitPrice * r.Liters.Value : decimal.Parse(r.Warehouse_Receiving.PriceWithDecimal) * r.Liters.Value).ToString(),
                     Asset = r.FuelRegister.Asset.AssetCode,
                     Odometer = r.FuelRegister.Odometer,
                     Company_Code = r.FuelRegister.Company_Code,
@@ -1507,6 +1509,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     x.Id,
                     x.ItemCode,
                     x.ActualGood,
+                    x.PriceWithDecimal,
                     x.UnitPrice,
                 });
 
@@ -1670,7 +1673,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                  }).Select(x => new WarehouseInventory
                  {
                      ItemCode = x.Key.ItemCode,
-                     UnitPrice = Math.Round(x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / x.Sum(x => x.ActualGood), 2),
+                     UnitPrice = x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / x.Sum(x => x.ActualGood),
                      ActualGood = x.Sum(x => x.ActualGood),
 
                  });
@@ -1684,7 +1687,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                  {
                      ItemCode = x.Key.ItemCode,
                      UnitPrice = x.First().UnitPrice,
-                     TotalUnitPrice = Math.Round((x.First().UnitPrice * x.First().ActualGood), 2),
+                     TotalUnitPrice = x.First().UnitPrice * x.First().ActualGood,
 
                  });
 
@@ -1836,7 +1839,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
 
             return await PagedList<DtoInventoryMovement>.CreateAsync(movementInventory, userParams.PageNumber, userParams.PageSize);
-
         }
 
         public async Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateFinanceReport(string DateFrom, string DateTo, string Search)
@@ -1865,8 +1867,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.ware.Uom,
                     Category = x.material.ItemCategory.ItemCategoryName,
                     Quantity = x.ware.ActualGood,
-                    UnitCost = x.ware.UnitPrice,
-                    LineAmount = Math.Round(x.ware.UnitPrice * x.ware.ActualGood, 2),
+                    UnitCost = (x.ware.PriceWithDecimal == null ? x.ware.UnitPrice : decimal.Parse(x.ware.PriceWithDecimal)).ToString(),
+                    LineAmount = (x.ware.PriceWithDecimal == null ? x.ware.UnitPrice * x.ware.ActualGood : decimal.Parse(x.ware.PriceWithDecimal) * x.ware.ActualGood).ToString(),
                     Source = x.ware.PoNumber,
                     TransactionType = "Receiving",
                     Reason = "",
@@ -1913,8 +1915,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.material.Uom.UomCode ,
                     Category = x.moveOrder.Category ,
                     Quantity = Math.Round(x.moveOrder.QuantityOrdered, 2),
-                    UnitCost = x.moveOrder.UnitPrice,
-                    LineAmount = Math.Round(x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered, 2),
+                    UnitCost = x.moveOrder.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered, 2)).ToString(),
                     Source = Convert.ToString(x.transMoveOrder.OrderNo),
                     TransactionType = "Move Order",
                     Reason = "",
@@ -1968,8 +1970,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.warehouse.Uom,
                     Category = "",
                     Quantity = x.warehouse.ActualGood,
-                    UnitCost = x.warehouse.UnitPrice,
-                    LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
+                    UnitCost =  (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice : decimal.Parse(x.warehouse.PriceWithDecimal)).ToString(),
+                    LineAmount = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice * x.warehouse.ActualGood  : decimal.Parse(x.warehouse.PriceWithDecimal) * x.warehouse.ActualGood).ToString(),
                     Source = Convert.ToString(x.receipt.Id),
                     TransactionType = "Miscellaneous Receipt",
                     Reason = x.receipt.Remarks,
@@ -2022,8 +2024,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.issue.Uom,
                     Category = "",
                     Quantity = Math.Round(x.issue.Quantity, 2),
-                    UnitCost = x.issue.UnitPrice,
-                    LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2),
+                    UnitCost = x.issue.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2)).ToString(),
                     Source = Convert.ToString(x.issue.Id),
                     TransactionType = "Miscellaneous Issue",
                     Reason = x.issue.Remarks,
@@ -2070,8 +2072,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.borrowDetail.Uom,
                     Category = "",
                     Quantity = Math.Round(x.borrowDetail.Quantity, 2),
-                    UnitCost = x.borrowDetail.UnitPrice,
-                    LineAmount = Math.Round(x.borrowDetail.UnitPrice * x.borrowDetail.Quantity, 2),
+                    UnitCost = x.borrowDetail.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.borrowDetail.UnitPrice * x.borrowDetail.Quantity, 2)).ToString(),
                     Source = Convert.ToString(x.borrow.Id),
                     TransactionType = "Borrow",
                     Reason = x.borrow.Remarks,
@@ -2182,8 +2184,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.borrowDetail.Uom,
                     Category = "",
                     Quantity = x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed,
-                    UnitCost = x.borrowDetail.UnitPrice,
-                    LineAmount = Math.Round(x.borrowDetail.UnitPrice.Value * x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed, 2),
+                    UnitCost = x.borrowDetail.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.borrowDetail.UnitPrice.Value * x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed, 2)).ToString(),
                     Source = Convert.ToString(x.borrow.Id),
                     TransactionType = "Returned",
                     Reason = x.borrowDetail.Remarks,
@@ -2226,20 +2228,20 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 {
 
                     Id = x.fuel.Id,
-                    TransactionDate = x.fuel.FuelRegister.Transact_At.Value.Date,
+                    TransactionDate = x.fuel.FuelRegister.issuanceDate.Value.Date,
                     ItemCode = x.fuel.Material.ItemCode,
                     ItemDescription = x.fuel.Material.ItemDescription,
                     Uom = x.fuel.Material.Uom.UomCode,
-                    Category = "",
+                    Category = "GASOLINE, OIL, LUBRICANT",
                     Quantity = x.fuel.Liters != null ? x.fuel.Liters : 0,
-                    UnitCost = x.fuel.Warehouse_Receiving.UnitPrice,
-                    LineAmount = Math.Round(x.fuel.Warehouse_Receiving.UnitPrice * x.fuel.Liters.Value, 2),
+                    UnitCost = (x.fuel.Warehouse_Receiving.PriceWithDecimal == null ? x.fuel.Warehouse_Receiving.UnitPrice : decimal.Parse(x.fuel.Warehouse_Receiving.PriceWithDecimal)).ToString(),
+                    LineAmount = (x.fuel.Warehouse_Receiving.PriceWithDecimal == null ? x.fuel.Warehouse_Receiving.UnitPrice * x.fuel.Liters.Value : decimal.Parse(x.fuel.Warehouse_Receiving.PriceWithDecimal) * x.fuel.Liters.Value).ToString(),
                     Source = Convert.ToString(x.fuel.FuelRegisterId),
-                    TransactionType = "Fuel",
-                    Reason = x.fuel.FuelRegister.Remarks,
-                    Reference = "",
-                    SupplierName = "",
-                    EncodedBy = x.fuel.FuelRegister.Transact_By,
+                    TransactionType = "Fuel Register",
+                    Reason = "",
+                    Reference = x.fuel.FuelRegister.Remarks,
+                    SupplierName = x.fuel.FuelRegister.Company_Name,
+                    EncodedBy = x.fuel.FuelRegister.Added_By,
                     CompanyCode = x.fuel.FuelRegister.Company_Code,
                     CompanyName = x.fuel.FuelRegister.Company_Name,
                     DepartmentCode = x.fuel.FuelRegister.Department_Code,
@@ -2247,7 +2249,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     LocationCode = x.fuel.FuelRegister.Location_Code,
                     LocationName = x.fuel.FuelRegister.Location_Name,
                     AccountTitleCode = x.fuel.FuelRegister.Account_Title_Code,
-                    AccountTitle = x.fuel.FuelRegister.Account_Title_Code,
+                    AccountTitle = x.fuel.FuelRegister.Account_Title_Name,
                     EmpId = x.fuel.FuelRegister.EmpId,
                     Fullname = x.fuel.FuelRegister.Fullname,
                     AssetTag = x.fuel.FuelRegister.Asset.AssetCode,
@@ -2263,6 +2265,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     SubUnitName = x.fuel.FuelRegister.SubUnitName,
                     FinancialStatement = x.accountTitle.FinancialStatement,
                     UnitResponsible = x.accountTitle.Unit,
+                    DieselPoNumber = x.fuel.dieselPONumber,
 
                 });
 
@@ -2386,7 +2389,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     SubUnitCode = consol.SubUnitCode,
                     SubUnitName = consol.SubUnitName,
                     FinancialStatement = consol.FinancialStatement,
-                    UnitResponsible = consol.UnitResponsible
+                    UnitResponsible = consol.UnitResponsible,
+                    DieselPoNumber = consol.DieselPoNumber
 
                 });
 
@@ -2438,16 +2442,16 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.ware.Uom,
                     Category = x.material.ItemCategory.ItemCategoryName,
                     Quantity = x.ware.ActualGood,
-                    UnitCost = x.ware.UnitPrice,
-                    LineAmount = Math.Round(x.ware.UnitPrice * x.ware.ActualGood, 2),
+                    UnitCost = (x.ware.PriceWithDecimal == null ? x.ware.UnitPrice : decimal.Parse(x.ware.PriceWithDecimal)).ToString(),
+                    LineAmount = (x.ware.PriceWithDecimal == null ? x.ware.UnitPrice * x.ware.ActualGood : decimal.Parse(x.ware.PriceWithDecimal) * x.ware.ActualGood).ToString(),
                     Source = x.ware.PoNumber,
                     TransactionType = "Receiving",
                     Reason = "",
                     Reference = x.ware.SINumber,
                     SupplierName = x.ware.Supplier,
                     EncodedBy = x.ware.AddedBy,
-                    CompanyCode = "10",
-                    CompanyName = "RDF Corporate Services",
+                    CompanyCode = "01",
+                    CompanyName = "RDF",
                     DepartmentCode = "0010",
                     DepartmentName = "Corporate Common",
                     LocationCode = "0001",
@@ -2489,8 +2493,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.material.Uom.UomCode,
                     Category = x.moveOrder.Category,
                     Quantity = Math.Round(x.moveOrder.QuantityOrdered, 2),
-                    UnitCost = x.moveOrder.UnitPrice,
-                    LineAmount = Math.Round(x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered, 2),
+                    UnitCost = x.moveOrder.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.moveOrder.UnitPrice * x.moveOrder.QuantityOrdered, 2)).ToString(),
                     Source = Convert.ToString(x.transMoveOrder.OrderNo),
                     TransactionType = "Move Order",
                     Reason = "",
@@ -2543,10 +2547,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ItemCode = x.warehouse.ItemCode,
                     ItemDescription = x.warehouse.ItemDescription,
                     Uom = x.warehouse.Uom,
-                    Category = "",
+                    Category = x.material.ItemCategoryName,
                     Quantity = x.warehouse.ActualGood,
-                    UnitCost = x.warehouse.UnitPrice,
-                    LineAmount = Math.Round(x.warehouse.UnitPrice * x.warehouse.ActualGood, 2),
+                    UnitCost = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice : decimal.Parse(x.warehouse.PriceWithDecimal)).ToString(),
+                    LineAmount = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice * x.warehouse.ActualGood : decimal.Parse(x.warehouse.PriceWithDecimal) * x.warehouse.ActualGood).ToString(),
                     Source = Convert.ToString(x.receipt.Id),
                     TransactionType = "Miscellaneous Receipt",
                     Reason = x.receipt.Remarks,
@@ -2598,10 +2602,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ItemCode = x.issue.ItemCode,
                     ItemDescription = x.issue.ItemDescription,
                     Uom = x.issue.Uom,
-                    Category = "",
+                    Category = x.material.ItemCategoryName,
                     Quantity = Math.Round(x.issue.Quantity, 2),
-                    UnitCost = x.issue.UnitPrice,
-                    LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2),
+                    UnitCost = x.issue.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2)).ToString(),
                     Source = Convert.ToString(x.issue.Id),
                     TransactionType = "Miscellaneous Issue",
                     Reason = x.issue.Remarks,
@@ -2649,8 +2653,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.borrowDetail.Uom,
                     Category = "",
                     Quantity = Math.Round(x.borrowDetail.Quantity, 2),
-                    UnitCost = x.borrowDetail.UnitPrice,
-                    LineAmount = Math.Round(x.borrowDetail.UnitPrice * x.borrowDetail.Quantity, 2),
+                    UnitCost = x.borrowDetail.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.borrowDetail.UnitPrice * x.borrowDetail.Quantity, 2)).ToString(),
                     Source = x.borrow.Id.ToString(),
                     TransactionType = "Borrow",
                     Status = "",
@@ -2762,8 +2766,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.borrowDetail.Uom,
                     Category = "",
                     Quantity = x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed,
-                    UnitCost = x.borrowDetail.UnitPrice,
-                    LineAmount = Math.Round(x.borrowDetail.UnitPrice.Value * x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed, 2),
+                    UnitCost = x.borrowDetail.UnitPrice.ToString(),
+                    LineAmount = (Math.Round(x.borrowDetail.UnitPrice.Value * x.borrowDetail.BorrowedQuantity - x.borrowDetail.Consumed, 2)).ToString(),
                     Source = x.borrow.Id.ToString(),
                     TransactionType = "Returned",
                     Status = "",
@@ -2813,8 +2817,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.Uom,
                     Category = "",
                     Quantity = x.StandartQuantity != x.QuantityOrdered ? x.StandartQuantity - x.QuantityOrdered : x.StandartQuantity,
-                    UnitCost = 0,
-                    LineAmount = 0,
+                    UnitCost = "",
+                    LineAmount = "",
                     Source = x.TrasactId.ToString(),
                     TransactionType = "",
                     Status = "Cancelled",
@@ -2862,10 +2866,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     Uom = x.Material.Uom.UomCode,
                     Category = "",
                     Quantity = x.Liters,
-                    UnitCost = x.Warehouse_Receiving.UnitPrice,
-                    LineAmount = Math.Round(x.Warehouse_Receiving.UnitPrice * x.Liters.Value, 2),
+                    UnitCost = (x.Warehouse_Receiving.PriceWithDecimal == null ? x.Warehouse_Receiving.UnitPrice :  decimal.Parse(x.Warehouse_Receiving.PriceWithDecimal)).ToString(),
+                    LineAmount = (x.Warehouse_Receiving.PriceWithDecimal == null ? x.Warehouse_Receiving.UnitPrice * x.Liters.Value : decimal.Parse(x.Warehouse_Receiving.PriceWithDecimal) * x.Liters.Value).ToString(),
                     Source = Convert.ToString(x.FuelRegisterId),
-                    TransactionType = "Returned",
+                    TransactionType = "Fuel Register",
                     Reason = x.FuelRegister.Remarks,
                     Reference = "",
                     SupplierName = "",
