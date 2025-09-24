@@ -306,7 +306,7 @@ namespace ELIXIRETD.API.Controllers.YMIRSYNC_CONTROLLER
         public async Task<List<YmirResponse>> Handle(GetPOFromYmirQuery request, CancellationToken cancellationToken)
         {
             var token = _config["Ymir:BearerToken"];
-            var baseUrl = "https://rdfymir.com/backend/public/api/dynamic_integration_rr_api";
+            var baseUrl = "https://rdfymir.com/backend/public/api/etd_api";
 
 
             var queryParams = new List<string>();

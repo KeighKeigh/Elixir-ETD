@@ -23,7 +23,6 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO.ConsolidationDto
 
         public string UnitCost { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
         public string LineAmount { get; set; }
         public string Source { get; set; }
         public string TransactionType { get; set; }

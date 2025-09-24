@@ -76,6 +76,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         ,"Department Unit Name"
                         ,"Sub Unit Code"
                         ,"Sub Unit Name"
+                        ,"Financial Statement"
+                        ,"Unit Responsible"
+                        ,"Diesel PO#"
 
                     };
 
@@ -143,6 +146,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                         row.Cell(34).Value = consolidate[index - 1].DepartmentUnitName;
                         row.Cell(35).Value = consolidate[index - 1].SubUnitCode;
                         row.Cell(36).Value = consolidate[index - 1].SubUnitName;
+                        row.Cell(36).Value = consolidate[index - 1].FinancialStatement;
+                        row.Cell(37).Value = consolidate[index - 1].UnitResponsible;
+                        row.Cell(38).Value = consolidate[index - 1].DieselPoNumber;
 
 
                     }
