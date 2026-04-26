@@ -51,6 +51,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.WAREHOUSE_MODEL
         public decimal? ActualReceiving { get; set; }
         public string RRNo { get; set; }
         public DateTime? RRDate { get; set; }
+        public string ItemRemarks { get; set; }
         public string PriceWithDecimal { get; set; }
 
 

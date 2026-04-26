@@ -68,6 +68,17 @@ namespace ELIXIRETD.API.Controllers.INVENTORY_CONTROLLER
         }
 
         [HttpGet]
+        [AllowAnonymous]
+        [Route("YmirSOHLists/{itemCode}")]
+        public async Task<IActionResult> YmirSOHLists([FromRoute] string itemCode)
+        {
+
+            var result = await _unitofwork.Inventory.YmirSOHList(itemCode);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
         [Route("GetMRP")]
         public async Task<ActionResult<IEnumerable<DtoMRP>>> GetMRP([FromQuery] UserParams userParams, [FromQuery] string search)
         {

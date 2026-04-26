@@ -147,6 +147,7 @@ namespace ELIXIRETD.API.Controllers.YMIRSYNC_CONTROLLER
             public string deleted_at { get; set; }
             public int? umd_sync { get; set; }
             public int? system_sync { get; set; }
+            public string price_string { get; set; }
             public Uomss uom { get; set; }
 
         }
@@ -307,7 +308,7 @@ namespace ELIXIRETD.API.Controllers.YMIRSYNC_CONTROLLER
         {
             var token = _config["Ymir:BearerToken"];
             var baseUrl = "https://rdfymir.com/backend/public/api/etd_api";
-
+            //var baseUrl = "https://pretestomega.rdfymir.com/backend/public/api/etd_api"; //pretest
 
             var queryParams = new List<string>();
 
@@ -329,6 +330,8 @@ namespace ELIXIRETD.API.Controllers.YMIRSYNC_CONTROLLER
 
             _httpClient.DefaultRequestHeaders.Remove("Token");
             _httpClient.DefaultRequestHeaders.Add("Token", $"Bearer {token}");
+
+            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);//pretest
 
             var response = await _httpClient.GetAsync(requestUrl, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -355,7 +358,7 @@ namespace ELIXIRETD.API.Controllers.YMIRSYNC_CONTROLLER
             {
                 foreach (var order in po.rr_orders)
                 {
-                    order.UMPriceToString = order.order.price.ToString();
+                    order.UMPriceToString = order.order.price_string;
                 }
             }
 

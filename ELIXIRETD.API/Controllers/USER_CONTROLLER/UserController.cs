@@ -5,8 +5,14 @@ using ELIXIRETD.DATA.DATA_ACCESS_LAYER.HELPERS;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.SETUP_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.MODELS.USER_MODEL;
 using ELIXIRETD.DATA.DATA_ACCESS_LAYER.STORE_CONTEXT;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RDF.Arcana.API.Features.Authenticate.AuthXApi;
+using System.Threading;
+using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.CQRS.User.OneChangePassword;
+using static ELIXIRETD.DATA.DATA_ACCESS_LAYER.CQRS.User.OneResetPassword;
 
 namespace ELIXIRETD.API.Controllers.USER_CONTROLLER
 {
@@ -15,11 +21,13 @@ namespace ELIXIRETD.API.Controllers.USER_CONTROLLER
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly StoreContext _context;
+        private readonly IMediator _mediator;
 
-        public UserController(StoreContext context, IUnitOfWork unitOfWork)
+        public UserController(StoreContext context, IUnitOfWork unitOfWork, IMediator mediator)
         {
             _context = context;
             _unitOfWork = unitOfWork;
+            _mediator = mediator;
         }
 
         [HttpGet]
@@ -66,6 +74,14 @@ namespace ELIXIRETD.API.Controllers.USER_CONTROLLER
 
 
             await _unitOfWork.Users.AddNewUser(user);
+
+            var pendinguser = await _context.PendingRequests.FirstOrDefaultAsync(x => (x.IdPrefix + "-" + x.IdNo) == user.EmpId);
+
+            if (pendinguser != null)
+            {
+                _context.PendingRequests.Remove(pendinguser);
+            }
+
             await _unitOfWork.CompleteAsync();
 
             return Ok(user);
@@ -322,6 +338,53 @@ namespace ELIXIRETD.API.Controllers.USER_CONTROLLER
         }
 
 
+
+        [AllowAnonymous]
+        [ApiKeyAuth]
+        [HttpPatch("change-password/{employee}")]
+        public async Task<IActionResult> OneChangePassword(string employee, [FromBody] OneChangePasswordCommand command)
+        {
+            try
+            {
+                command.EmpId = employee;
+
+                var result = await _mediator.Send(command);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [ApiKeyAuth]
+        [HttpPatch("reset-password/{employee}")]
+        public async Task<IActionResult> OneResetPassword(string employee)
+        {
+            try
+            {
+                var result = await _mediator.Send(new OneResetPasswordCommand
+                {
+                    EmpId = employee
+                });
+                if (result.IsFailure)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
 
 
 

@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ELIXIRETD.API", "ELIXIRETD.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ELIXIRETD.DATA", "ELIXIRETD.DATA\ELIXIRETD.DATA.csproj", "{51E30275-C654-46CB-9B63-69F710BC7042}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F9386CB6-5FC1-4975-B112-646FA16C72DE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{51E30275-C654-46CB-9B63-69F710BC7042}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51E30275-C654-46CB-9B63-69F710BC7042}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51E30275-C654-46CB-9B63-69F710BC7042}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F9386CB6-5FC1-4975-B112-646FA16C72DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9386CB6-5FC1-4975-B112-646FA16C72DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9386CB6-5FC1-4975-B112-646FA16C72DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9386CB6-5FC1-4975-B112-646FA16C72DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

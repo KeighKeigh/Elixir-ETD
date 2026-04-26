@@ -84,27 +84,33 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .Where(x => x.ReceivingDate.Date >= DateTime.Parse(DateFrom).Date && x.ReceivingDate.Date <= DateTime.Parse(DateTo).Date)
                 .Where(x => x.IsActive)
                 .Where(x => x.TransactionType == "Receiving")
+                .GroupJoin(_context.PoSummaries, warehouse => warehouse.PoSummaryId, posummary => posummary.Id, (warehouse, posummary) => new {warehouse, posummary})
+                .SelectMany(x => x.posummary.DefaultIfEmpty(), (x, posummary) => new {x.warehouse, posummary})
                 .Select(x => new DtoWarehouseReceivingReports
                 {
-                    WarehouseId = x.Id,
-                    PoNumber = x.PoNumber,
-                    PR_Year_Number = x.PR_Year_Number,
-                    RRNumber = x.RRNo,
-                    RRDate = x.RRDate.Value.Date,
-                    ReceiveDate = x.ReceivingDate.ToString(),
-                    ActualReceivingDate = x.ActualReceivingDate.ToString(),
-                    ItemCode = x.ItemCode,
-                    ItemDescrption = x.ItemDescription,
-                    Uom = x.Uom,
-                    Category = x.LotSection,
-                    Quantity = x.ActualDelivered,
-                    TotalReject = x.TotalReject,
-                    SupplierName = x.Supplier,
-                    TransactionType = x.TransactionType,
-                    ReceivedBy = x.AddedBy,
-                    UnitPrice = (x.PriceWithDecimal == null ? x.UnitPrice : decimal.Parse(x.PriceWithDecimal)).ToString(),
-                    Amount = (x.PriceWithDecimal == null ? x.UnitPrice * x.ActualDelivered : decimal.Parse(x.PriceWithDecimal) * x.ActualDelivered).ToString(),
-                    SINumber = x.SINumber
+                    WarehouseId = x.warehouse.Id,
+                    PoNumber = x.warehouse.PoNumber,
+                    PR_Year_Number = x.warehouse.PR_Year_Number,
+                    RRNumber = x.warehouse.RRNo,
+                    RRDate = x.warehouse.RRDate.Value.Date,
+                    DeliveryDate = x.warehouse.ReceivingDate.ToString(),
+                    ReceiveDate = x.warehouse.ActualReceivingDate.ToString(),
+                    ItemCode = x.warehouse.ItemCode,
+                    ItemDescrption = x.warehouse.ItemDescription,
+                    Uom = x.warehouse.Uom,
+                    Category = x.warehouse.LotSection,
+                    Quantity = x.warehouse.ActualDelivered,
+                    TotalReject = x.warehouse.TotalReject,
+                    SupplierName = x.warehouse.Supplier,
+                    TransactionType = x.warehouse.TransactionType,
+                    ReceivedBy = x.warehouse.AddedBy,
+                    UnitPrice = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice : decimal.Parse(x.warehouse.PriceWithDecimal)).ToString(),
+                    Amount = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice * x.warehouse.ActualDelivered : decimal.Parse(x.warehouse.PriceWithDecimal) * x.warehouse.ActualDelivered).ToString(),
+                    SINumber = x.warehouse.SINumber,
+                    ItemRemarks = x.warehouse.ItemRemarks,
+                    
+                    
+
                 });
 
             if (!string.IsNullOrEmpty(Search))
@@ -593,6 +599,17 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
         public async Task<PagedList<DtoMiscReports>> MiscReports(UserParams userParams, string DateFrom, string DateTo, string Search)
         {
+
+            //_context.MiscellaneousReceipts
+            //    .AsNoTracking()
+            //    .GroupJoin(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
+            //    .SelectMany(x => x.warehouse.DefaultIfEmpty(), (x, warehouse) => new { x.receipt, warehouse }).Join(_context.Users, x => x.receipt.PreparedBy, user => user.FullName,
+            //(x, user) => new { x.receipt, x.warehouse, user })
+            //    .GroupJoin(_context.OneAccountTitles, user => user.warehouse.AccountCode, accountTitle => accountTitle.AccountCode, (user, accountTitle) => new { user, accountTitle })
+            //    .SelectMany(x => x.accountTitle.DefaultIfEmpty(), (x, accountTitle) => new { x.user.receipt, x.user.warehouse, x.user.user, accountTitle })
+            //   .Join(materials, account => account.warehouse.ItemCode, material => material.ItemCode, (x, material) => new { x.receipt, x.warehouse, x.user, x.accountTitle, material })
+            //    .Where(x => x.warehouse.IsActive == true && x.warehouse.TransactionType == "MiscellaneousReceipt")
+
             var receipts = (from receiptHeader in _context.MiscellaneousReceipts
                             join receipt in _context.WarehouseReceived
                             on receiptHeader.Id equals receipt.MiscellaneousReceiptId
@@ -898,6 +915,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .ThenInclude(id => id.ItemCategory)
                 .Include(w => w.Warehouse_Receiving)
                 .Where(r => r.FuelRegister.Is_Transact == true)
+                .OrderBy(x => x.FuelRegister.issuanceDate)
                 .Select(r => new FuelRegisterReportsDto
                 {
                     Id = r.Id,
@@ -1073,6 +1091,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
         public async Task<PagedList<DtoInventoryMovement>> InventoryMovementReports(UserParams userParams, string DateFrom, string PlusOne, string Search)
         {
             var DateToday = DateTime.Today.AddDays(1);//dito
+            var dateFrom = DateTime.Parse(DateFrom).Date;
+            var plusOne = DateTime.Parse(PlusOne).Date.AddDays(1);
+            var dateTo = DateTime.Parse(PlusOne).Date;
+
 
             var getWarehouseStock = _context.WarehouseReceived
                 .AsNoTracking()
@@ -1087,80 +1109,84 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ActualGood = x.Sum(x => x.ActualGood)
                 });
 
-            var getMoveOrdersOutByDate = _context.MoveOrders
-                .AsNoTracking()
-                .Where(x => x.IsActive == true)
-                .Where(x => x.IsPrepared == true)
-                .Where(x => x.PreparedDate.Value >= DateTime.Parse(DateFrom) && x.PreparedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
+            var getMoveOrdersOutByDate = _context.MoveOrders.AsNoTracking()
+                .Join(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
+                 //.SelectMany(x => x.transact.DefaultIfEmpty(), (x, transact) => new { x.moveorder, transact })
+                 .Where(x => x.moveorder.IsActive == true)
+                 .Where(x => x.moveorder.IsPrepared == true)
+                 .Where(x => x.moveorder.IsTransact == true)
+                .Where(x => x.transact.PreparedDate.Value.Date >= dateFrom && x.transact.PreparedDate.Value.Date <= dateTo)//dito
                .GroupBy(x => new
                {
 
-                   x.ItemCode,
+                   x.moveorder.ItemCode,
 
                }).Select(x => new MoveOrderInventory
                {
 
                    ItemCode = x.Key.ItemCode,
-                   QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+                   QuantityOrdered = x.Sum(x => x.moveorder.QuantityOrdered)
 
                });
 
-            var getMoveOrdersOutbyDatePlus = _context.MoveOrders
-                 .AsNoTracking()
-                 .Where(x => x.IsActive == true)
-                 .Where(x => x.IsPrepared == true)
-                 .Where(x => x.PreparedDate.Value >= DateTime.Parse(PlusOne).AddDays(1) && x.PreparedDate.Value <= DateToday)
+            var getMoveOrdersOutbyDatePlus = _context.MoveOrders.AsNoTracking()
+                .Join(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
+                 //.SelectMany(x => x.transact.DefaultIfEmpty(), (x, transact) => new { x.moveorder, transact })
+                 .Where(x => x.moveorder.IsActive == true)
+                 .Where(x => x.moveorder.IsPrepared == true)
+                 .Where(x => x.moveorder.IsTransact == true)
+                 .Where(x => x.transact.PreparedDate.Value.Date >= plusOne && x.transact.PreparedDate.Value.Date <= DateToday)
                  .GroupBy(x => new
                  {
 
-                     x.ItemCode,
+                     x.moveorder.ItemCode,
 
                  }).Select(x => new MoveOrderInventory
                  {
 
                      ItemCode = x.Key.ItemCode,
-                     QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+                     QuantityOrdered = x.Sum(x => x.moveorder.QuantityOrdered)
 
                  });
 
 
-            var getIssueOutByDate = _context.MiscellaneousIssueDetail
-                .AsNoTracking()
-                .Where(x => x.IsActive == true)
-                .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+            var getIssueOutByDate = _context.MiscellaneousIssues.AsNoTracking()
+                .Join(_context.MiscellaneousIssueDetail, issue => issue.Id, issueDetail => issueDetail.IssuePKey, (issue, issueDetail) => new { issue, issueDetail })
+                .Where(x => x.issue.IsActive == true)
+                .Where(x => x.issue.TransactionDate >= dateFrom && x.issue.TransactionDate.Date <= dateTo)
                 .GroupBy(x => new
                 {
-                    x.ItemCode,
+                    x.issueDetail.ItemCode,
 
                 }).Select(x => new DtoMiscIssue
                 {
 
                     ItemCode = x.Key.ItemCode,
-                    Quantity = x.Sum(x => x.Quantity)
+                    Quantity = x.Sum(x => x.issueDetail.Quantity)
 
                 });
 
-            var getIssueOutByDatePlus = _context.MiscellaneousIssueDetail
-                .AsNoTracking()
-                .Where(x => x.IsActive == true)
-                .Where(x => x.PreparedDate >= DateTime.Parse(PlusOne).AddDays(1) && x.PreparedDate <= (DateToday))
+            var getIssueOutByDatePlus = _context.MiscellaneousIssues.AsNoTracking()
+                .Join(_context.MiscellaneousIssueDetail, issue => issue.Id, issueDetail => issueDetail.IssuePKey, (issue, issueDetail) => new { issue, issueDetail })
+                .Where(x => x.issue.IsActive == true)
+                .Where(x => x.issue.TransactionDate.Date >= plusOne && x.issue.TransactionDate.Date <= (DateToday))
                 .GroupBy(x => new
                 {
 
-                    x.ItemCode,
+                    x.issueDetail.ItemCode,
 
                 }).Select(x => new DtoMiscIssue
                 {
 
                     ItemCode = x.Key.ItemCode,
-                    Quantity = x.Sum(x => x.Quantity)
+                    Quantity = x.Sum(x => x.issueDetail.Quantity)
 
                 });
 
             var getBorrowedOutByDate = _context.BorrowedIssueDetails
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.BorrowedDate >= DateTime.Parse(DateFrom) && x.BorrowedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+                .Where(x => x.BorrowedDate >= dateFrom && x.BorrowedDate.Date <= dateTo)//dito
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1176,8 +1202,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var getBorrowedOutByDatePlus = _context.BorrowedIssueDetails
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.BorrowedDate >= DateTime.Parse(PlusOne).AddDays(1)
-                 && x.BorrowedDate <= (DateToday))
+                .Where(x => x.BorrowedDate.Date >= plusOne
+                 && x.BorrowedDate.Date <= (DateToday))
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1215,8 +1241,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .Where(x => x.IsApprovedReturned == true)
                 .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
                 .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
-                .Where(x => x.returned.IsApprovedReturnedDate.Value >= DateTime.Parse(DateFrom)
-                 && x.returned.IsApprovedReturnedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
+                .Where(x => x.returned.IsApprovedReturnedDate.Value >= dateFrom
+                 && x.returned.IsApprovedReturnedDate.Value.Date <= dateTo)//dito
                 .GroupBy(x => new
                 {
                     x.returned.ItemCode,
@@ -1237,8 +1263,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .Where(x => x.IsApprovedReturned == true)
                 .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
                 .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
-                .Where(x => x.returned.IsApprovedReturnedDate.Value >= DateTime.Parse(PlusOne).AddDays(1)
-                 && x.returned.IsApprovedReturnedDate.Value <= (DateToday))
+                .Where(x => x.returned.IsApprovedReturnedDate.Value.Date >= plusOne
+                 && x.returned.IsApprovedReturnedDate.Value.Date <= (DateToday))
                  .GroupBy(x => new
                  {
                      x.returned.ItemCode,
@@ -1253,8 +1279,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
             var fuelRegisterByDate = _context.FuelRegisterDetails
                 .AsNoTracking()
-                .Where(fr => fr.Is_Active == true)
-                .Where(x => x.Created_At.Date >= DateTime.Parse(DateFrom).Date && x.Created_At.Date <= DateTime.Parse(PlusOne).Date.AddDays(1))
+                .Include(x => x.FuelRegister)
+                .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+                .Where(x => x.FuelRegister.issuanceDate.Value.Date >= dateFrom && x.FuelRegister.issuanceDate.Value.Date <= dateTo)
                 .GroupBy(fr => new
                 {
                     fr.Material.ItemCode,
@@ -1270,9 +1297,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var fuelRegisterByDatePlus = _context.FuelRegisterDetails
                 .AsNoTrackingWithIdentityResolution()
                 .Include(m => m.Material)
+                .Include(x => x.FuelRegister)
                 .AsSplitQuery()
-                .Where(fr => fr.Is_Active == true)
-                .Where(x => x.Created_At.Date >= DateTime.Parse(PlusOne).AddDays(1).Date && x.Created_At.Date <= (DateToday).Date)
+                .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+                .Where(x => x.FuelRegister.issuanceDate.Value.Date >= plusOne && x.FuelRegister.issuanceDate.Value.Date <= (DateToday).Date)
                 .GroupBy(fr => new
                 {
                     fr.Material.ItemCode,
@@ -1288,7 +1316,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
                 .Where(x => x.TransactionType == "Receiving")
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+                .Where(x => x.ActualReceivingDate >= dateFrom && x.ActualReceivingDate.Date <= dateTo)//dito
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1305,7 +1333,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
                 .Where(x => x.TransactionType == "Receiving")
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(PlusOne).AddDays(1) && x.ActualReceivingDate <= DateToday)
+                .Where(x => x.ActualReceivingDate.Date >= plusOne && x.ActualReceivingDate.Date <= DateToday)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1318,39 +1346,39 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
 
                 });
 
-            var getReceiptIn = _context.WarehouseReceived
-                .AsNoTracking()
-                .Where(x => x.IsActive == true)
-                .Where(x => x.TransactionType == "MiscellaneousReceipt")
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+            var getReceiptIn = _context.MiscellaneousReceipts.AsNoTracking()
+                .Join(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
+                .Where(x => x.warehouse.IsActive == true)
+                .Where(x => x.warehouse.TransactionType == "MiscellaneousReceipt")
+                .Where(x => x.receipt.TransactionDate >= dateFrom && x.receipt.TransactionDate.Date <= dateTo)//dito
                 .GroupBy(x => new
                 {
 
-                    x.ItemCode,
+                    x.warehouse.ItemCode,
 
                 }).Select(x => new DtoRecieptIn
                 {
 
                     ItemCode = x.Key.ItemCode,
-                    Quantity = x.Sum(x => x.ActualGood)
+                    Quantity = x.Sum(x => x.warehouse.ActualGood)
 
                 });
 
 
-            var getReceiptInPlus = _context.WarehouseReceived.AsNoTracking()
-                .AsNoTracking()
-                .Where(x => x.IsActive == true)
-                .Where(x => x.TransactionType == "MiscellaneousReceipt")
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(PlusOne).AddDays(1) && x.ActualReceivingDate <= DateToday)
+            var getReceiptInPlus = _context.MiscellaneousReceipts.AsNoTracking()
+                .Join(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
+                .Where(x => x.warehouse.IsActive == true)
+                .Where(x => x.warehouse.TransactionType == "MiscellaneousReceipt")
+                .Where(x => x.receipt.TransactionDate.Date >= plusOne && x.receipt.TransactionDate.Date <= DateToday)
                 .GroupBy(x => new
                 {
-                    x.ItemCode,
+                    x.warehouse.ItemCode,
 
                 }).Select(x => new DtoRecieptIn
                 {
 
                     ItemCode = x.Key.ItemCode,
-                    Quantity = x.Sum(x => x.ActualGood)
+                    Quantity = x.Sum(x => x.warehouse.ActualGood)
 
                 });
 
@@ -1359,6 +1387,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
                 .Where(x => x.IsPrepared == true)
+                .Where(x => x.IsTransact == true)
                 .GroupBy(x => new
                 {
 
@@ -1429,8 +1458,9 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var fuelRegisterOut = _context.FuelRegisterDetails
                .AsNoTrackingWithIdentityResolution()
                .Include(m => m.Material)
+               .Include(x => x.FuelRegister)
                .AsSplitQuery()
-               .Where(fr => fr.Is_Active == true)
+               .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
                .GroupBy(fr => new
                {
                    fr.Material.ItemCode,
@@ -1504,7 +1534,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var wareHouseUnitCost = _context.WarehouseReceived
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                .Where(x => x.ActualReceivingDate >= DateTime.Parse(DateFrom) && x.ActualReceivingDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+                .Where(x => x.ActualReceivingDate >= dateFrom && x.ActualReceivingDate.Date <= dateTo)//dito
                 .Select(x => new
                 {
                     x.Id,
@@ -1513,35 +1543,37 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     x.UnitPrice,
                 });
 
-            var moveOrderUnitCost = _context.MoveOrders
-                .AsNoTracking()
-                 .Where(x => x.IsActive == true)
-                 .Where(x => x.IsPrepared == true)
-                 .Where(x => x.PreparedDate.Value >= DateTime.Parse(DateFrom) && x.PreparedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
-                 .GroupBy(x => new { x.WarehouseId, x.ItemCode, })
+            var moveOrderUnitCost = _context.MoveOrders.AsNoTracking()
+                .Join(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
+                 .Where(x => x.moveorder.IsActive == true)
+                 .Where(x => x.moveorder.IsPrepared == true)
+                 .Where(x => x.moveorder.IsTransact == true)
+                 .Where(x => x.transact.PreparedDate.Value >= dateFrom && x.transact.PreparedDate.Value.Date <= dateTo)//dito
+                 .GroupBy(x => new { x.moveorder.WarehouseId, x.moveorder.ItemCode, })
                  .Select(x => new
                  {
 
                      x.Key.WarehouseId,
                      x.Key.ItemCode,
-                     Quantity = x.Sum(x => x.QuantityOrdered)
+                     Quantity = x.Sum(x => x.moveorder.QuantityOrdered)
 
                  });
 
-            var issueUnitCost = _context.MiscellaneousIssueDetail
-                .AsNoTracking()
-                .Where(x => x.IsActive == true)
-                .Where(x => x.PreparedDate >= DateTime.Parse(DateFrom) && x.PreparedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+            var issueUnitCost = _context.MiscellaneousIssues.AsNoTracking()
+                .Join(_context.MiscellaneousIssueDetail, issue => issue.Id, issueDetail => issueDetail.IssuePKey, (issue, issueDetail) => new { issue, issueDetail })
+.Where(x => x.issue.IsActive == true)
+                .Where(x => x.issueDetail.IsActive == true)
+                .Where(x => x.issue.TransactionDate >= dateFrom && x.issue.TransactionDate.Date <= dateTo)//dito
                 .GroupBy(x => new
                 {
-                    x.WarehouseId,
-                    x.ItemCode,
+                    x.issueDetail.WarehouseId,
+                    x.issueDetail.ItemCode,
 
                 }).Select(x => new
                 {
                     x.Key.WarehouseId,
                     x.Key.ItemCode,
-                    Quantity = x.Sum(x => x.Quantity),
+                    Quantity = x.Sum(x => x.issueDetail.Quantity),
 
                 });
 
@@ -1549,7 +1581,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var borrowedUnitCost = _context.BorrowedIssueDetails
                 .AsNoTracking()
                 .Where(x => x.IsActive == true)
-                 .Where(x => x.BorrowedDate >= DateTime.Parse(DateFrom) && x.BorrowedDate <= DateTime.Parse(PlusOne).AddDays(1))//dito
+                 .Where(x => x.BorrowedDate >= dateFrom && x.BorrowedDate.Date <= dateTo)//dito
                  .GroupBy(x => new
                  {
                      x.WarehouseId,
@@ -1573,8 +1605,8 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .Where(x => x.IsApprovedReturned == true)
                 .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
                 .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
-                .Where(x => x.returned.IsApprovedReturnedDate.Value >= DateTime.Parse(DateFrom)
-                        && x.returned.IsApprovedReturnedDate.Value <= DateTime.Parse(PlusOne).AddDays(1))//dito
+                .Where(x => x.returned.IsApprovedReturnedDate.Value >= dateFrom
+                        && x.returned.IsApprovedReturnedDate.Value.Date <= dateTo)//dito
                 .GroupBy(x => new
                 {
                     x.returned.WarehouseId,
@@ -1592,9 +1624,802 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var fuelRegisterCost = _context.FuelRegisterDetails
              .AsNoTrackingWithIdentityResolution()
              .Include(m => m.Material)
+             .Include(x => x.FuelRegister)
              .AsSplitQuery()
-             .Where(fr => fr.Is_Active == true)
-             .Where(x => x.Created_At.Date >= DateTime.Parse(DateFrom).AddDays(1).Date && x.Created_At.Date <= DateTime.Parse(PlusOne).Date.AddDays(1).AddDays(1))//dito
+             .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+             .Where(x => x.FuelRegister.issuanceDate.Value.Date >= dateFrom && x.FuelRegister.issuanceDate.Value.Date <= dateTo)//dito
+            .GroupBy(fr => new
+            {
+                fr.Material.ItemCode,
+                fr.Warehouse_ReceivingId,
+
+            }).Select(fr => new
+            {
+                itemCode = fr.Key.ItemCode,
+                WarehouseId = fr.Key.Warehouse_ReceivingId,
+                Quantity = fr.Sum(fr => fr.Liters != null ? fr.Liters : 0)
+
+            });
+
+            var getUnitPrice = (from warehouse in wareHouseUnitCost
+                                join moveorder in moveOrderUnitCost
+                                on warehouse.Id equals moveorder.WarehouseId
+                                into leftJ1
+                                from moveorder in leftJ1.DefaultIfEmpty()
+
+                                join issue in issueUnitCost
+                                on warehouse.Id equals issue.WarehouseId
+                                into leftJ2
+                                from issue in leftJ2.DefaultIfEmpty()
+
+                                join borrow in borrowedUnitCost
+                                on warehouse.Id equals borrow.WarehouseId
+                                into leftJ3
+                                from borrow in leftJ3.DefaultIfEmpty()
+
+                                join returned in returnUnitCost
+                                on warehouse.Id equals returned.WarehouseId
+                                into leftJ4
+                                from returned in leftJ4.DefaultIfEmpty()
+
+                                join fuel in fuelRegisterCost
+                                on warehouse.Id equals fuel.WarehouseId
+                                into leftJ5
+                                from fuel in leftJ5.DefaultIfEmpty()
+                                group new
+                                {
+                                    warehouse,
+                                    moveorder,
+                                    issue,
+                                    borrow,
+                                    returned,
+                                    fuel,
+
+                                }
+
+                              by new
+                              {
+                                  warehouse.Id,
+                                  warehouse.ItemCode,
+
+                              }
+                               into x
+                                select new WarehouseInventory
+                                {
+
+                                    WarehouseId = x.Key.Id,
+                                    ItemCode = x.Key.ItemCode,
+                                    UnitPrice = x.Sum(x => x.warehouse.UnitPrice) * (x.First().warehouse.ActualGood + x.Sum(x => x.returned.ReturnQuantity) - x.Sum(x => x.moveorder.Quantity) - x.Sum(x => x.issue.Quantity) - x.Sum(x => x.borrow.Quantity) - x.Sum(x => x.fuel.Quantity.Value)),
+                                    ActualGood = x.First().warehouse.ActualGood + (x.Sum(x => x.returned.ReturnQuantity)
+                                    - x.Sum(x => x.moveorder.Quantity) - x.Sum(x => x.issue.Quantity) - x.Sum(x => x.borrow.Quantity) -
+                                    x.Sum(x => x.fuel.Quantity.Value)),
+                                    //Quantity = Math.Round(x.Sum(x => x.warehouse.UnitPrice) * (x.First().warehouse.ActualGood + x.Sum(x => x.returned.ReturnQuantity) - x.Sum(x => x.moveorder.Quantity) - x.Sum(x => x.issue.Quantity) - x.Sum(x => x.borrow.Quantity) - x.Sum(x => x.fuel.Quantity.Value)), 2)
+                                    //* (x.First().warehouse.ActualGood + (x.Sum(x => x.returned.ReturnQuantity)
+                                    //- x.Sum(x => x.moveorder.Quantity) - x.Sum(x => x.issue.Quantity) - x.Sum(x => x.borrow.Quantity) -
+                                    //x.Sum(x => x.fuel.Quantity.Value)))
+
+                                });
+
+
+            var getUnitprice = getUnitPrice
+                 .GroupBy(x => new
+                 {
+                     x.ItemCode,
+
+                 }).Select(x => new WarehouseInventory
+                 {
+                     ItemCode = x.Key.ItemCode,
+                     UnitPrice = x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / (x.Sum(x => x.ActualGood) == 0 ? 1 : x.Sum(x => x.ActualGood)),
+                     ActualGood = x.Sum(x => x.ActualGood),
+                     Quantity = x.Sum(x => x.UnitPrice)
+                 });
+
+            var getUnitpriceTotal = getUnitprice
+                 .GroupBy(x => new
+                 {
+                     x.ItemCode,
+
+                 }).Select(x => new WarehouseInventory
+                 {
+                     ItemCode = x.Key.ItemCode,
+                     UnitPrice = x.First().UnitPrice,
+                     TotalUnitPrice = x.First().Quantity,
+
+                 });
+
+
+            var movementInventory = (from material in _context.Materials
+                                     //where material.IsActive == true
+                                     join moveorder in getMoveOrdersOutByDate
+                                     on material.ItemCode equals moveorder.ItemCode
+                                     into leftJ1
+                                     from moveorder in leftJ1.DefaultIfEmpty()
+
+                                     join issue in getIssueOutByDate
+                                     on material.ItemCode equals issue.ItemCode
+                                     into leftJ2
+                                     from issue in leftJ2.DefaultIfEmpty()
+
+                                     join borrowed in getBorrowedOutByDate
+                                     on material.ItemCode equals borrowed.ItemCode
+                                     into leftJ3
+                                     from borrowed in leftJ3.DefaultIfEmpty()
+
+                                     join returned in getReturnedOutByDate
+                                     on material.ItemCode equals returned.ItemCode
+                                     into leftJ4
+                                     from returned in leftJ4.DefaultIfEmpty()
+
+                                     join receiveIn in getReceiveIn
+                                     on material.ItemCode equals receiveIn.ItemCode
+                                     into leftJ5
+                                     from receiveIn in leftJ5.DefaultIfEmpty()
+
+                                     join receipt in getReceiptIn
+                                     on material.ItemCode equals receipt.ItemCode
+                                     into leftJ6
+                                     from receipt in leftJ6.DefaultIfEmpty()
+
+                                     join SOH in getSOH
+                                     on material.ItemCode equals SOH.ItemCode
+                                     into leftJ7
+                                     from SOH in leftJ7.DefaultIfEmpty()
+
+                                     join moveorderPlus in getMoveOrdersOutbyDatePlus
+                                     on material.ItemCode equals moveorderPlus.ItemCode
+                                     into leftJ8
+                                     from moverorderPlus in leftJ8.DefaultIfEmpty()
+
+                                     join issuePlus in getIssueOutByDatePlus
+                                     on material.ItemCode equals issuePlus.ItemCode
+                                     into leftJ9
+                                     from issuePlus in leftJ9.DefaultIfEmpty()
+
+                                     join borrowedPlus in getBorrowedOutByDatePlus
+                                     on material.ItemCode equals borrowedPlus.ItemCode
+                                     into leftJ10
+                                     from borrowedPlus in leftJ10.DefaultIfEmpty()
+
+                                     join returnedPlus in getReturnedOutByDatePlus
+                                     on material.ItemCode equals returnedPlus.ItemCode
+                                     into leftJ11
+                                     from returnedPlus in leftJ11.DefaultIfEmpty()
+
+                                     join receiveInPlus in getReceiveInPlus
+                                     on material.ItemCode equals receiveInPlus.ItemCode
+                                     into leftJ12
+                                     from receiveInPlus in leftJ12.DefaultIfEmpty()
+
+                                     join receiptInPlus in getReceiptInPlus
+                                     on material.ItemCode equals receiptInPlus.ItemCode
+                                     into leftJ13
+                                     from receiptInPlus in leftJ13.DefaultIfEmpty()
+
+                                     join unit in getUnitpriceTotal
+                                     on material.ItemCode equals unit.ItemCode
+                                     into leftJ14
+                                     from unit in leftJ14.DefaultIfEmpty()
+
+                                     join fuel in fuelRegisterByDate
+                                     on material.ItemCode equals fuel.itemCode
+                                     into leftJ15
+                                     from fuel in leftJ15.DefaultIfEmpty()
+
+                                     join fuelPlus in fuelRegisterByDatePlus
+                                     on material.ItemCode equals fuelPlus.itemCode
+                                     into leftJ16
+                                     from fuelPlus in leftJ16.DefaultIfEmpty()
+
+                                     group new
+                                     {
+
+                                         material,
+                                         moveorder,
+                                         issue,
+                                         borrowed,
+                                         returned,
+                                         receiveIn,
+                                         receipt,
+                                         SOH,
+                                         moverorderPlus,
+                                         issuePlus,
+                                         borrowedPlus,
+                                         returnedPlus,
+                                         receiveInPlus,
+                                         receiptInPlus,
+                                         unit,
+                                         fuel,
+                                         fuelPlus,
+                                     }
+
+                                     by new
+                                     {
+                                         material.ItemCode,
+                                         material.ItemDescription,
+                                     }
+                                     into total
+
+                                     select new DtoInventoryMovement
+                                     {
+
+                                         ItemCode = total.Key.ItemCode,
+                                         ItemDescription = total.Key.ItemDescription,
+                                         TotalReceiving = total.Sum(x => x.receiveIn.Quantity),
+                                         TotalMoveOrder = total.Sum(x => x.moveorder.QuantityOrdered),
+                                         TotalReceipt = total.Sum(x => x.receipt.Quantity),
+                                         TotalIssue = total.Sum(x => x.issue.Quantity),
+                                         TotalBorrowed = total.Sum(x => x.borrowed.Quantity),
+                                         TotalReturned = total.Sum(x => x.returned.ReturnQuantity),
+                                         TotalFuelRegister = total.Sum(x => x.fuel.Quantity.Value),
+                                         Ending = (total.Sum(x => x.receipt.Quantity) + total.Sum(x => x.receiveIn.Quantity) + total.Sum(x => x.returned.ReturnQuantity)) -
+                                         (total.Sum(x => x.borrowed.Quantity) + total.Sum(x => x.moveorder.QuantityOrdered) + total.Sum(x => x.issue.Quantity) + total.Sum(x => x.fuel.Quantity.Value)),
+                                         UnitCost = total.Sum(x => x.unit.UnitPrice),
+                                         Amount = total.Sum(x => x.unit.TotalUnitPrice),
+                                         CurrentStock = total.Sum(x => x.SOH.SOH),
+                                         PurchaseOrder = total.Sum(x => x.receiveInPlus.Quantity) + total.Sum(x => x.receiptInPlus.Quantity) + total.Sum(x => x.returnedPlus.ReturnQuantity),
+                                         OtherPlus = total.Sum(x => x.moverorderPlus.QuantityOrdered) + total.Sum(x => x.issuePlus.Quantity) + total.Sum(x => x.borrowedPlus.Quantity) + total.Sum(x => x.fuelPlus.Quantity.Value),
+
+                                     });
+
+
+            if (!string.IsNullOrEmpty(Search))
+            {
+                movementInventory = movementInventory
+                    .Where(x => Convert.ToString(x.ItemCode).ToLower().Contains(Search.Trim().ToLower())
+                || Convert.ToString(x.ItemDescription).ToLower().Contains(Search.Trim().ToLower()));
+            }
+
+            movementInventory = movementInventory
+                .AsNoTrackingWithIdentityResolution()
+                .AsSplitQuery()
+                .OrderBy(x => x.ItemCode);
+
+
+            return await PagedList<DtoInventoryMovement>.CreateAsync(movementInventory, userParams.PageNumber, userParams.PageSize);
+
+        }
+
+        //kkexport
+        public async Task<IReadOnlyList<DtoInventoryMovement>> InventoryMovementExp(string DateFrom, string PlusOne, string Search)
+        {
+            var DateToday = DateTime.Today.AddDays(1);//dito
+            var dateFrom = DateTime.Parse(DateFrom).Date;
+            var plusOne = DateTime.Parse(PlusOne).Date.AddDays(1);
+            var dateTo = DateTime.Parse(PlusOne).Date;
+
+
+            var getWarehouseStock = await _context.WarehouseReceived
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new WarehouseInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    ActualGood = x.Sum(x => x.ActualGood)
+                }).ToListAsync();
+
+            var getMoveOrdersOutByDate = await _context.MoveOrders.AsNoTracking()
+                .Join(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
+                 //.SelectMany(x => x.transact.DefaultIfEmpty(), (x, transact) => new { x.moveorder, transact })
+                 .Where(x => x.moveorder.IsActive == true)
+                 .Where(x => x.moveorder.IsPrepared == true)
+                 .Where(x => x.moveorder.IsTransact == true)
+                .Where(x => x.transact.PreparedDate.Value.Date >= dateFrom && x.transact.PreparedDate.Value.Date <= dateTo)//dito
+               .GroupBy(x => new
+               {
+
+                   x.moveorder.ItemCode,
+
+               }).Select(x => new MoveOrderInventory
+               {
+
+                   ItemCode = x.Key.ItemCode,
+                   QuantityOrdered = x.Sum(x => x.moveorder.QuantityOrdered)
+
+               }).ToListAsync();
+
+            var getMoveOrdersOutbyDatePlus =await _context.MoveOrders.AsNoTracking()
+                .Join(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
+                 //.SelectMany(x => x.transact.DefaultIfEmpty(), (x, transact) => new { x.moveorder, transact })
+                 .Where(x => x.moveorder.IsActive == true)
+                 .Where(x => x.moveorder.IsPrepared == true)
+                 .Where(x => x.moveorder.IsTransact == true)
+                 .Where(x => x.transact.PreparedDate.Value.Date >= plusOne && x.transact.PreparedDate.Value.Date <= DateToday)
+                 .GroupBy(x => new
+                 {
+
+                     x.moveorder.ItemCode,
+
+                 }).Select(x => new MoveOrderInventory
+                 {
+
+                     ItemCode = x.Key.ItemCode,
+                     QuantityOrdered = x.Sum(x => x.moveorder.QuantityOrdered)
+
+                 }).ToListAsync();
+
+
+            var getIssueOutByDate = await _context.MiscellaneousIssues.AsNoTracking()
+                .Join(_context.MiscellaneousIssueDetail, issue => issue.Id, issueDetail => issueDetail.IssuePKey, (issue, issueDetail) => new { issue, issueDetail })
+                .Where(x => x.issue.IsActive == true)
+                .Where(x => x.issue.TransactionDate >= dateFrom && x.issue.TransactionDate.Date <= dateTo)
+                .GroupBy(x => new
+                {
+                    x.issueDetail.ItemCode,
+
+                }).Select(x => new DtoMiscIssue
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.issueDetail.Quantity)
+
+                }).ToListAsync();
+
+            var getIssueOutByDatePlus = await _context.MiscellaneousIssues.AsNoTracking()
+                .Join(_context.MiscellaneousIssueDetail, issue => issue.Id, issueDetail => issueDetail.IssuePKey, (issue, issueDetail) => new { issue, issueDetail })
+                .Where(x => x.issue.IsActive == true)
+                .Where(x => x.issue.TransactionDate.Date >= plusOne && x.issue.TransactionDate.Date <= (DateToday))
+                .GroupBy(x => new
+                {
+
+                    x.issueDetail.ItemCode,
+
+                }).Select(x => new DtoMiscIssue
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.issueDetail.Quantity)
+
+                }).ToListAsync();
+
+            var getBorrowedOutByDate = await _context.BorrowedIssueDetails
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.BorrowedDate >= dateFrom && x.BorrowedDate.Date <= dateTo)//dito
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new DtoBorrowedIssue
+                {
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.Quantity)
+
+                }).ToListAsync();
+
+
+            var getBorrowedOutByDatePlus = _context.BorrowedIssueDetails
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.BorrowedDate.Date >= plusOne
+                 && x.BorrowedDate.Date <= (DateToday))
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new DtoBorrowedIssue
+                {
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.Quantity)
+
+                });
+
+
+
+            var consumed = _context.BorrowedConsumes
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+                    x.BorrowedItemPkey
+
+                }).Select(x => new ItemStocksDto
+                {
+                    ItemCode = x.Key.ItemCode,
+                    BorrowedItemPkey = x.Key.BorrowedItemPkey,
+                    Consume = x.Sum(x => x.Consume != null ? x.Consume : 0)
+
+                });
+
+            var getReturnedOutByDate = _context.BorrowedIssueDetails
+                .AsNoTrackingWithIdentityResolution()
+                .AsSplitQuery()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.IsReturned == true)
+                .Where(x => x.IsApprovedReturned == true)
+                .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
+                .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
+                .Where(x => x.returned.IsApprovedReturnedDate.Value >= dateFrom
+                 && x.returned.IsApprovedReturnedDate.Value.Date <= dateTo)//dito
+                .GroupBy(x => new
+                {
+                    x.returned.ItemCode,
+
+                }).Select(x => new DtoBorrowedIssue
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    ReturnQuantity = x.Sum(x => x.returned.Quantity) - x.Sum(x => x.consume.Consume)
+
+                });
+
+            var getReturnedOutByDatePlus = _context.BorrowedIssueDetails
+                .AsNoTrackingWithIdentityResolution()
+                .AsSplitQuery()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.IsReturned == true)
+                .Where(x => x.IsApprovedReturned == true)
+                .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
+                .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
+                .Where(x => x.returned.IsApprovedReturnedDate.Value.Date >= plusOne
+                 && x.returned.IsApprovedReturnedDate.Value.Date <= (DateToday))
+                 .GroupBy(x => new
+                 {
+                     x.returned.ItemCode,
+
+                 }).Select(x => new DtoBorrowedIssue
+                 {
+
+                     ItemCode = x.Key.ItemCode,
+                     ReturnQuantity = x.Sum(x => x.returned.Quantity) - x.Sum(x => x.consume.Consume)
+
+                 });
+
+            var fuelRegisterByDate =  await _context.FuelRegisterDetails
+                .AsNoTracking()
+                .Include(x => x.FuelRegister)
+                .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+                .Where(x => x.FuelRegister.issuanceDate.Value.Date >= dateFrom && x.FuelRegister.issuanceDate.Value.Date <= dateTo)
+                .GroupBy(fr => new
+                {
+                    fr.Material.ItemCode,
+
+                }).Select(fr => new
+                {
+                    itemCode = fr.Key.ItemCode,
+                    Quantity = fr.Sum(fr => fr.Liters != null ? fr.Liters : 0)
+
+                }).ToListAsync();
+
+
+            var fuelRegisterByDatePlus = _context.FuelRegisterDetails
+                .AsNoTrackingWithIdentityResolution()
+                .Include(m => m.Material)
+                .Include(x => x.FuelRegister)
+                .AsSplitQuery()
+                .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+                .Where(x => x.FuelRegister.issuanceDate.Value.Date >= plusOne && x.FuelRegister.issuanceDate.Value.Date <= (DateToday).Date)
+                .GroupBy(fr => new
+                {
+                    fr.Material.ItemCode,
+
+                }).Select(fr => new
+                {
+                    itemCode = fr.Key.ItemCode,
+                    Quantity = fr.Sum(fr => fr.Liters != null ? fr.Liters : 0)
+
+                });
+
+            var getReceiveIn = _context.WarehouseReceived
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.TransactionType == "Receiving")
+                .Where(x => x.ActualReceivingDate >= dateFrom && x.ActualReceivingDate.Date <= dateTo)//dito
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new DtoReceiveIn
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.ActualGood)
+
+                });
+
+            var getReceiveInPlus = _context.WarehouseReceived
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.TransactionType == "Receiving")
+                .Where(x => x.ActualReceivingDate.Date >= plusOne && x.ActualReceivingDate.Date <= DateToday)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new DtoReceiveIn
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.ActualGood)
+
+                });
+
+            var getReceiptIn = _context.MiscellaneousReceipts.AsNoTracking()
+                .Join(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
+                .Where(x => x.warehouse.IsActive == true)
+                .Where(x => x.warehouse.TransactionType == "MiscellaneousReceipt")
+                .Where(x => x.receipt.TransactionDate >= dateFrom && x.receipt.TransactionDate.Date <= dateTo)//dito
+                .GroupBy(x => new
+                {
+
+                    x.warehouse.ItemCode,
+
+                }).Select(x => new DtoRecieptIn
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.warehouse.ActualGood)
+
+                });
+
+
+            var getReceiptInPlus = _context.MiscellaneousReceipts.AsNoTracking()
+                .Join(_context.WarehouseReceived, receipt => receipt.Id, warehouse => warehouse.MiscellaneousReceiptId, (receipt, warehouse) => new { receipt, warehouse })
+                .Where(x => x.warehouse.IsActive == true)
+                .Where(x => x.warehouse.TransactionType == "MiscellaneousReceipt")
+                .Where(x => x.receipt.TransactionDate.Date >= plusOne && x.receipt.TransactionDate.Date <= DateToday)
+                .GroupBy(x => new
+                {
+                    x.warehouse.ItemCode,
+
+                }).Select(x => new DtoRecieptIn
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.warehouse.ActualGood)
+
+                });
+
+
+            var getMoveOrderOut = _context.MoveOrders
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.IsPrepared == true)
+                .Where(x => x.IsTransact == true)
+                .GroupBy(x => new
+                {
+
+                    x.ItemCode,
+
+                }).Select(x => new MoveOrderInventory
+                {
+                    ItemCode = x.Key.ItemCode,
+                    QuantityOrdered = x.Sum(x => x.QuantityOrdered)
+
+                });
+
+
+            var getIssueOut = _context.MiscellaneousIssueDetail
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+
+                    x.ItemCode
+
+                }).Select(x => new DtoMiscIssue
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.Quantity)
+
+                });
+
+
+            var getBorrowedOut = _context.BorrowedIssueDetails
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .GroupBy(x => new
+                {
+                    x.ItemCode,
+
+                }).Select(x => new DtoBorrowedIssue
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.Quantity)
+
+                });
+
+            var getReturned = _context.BorrowedIssueDetails
+                .AsNoTrackingWithIdentityResolution()
+                .AsSplitQuery()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.IsReturned == true)
+                .Where(x => x.IsApprovedReturned == true)
+                .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
+                .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
+                .GroupBy(x => new
+                {
+
+                    x.returned.ItemCode,
+
+                }).Select(x => new DtoBorrowedIssue
+                {
+
+                    ItemCode = x.Key.ItemCode,
+                    ReturnQuantity = x.Sum(x => x.returned.Quantity) - x.Sum(x => x.consume.Consume)
+
+                });
+
+
+            var fuelRegisterOut = _context.FuelRegisterDetails
+               .AsNoTrackingWithIdentityResolution()
+               .Include(m => m.Material)
+               .Include(x => x.FuelRegister)
+               .AsSplitQuery()
+               .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+               .GroupBy(fr => new
+               {
+                   fr.Material.ItemCode,
+
+               }).Select(fr => new
+               {
+                   itemCode = fr.Key.ItemCode,
+                   Quantity = fr.Sum(fr => fr.Liters != null ? fr.Liters : 0)
+
+               });
+
+
+            var getSOH = (from warehouse in getWarehouseStock
+                          join moveorder in getMoveOrderOut
+                          on warehouse.ItemCode equals moveorder.ItemCode
+                          into leftJ1
+                          from moveorder in leftJ1.DefaultIfEmpty()
+
+                          join issue in getIssueOut
+                          on warehouse.ItemCode equals issue.ItemCode
+                          into leftJ2
+                          from issue in leftJ2.DefaultIfEmpty()
+
+                          join borrowed in getBorrowedOut
+                          on warehouse.ItemCode equals borrowed.ItemCode
+                          into leftJ3
+                          from borrowed in leftJ3.DefaultIfEmpty()
+
+                          join returned in getReturned
+                          on warehouse.ItemCode equals returned.ItemCode
+                          into leftJ4
+                          from returned in leftJ4.DefaultIfEmpty()
+
+                          join fuel in fuelRegisterOut
+                          on warehouse.ItemCode equals fuel.itemCode
+                          into leftJ5
+                          from fuel in leftJ5.DefaultIfEmpty()
+
+                          group new
+                          {
+
+                              warehouse,
+                              moveorder,
+                              issue,
+                              borrowed,
+                              returned,
+                              fuel,
+
+                          }
+
+                          by new
+                          {
+                              warehouse.ItemCode
+                          }
+
+                          into total
+
+                          select new DtoSOH
+                          {
+
+                              ItemCode = total.Key.ItemCode,
+                              SOH = total.Sum(x => x.warehouse.ActualGood != null ? x.warehouse.ActualGood : 0) +
+                             total.Sum(x => x.returned.ReturnQuantity != null ? x.returned.ReturnQuantity : 0) -
+                             total.Sum(x => x.issue.Quantity != null ? x.issue.Quantity : 0) -
+                             total.Sum(x => x.borrowed.Quantity != null ? x.borrowed.Quantity : 0) -
+                             total.Sum(x => x.moveorder.QuantityOrdered != null ? x.moveorder.QuantityOrdered : 0) -
+                             total.Sum(x => x.fuel.Quantity.Value)
+
+                          });
+
+            var wareHouseUnitCost = _context.WarehouseReceived
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.ActualReceivingDate >= dateFrom && x.ActualReceivingDate.Date <= dateTo)//dito
+                .Select(x => new
+                {
+                    x.Id,
+                    x.ItemCode,
+                    x.ActualGood,
+                    x.UnitPrice,
+                });
+
+            var moveOrderUnitCost = _context.MoveOrders.AsNoTracking()
+                .Join(_context.TransactOrder, moveorder => moveorder.OrderNo, transact => transact.OrderNo, (moveorder, transact) => new { moveorder, transact })
+                 .Where(x => x.moveorder.IsActive == true)
+                 .Where(x => x.moveorder.IsPrepared == true)
+                 .Where(x => x.moveorder.IsTransact == true)
+                 .Where(x => x.transact.PreparedDate.Value >= dateFrom && x.transact.PreparedDate.Value.Date <= dateTo)//dito
+                 .GroupBy(x => new { x.moveorder.WarehouseId, x.moveorder.ItemCode, })
+                 .Select(x => new
+                 {
+
+                     x.Key.WarehouseId,
+                     x.Key.ItemCode,
+                     Quantity = x.Sum(x => x.moveorder.QuantityOrdered)
+
+                 });
+
+            var issueUnitCost = _context.MiscellaneousIssues.AsNoTracking()
+                .Join(_context.MiscellaneousIssueDetail, issue => issue.Id, issueDetail => issueDetail.IssuePKey, (issue, issueDetail) => new { issue, issueDetail })
+.Where(x => x.issue.IsActive == true)
+                .Where(x => x.issueDetail.IsActive == true)
+                .Where(x => x.issue.TransactionDate >= dateFrom && x.issue.TransactionDate.Date <= dateTo)//dito
+                .GroupBy(x => new
+                {
+                    x.issueDetail.WarehouseId,
+                    x.issueDetail.ItemCode,
+
+                }).Select(x => new
+                {
+                    x.Key.WarehouseId,
+                    x.Key.ItemCode,
+                    Quantity = x.Sum(x => x.issueDetail.Quantity),
+
+                });
+
+
+            var borrowedUnitCost = _context.BorrowedIssueDetails
+                .AsNoTracking()
+                .Where(x => x.IsActive == true)
+                 .Where(x => x.BorrowedDate >= dateFrom && x.BorrowedDate.Date <= dateTo)//dito
+                 .GroupBy(x => new
+                 {
+                     x.WarehouseId,
+                     x.ItemCode,
+
+                 }).Select(x => new
+                 {
+                     x.Key.WarehouseId,
+                     x.Key.ItemCode,
+                     Quantity = x.Sum(x => x.Quantity),
+
+
+                 });
+
+
+            var returnUnitCost = _context.BorrowedIssueDetails
+                .AsNoTrackingWithIdentityResolution()
+                .AsSplitQuery()
+                .Where(x => x.IsActive == true)
+                .Where(x => x.IsReturned == true)
+                .Where(x => x.IsApprovedReturned == true)
+                .GroupJoin(consumed, returned => returned.Id, consume => consume.BorrowedItemPkey, (returned, consume) => new { returned, consume })
+                .SelectMany(x => x.consume.DefaultIfEmpty(), (x, consume) => new { x.returned, consume })
+                .Where(x => x.returned.IsApprovedReturnedDate.Value >= dateFrom
+                        && x.returned.IsApprovedReturnedDate.Value.Date <= dateTo)//dito
+                .GroupBy(x => new
+                {
+                    x.returned.WarehouseId,
+                    x.returned.ItemCode,
+
+                }).Select(x => new
+                {
+
+                    x.Key.WarehouseId,
+                    x.Key.ItemCode,
+                    ReturnQuantity = x.Sum(x => x.returned.Quantity) - x.Sum(x => x.consume.Consume),
+
+                });
+
+            var fuelRegisterCost = _context.FuelRegisterDetails
+             .AsNoTrackingWithIdentityResolution()
+             .Include(m => m.Material)
+             .Include(x => x.FuelRegister)
+             .AsSplitQuery()
+             .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Approve == true && fr.FuelRegister.Is_Transact == true)
+             .Where(x => x.FuelRegister.issuanceDate.Value.Date >= dateFrom && x.FuelRegister.issuanceDate.Value.Date <= dateTo)//dito
             .GroupBy(fr => new
             {
                 fr.Material.ItemCode,
@@ -1673,7 +2498,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                  }).Select(x => new WarehouseInventory
                  {
                      ItemCode = x.Key.ItemCode,
-                     UnitPrice = x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / x.Sum(x => x.ActualGood),
+                     UnitPrice = Math.Round(x.Sum(x => x.UnitPrice != null ? x.UnitPrice : 0) / (x.Sum(x => x.ActualGood) == 0 ? 1 : x.Sum(x => x.ActualGood)), 2),
                      ActualGood = x.Sum(x => x.ActualGood),
 
                  });
@@ -1687,7 +2512,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                  {
                      ItemCode = x.Key.ItemCode,
                      UnitPrice = x.First().UnitPrice,
-                     TotalUnitPrice = x.First().UnitPrice * x.First().ActualGood,
+                     TotalUnitPrice = Math.Round((x.First().UnitPrice * x.First().ActualGood), 2),
 
                  });
 
@@ -1838,8 +2663,10 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .OrderBy(x => x.ItemCode);
 
 
-            return await PagedList<DtoInventoryMovement>.CreateAsync(movementInventory, userParams.PageNumber, userParams.PageSize);
+            return await movementInventory.ToListAsync();
+
         }
+        //kkexport
 
         public async Task<IReadOnlyList<ConsolidateFinanceReportDto>> ConsolidateFinanceReport(string DateFrom, string DateTo, string Search)
         {
@@ -1852,7 +2679,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             var materials = _context.Materials
                 .AsNoTracking()
                 .Include(x => x.Uom)
-                .Include(x => x.ItemCategory).Where(x => x.IsActive == true);
+                .Include(x => x.ItemCategory);
 
             var receivingConsol = _context.WarehouseReceived
                 .AsNoTracking()
@@ -1907,18 +2734,18 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .SelectMany(x => x.user.DefaultIfEmpty(), (x, user) => new { x.trans.moveOrder, x.trans.transMoveOrder, user })
                 .GroupJoin(_context.OneAccountTitles, user => user.moveOrder.AccountCode, account => account.AccountCode, (user, account) => new { user, account })
                 .SelectMany(x => x.account.DefaultIfEmpty(), (x, account) => new { x.user.moveOrder, x.user.transMoveOrder, x.user.user, account })
-                .GroupJoin(materials, account => account.moveOrder.ItemCode, material => material.ItemCode, (account, material) => new {account, material })
-                .SelectMany(x => x.material.DefaultIfEmpty(), (x, material) => new { x.account.moveOrder, x.account.transMoveOrder, x.account.user, x.account.account, material})
+                .GroupJoin(_context.WarehouseReceived, account => account.moveOrder.WarehouseId, ware => ware.Id, (account, ware) => new {account, ware })
+                .SelectMany(x => x.ware.DefaultIfEmpty(), (x, ware) => new { x.account.moveOrder, x.account.transMoveOrder, x.account.user, x.account.account, ware})
                 
                 
-                .Where(x => x.moveOrder.IsTransact == true)
+                .Where(x => x.moveOrder.IsTransact == true && x.moveOrder.IsActive == true && x.moveOrder.IsPrepared == true)
                 .Select(x => new ConsolidateFinanceReportDto
                 {
                     Id = x.moveOrder.Id,
                     TransactionDate = x.transMoveOrder.PreparedDate.Value.Date,
                     ItemCode = x.moveOrder.ItemCode  ,
                     ItemDescription = x.moveOrder.ItemDescription  ,
-                    Uom = x.material.Uom.UomCode ,
+                    Uom = x.ware.Uom,
                     Category = x.moveOrder.Category ,
                     Quantity = Math.Round(x.moveOrder.QuantityOrdered, 2),
                     UnitCost = x.moveOrder.UnitPrice.ToString(),
@@ -1974,7 +2801,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ItemCode = x.warehouse.ItemCode,
                     ItemDescription = x.warehouse.ItemDescription,
                     Uom = x.warehouse.Uom,
-                    Category = "",
+                    Category = x.material.ItemCategory.ItemCategoryName,
                     Quantity = x.warehouse.ActualGood,
                     UnitCost =  x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice.ToString() : x.warehouse.PriceWithDecimal,
                     LineAmount = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice * x.warehouse.ActualGood  : decimal.Parse(x.warehouse.PriceWithDecimal) * x.warehouse.ActualGood).ToString(),
@@ -1994,7 +2821,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AccountTitle = x.warehouse.AccountTitles,
                     EmpId = x.warehouse.EmpId,
                     Fullname = x.warehouse.FullName,
-                    AssetTag = "",
+                    AssetTag = x.receipt.AssetTag,
                     CIPNo = "",
                     Helpdesk = "",
                     //Remarks = x.receipt.Remarks,
@@ -2028,7 +2855,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ItemCode = x.issue.ItemCode,
                     ItemDescription = x.issue.ItemDescription,
                     Uom = x.issue.Uom,
-                    Category = "",
+                    Category = x.material.ItemCategory.ItemCategoryName,
                     Quantity = Math.Round(x.issue.Quantity, 2),
                     UnitCost = x.issue.UnitPrice.ToString(),
                     LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2).ToString(),
@@ -2048,7 +2875,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AccountTitle = x.issue.AccountTitles,
                     EmpId = x.issue.EmpId,
                     Fullname = x.issue.FullName,
-                    AssetTag = "",
+                    AssetTag = x.miscDetail.AssetTag,
                     CIPNo = "",
                     Helpdesk = "",
                     Rush = "",
@@ -2259,7 +3086,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     EmpId = x.fuel.FuelRegister.EmpId,
                     Fullname = x.fuel.FuelRegister.Fullname,
                     AssetTag = x.fuel.FuelRegister.Asset.AssetCode,
-                    CIPNo = "",
+                    CIPNo = x.fuel.FuelRegister.cipNo,
                     Helpdesk = "",
                     Rush = "",
                     OneChargingName = x.fuel.FuelRegister.OneChargingName,
@@ -2490,11 +3317,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                 .SelectMany(x => x.user.DefaultIfEmpty(), (x, user) => new { x.trans.moveOrder, x.trans.transMoveOrder, user })
                 .GroupJoin(_context.OneAccountTitles, user => user.moveOrder.AccountCode, account => account.AccountCode, (user, account) => new { user, account })
                 .SelectMany(x => x.account.DefaultIfEmpty(), (x, account) => new { x.user.moveOrder, x.user.transMoveOrder, x.user.user, account })
-                .GroupJoin(materials, account => account.moveOrder.ItemCode, material => material.ItemCode, (account, material) => new { account, material })
-                .SelectMany(x => x.material.DefaultIfEmpty(), (x, material) => new { x.account.moveOrder, x.account.transMoveOrder, x.account.user, x.account.account, material })
+                .GroupJoin(_context.WarehouseReceived, account => account.moveOrder.WarehouseId, ware => ware.Id, (account, ware) => new { account, ware })
+                .SelectMany(x => x.ware.DefaultIfEmpty(), (x, ware) => new { x.account.moveOrder, x.account.transMoveOrder, x.account.user, x.account.account, ware })
 
 
-                .Where(x => x.moveOrder.IsTransact == true)
+                .Where(x => x.moveOrder.IsTransact == true && x.moveOrder.IsActive == true && x.moveOrder.IsPrepared == true)
                 .Where(x => x.transMoveOrder.PreparedDate.Value.Date >= dateFrom && x.transMoveOrder.PreparedDate.Value.Date <= dateTo)
                 .Select(x => new ConsolidateAuditReportDto
                 {
@@ -2502,7 +3329,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     TransactionDate = x.transMoveOrder.PreparedDate.Value.Date.ToString(),
                     ItemCode = x.moveOrder.ItemCode,
                     ItemDescription = x.moveOrder.ItemDescription,
-                    Uom = x.material.Uom.UomCode,
+                    Uom = x.ware.Uom,
                     Category = x.moveOrder.Category,
                     Quantity = Math.Round(x.moveOrder.QuantityOrdered, 2),
                     UnitCost = x.moveOrder.UnitPrice.ToString(),
@@ -2549,7 +3376,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             (x, user) => new { x.receipt, x.warehouse, user })
                 .GroupJoin(_context.OneAccountTitles, user => user.warehouse.AccountCode, accountTitle => accountTitle.AccountCode, (user, accountTitle) => new { user, accountTitle })
                 .SelectMany(x => x.accountTitle.DefaultIfEmpty(), (x, accountTitle) => new { x.user.receipt, x.user.warehouse, x.user.user, accountTitle })
-               .Join(materials, account => account.warehouse.ItemCode, material => material.ItemCode, (x, material) => new { x.receipt, x.warehouse, x.user, x.accountTitle, material })
+               //.Join(materials, account => account.warehouse.ItemCode, material => material.ItemCode, (x, material) => new { x.receipt, x.warehouse, x.user, x.accountTitle, material })
                 .Where(x => x.warehouse.IsActive == true && x.warehouse.TransactionType == "MiscellaneousReceipt")
                 .Where(x => x.receipt.TransactionDate.Date >= dateFrom && x.receipt.TransactionDate.Date <= dateTo)
                 .Select(x => new ConsolidateAuditReportDto
@@ -2559,7 +3386,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ItemCode = x.warehouse.ItemCode,
                     ItemDescription = x.warehouse.ItemDescription,
                     Uom = x.warehouse.Uom,
-                    Category = x.material.ItemCategoryName,
+                    Category = "",
                     Quantity = x.warehouse.ActualGood,
                     UnitCost = x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice.ToString() : x.warehouse.PriceWithDecimal,
                     LineAmount = (x.warehouse.PriceWithDecimal == null ? x.warehouse.UnitPrice * x.warehouse.ActualGood : decimal.Parse(x.warehouse.PriceWithDecimal) * x.warehouse.ActualGood).ToString(),
@@ -2579,7 +3406,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AccountTitle = x.warehouse.AccountTitles,
                     EmpId = x.warehouse.EmpId,
                     Fullname = x.warehouse.FullName,
-                    AssetTag = "",
+                    AssetTag = x.receipt.AssetTag,
                     CIPNo = "",
                     Helpdesk = "",
                     //Remarks = x.receipt.Remarks,
@@ -2604,7 +3431,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
             (x, user) => new { x.miscDetail, x.issue, user })
                 .GroupJoin(_context.OneAccountTitles, user => user.issue.AccountCode, accountTitle => accountTitle.AccountCode, (user, accountTitle) => new { user, accountTitle })
                 .SelectMany(x => x.accountTitle.DefaultIfEmpty(), (x, accountTitle) => new { x.user.miscDetail, x.user.issue, x.user.user, accountTitle })
-                .Join(materials, account => account.issue.ItemCode, material => material.ItemCode, (x, material) => new { x.miscDetail, x.issue, x.user, x.accountTitle, material })
+                //.Join(materials, account => account.issue.ItemCode, material => material.ItemCode, (x, material) => new { x.miscDetail, x.issue, x.user, x.accountTitle, material })
                 .Where(x => x.issue.IsActive == true)
                 .Where(x => x.miscDetail.TransactionDate.Date >= dateFrom && x.miscDetail.TransactionDate.Date <= dateTo)
                 .Select(x => new ConsolidateAuditReportDto
@@ -2614,7 +3441,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     ItemCode = x.issue.ItemCode,
                     ItemDescription = x.issue.ItemDescription,
                     Uom = x.issue.Uom,
-                    Category = x.material.ItemCategoryName,
+                    Category = "",
                     Quantity = Math.Round(x.issue.Quantity, 2),
                     UnitCost = x.issue.UnitPrice.ToString(),
                     LineAmount = Math.Round(x.issue.UnitPrice * x.issue.Quantity, 2).ToString(),
@@ -2634,7 +3461,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.REPORTS_REPOSITORY
                     AccountTitle = x.issue.AccountTitles,
                     EmpId = x.issue.EmpId,
                     Fullname = x.issue.FullName,
-                    AssetTag = "",
+                    AssetTag = x.miscDetail.AssetTag,
                     CIPNo = "",
                     Helpdesk = "",
                     Rush = "",

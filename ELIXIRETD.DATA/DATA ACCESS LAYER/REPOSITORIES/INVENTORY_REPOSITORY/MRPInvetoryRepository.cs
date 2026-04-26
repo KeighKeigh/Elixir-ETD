@@ -95,7 +95,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
                                                            });
 
             var getMoveOrderOut = _context.MoveOrders.AsNoTracking().Where(x => x.IsActive == true)
-                                                    .Where(x => x.IsPrepared == true)
+                                                    .Where(x => x.IsPrepared == true && x.IsTransact == true)
                                                     .GroupBy(x => new
                                                     {
                                                         x.ItemCode,
@@ -234,7 +234,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
          var fuelRegister = _context.FuelRegisterDetails
         .AsNoTrackingWithIdentityResolution()
         .Include(m => m.Material)
-        .Where(fr => fr.Is_Active == true)
+        .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Transact == true)
         .GroupBy(fr => new
         {
             fr.Material.ItemCode,
@@ -380,11 +380,11 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
                                   ItemCode = total.Key.ItemCode,
                                   Reserve = total.Sum(x => x.warehouse.ActualGood != null ? x.warehouse.ActualGood : 0)
-                                  + total.Sum(x => x.returned.ReturnQuantity != null ? x.returned.ReturnQuantity : 0) 
-                                  - total.Sum(x => x.ordering.QuantityOrdered != null ? x.ordering.QuantityOrdered : 0)
-                                  - total.Sum(x => x.issue.Quantity != null ? x.issue.Quantity : 0)
-                                  - total.Sum(x => x.borrowed.Quantity != null ? x.borrowed.Quantity : 0) -
-                                    total.Sum(x => x.fuel.Quantity.Value)
+                                  + total.Sum(x => x.returned.ReturnQuantity != null ? x.returned.ReturnQuantity : 0)
+                                  - (total.Sum(x => x.ordering.QuantityOrdered != null ? x.ordering.QuantityOrdered : 0)
+                                  + total.Sum(x => x.issue.Quantity != null ? x.issue.Quantity : 0)
+                                  + total.Sum(x => x.borrowed.Quantity != null ? x.borrowed.Quantity : 0)
+                                  + total.Sum(x => x.fuel.Quantity.Value))
 
                               });
 
@@ -631,7 +631,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             var getfuelRegister = _context.FuelRegisterDetails
            .AsNoTrackingWithIdentityResolution()
            .Include(x => x.Material)
-           .Where(fr => fr.Is_Active == true)
+           .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Transact == true)
            .GroupBy(fr => new
            {
                fr.Material.ItemCode,
@@ -999,7 +999,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
           var fuelRegister = _context.FuelRegisterDetails
         .Include(m => m.Material)
-        .Where(fr => fr.Is_Active == true)
+        .Where(fr => fr.Is_Active == true && fr.FuelRegister.Is_Transact == true)
         .GroupBy(fr => new
         {
             fr.Material.ItemCode,
@@ -1237,16 +1237,13 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
 
                     UnitCost = (_context.WarehouseReceived
-                                .Where(r => r.IsActive == true && r.TransactionType == "Receiving" && r.ItemCode == x.ItemCode)
-                                .Sum(x => x.ActualGood) +
-                                _context.WarehouseReceived
-                                .AsNoTracking()
-                                .Where(mr => mr.IsActive == true && mr.TransactionType == "MiscellaneousReceipt" && mr.ItemCode == x.ItemCode)
+                                .Where(r => r.IsActive == true && r.ItemCode == x.ItemCode)
                                 .Sum(x => x.ActualGood) +
                                 _context.BorrowedIssueDetails
                                 .AsNoTracking()
                                 .Where(rb => rb.IsActive == true && rb.IsReturned == true && rb.IsApprovedReturned == true && rb.ItemCode == x.ItemCode)
-                                .Sum(x => x.Quantity)) -
+                                .Sum(x => x.Quantity)) 
+                                -
                                 (_context.MoveOrders
                                 .AsNoTracking()
                                 .Where(m => m.IsActive == true && m.IsPrepared == true && m.ItemCode == x.ItemCode)
@@ -1509,7 +1506,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
             var getMoveOrderOut = await _context.MoveOrders
                 .AsNoTracking()
-                .Where(x => x.IsActive == true && x.IsPrepared == true)
+                .Where(x => x.IsActive == true && x.IsPrepared == true && x.IsTransact == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1815,7 +1812,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
             var getMoveOrderoutPerMonth = await _context.MoveOrders
                 .AsNoTracking()
                 .Where(x => x.PreparedDate >= StartDate && x.PreparedDate <= EndDate)
-                .Where(x => x.IsActive == true && x.IsPrepared == true)
+                .Where(x => x.IsActive == true && x.IsPrepared == true && x.IsTransact == true)
                 .GroupBy(x => new
                 {
                     x.ItemCode,
@@ -1946,7 +1943,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.REPOSITORIES.INVENTORY_REPOSITORY
 
             var getMoveOrderOutid = await _context.MoveOrders
                 .AsNoTracking()
-                .Where(x => x.IsActive == true && x.IsPrepared == true)
+                .Where(x => x.IsActive == true && x.IsPrepared == true && x.IsTransact == true)
                 .GroupBy(x => new
                 {
                     x.WarehouseId,

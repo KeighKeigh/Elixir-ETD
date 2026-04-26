@@ -19,12 +19,32 @@ namespace RDF.Arcana.API.Features.Authenticate.AuthXApi
 
             var apiKey = configuration.GetValue<string>(AuthConstants.ApiKeySectionName);
 
-            if (!context.HttpContext.Request.Headers.TryGetValue(AuthConstants.ApiKeyHeaderName, out var extractedApiKey) ||
-                string.IsNullOrEmpty(apiKey) ||
-                !apiKey.Equals(extractedApiKey))
+            string[] headerNames = { "X-Api-Key", "Api-Key" };
+
+            string extractedKey = null;
+
+            foreach (var header in headerNames)
+            {
+                if (context.HttpContext.Request.Headers.TryGetValue(header, out var value))
+                {
+                    extractedKey = value;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(extractedKey) || !apiKey.Equals(extractedKey))
             {
                 context.Result = new UnauthorizedObjectResult("Invalid or missing API Key");
             }
+
+            //var apiKey = configuration.GetValue<string>(AuthConstants.ApiKeySectionName);
+
+            //if (!context.HttpContext.Request.Headers.TryGetValue(AuthConstants.ApiKeyHeaderName, out var extractedApiKey) ||
+            //    string.IsNullOrEmpty(apiKey) ||
+            //    !apiKey.Equals(extractedApiKey))
+            //{
+            //    context.Result = new UnauthorizedObjectResult("Invalid or missing API Key");
+            //}
         }
     }
 }

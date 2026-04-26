@@ -34,7 +34,7 @@ namespace ELIXIRETD.API.Controllers.ONECHARGING_CONTROLLER
         {
 
             var apiKeyHeader = Request.Headers["Api-Key"].ToString();
-            var expectedApiKey = _config["Authentication:ApiKey"];
+            var expectedApiKey = _config["Authentication:Api-Key"];
 
 
 

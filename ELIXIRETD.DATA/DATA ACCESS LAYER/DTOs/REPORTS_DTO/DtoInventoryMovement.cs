@@ -30,7 +30,7 @@ namespace ELIXIRETD.DATA.DATA_ACCESS_LAYER.DTOs.REPORTS_DTO
         public decimal Ending { get; set; }
 
         public decimal CurrentStock { get; set; }
-        public decimal PurchaseOrder { get; set; }
+        public decimal? PurchaseOrder { get; set; }
         public decimal OtherPlus { get; set; }
 
 

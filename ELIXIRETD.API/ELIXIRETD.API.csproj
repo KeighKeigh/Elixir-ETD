@@ -48,6 +48,10 @@
     <ProjectReference Include="..\ELIXIRETD.DATA\ELIXIRETD.DATA.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\NewFolder\" />
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

@@ -3,8 +3,8 @@
     public class DtoWarehouseReceivingReports
     {
         public int WarehouseId { get; set; }
+        public string DeliveryDate { get; set; }
         public string ReceiveDate { get; set; }
-        public string ActualReceivingDate { get; set; }
         public string ItemCode { get; set; }
         public string ItemDescrption { get; set; }
         public string Category { get; set; }
@@ -21,6 +21,7 @@
         public string TransactionType { get; set; }
         public string UnitPrice { get; set; }
         public string Amount { get; set; }
+        public string ItemRemarks { get; set; }
 
     }
 }
